@@ -16,7 +16,8 @@ const DashboardPage = lazy(() => import("@pages/DashboardPage"));
 const CategoryForm = lazy(() => import("@components/Category/CategoryForm"));
 const ProductForm = lazy(() => import("@components/Product/ProductForm"));
 const InventoryForm = lazy(() => import("@components/Inventory/InventoryForm"));
-const ShopForm = lazy(()=> import("@components/Shop/ShopForm"))
+const ShopForm = lazy(()=> import("@components/Shop/ShopForm"));
+const MainPage = lazy(()=> import("@pages/MainPage/MainPage"));
 
 function App() {
   const theme = localStorage.getItem('theme');
@@ -27,7 +28,8 @@ function App() {
   return (
     <Suspense fallback={<Loading />}>
         <Routes>
-          <Route path="/" element={<Login />}/>
+          <Route path="/" element={<MainPage />}/>
+          <Route path="/login" element={<Login />}/>
           <Route path="/signup" element={<Signup />}/>
           <Route path="/dashboard/*" element={<DashboardPage />}/>
           <Route path="/create-category" element={<CategoryForm />}/>
