@@ -3,7 +3,7 @@ import ButtonComponent from "@common/ButtonComponent";
 import InputTextComponent from "@common/InputTextComponent";
 import FileUpload from "@common/FileUpload";
 import DropdownComponent from "@common/DropdownComponent";
-import { allApi } from "@api/api";
+import { allApiWithHeaderToken } from "@api/api";
 
 // external libraries
 import * as yup from "yup";
@@ -45,7 +45,7 @@ const ShopForm = () => {
   };
 
   const createStock = (value) => {
-    allApi("stockManagement", value, "post")
+    allApiWithHeaderToken("shopDetails/addShopDetails", value, "post")
       .then(() => {
         navigate("/dashboard/stock-management");
       })
@@ -55,7 +55,7 @@ const ShopForm = () => {
   };
 
   const updateStock = (value) => {
-    allApi(`stockManagement/${id}`, value, "put")
+    allApiWithHeaderToken(`stockManagement/${id}`, value, "put")
       .then(() => {
         navigate("/dashboard/stock-management");
       })

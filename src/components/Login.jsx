@@ -14,7 +14,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 
 const data = {
-  email: "",
+  userName: "",
   password: "",
 };
 
@@ -25,10 +25,9 @@ const Login = () => {
   const navigate = useNavigate();
 
   const validationSchema = yup.object().shape({
-    email: yup
+    userName: yup
       .string()
-      .email(t("please_enter_valid_email"))
-      .required(t("email_is_required")),
+      .required(t("userName_is_required")),
     password: yup
       .string()
       .min(6, t("please_enter_password_more_then_6_characters"))
@@ -37,13 +36,13 @@ const Login = () => {
   });
 
   const onHandleSubmit = async (value) => {
-    allApi("users", value, "post")
+    allApi("admin/login", value, "post")
       .then((response) => {
-        if (checked) {
-          localStorage.setItem("keepMeLoggedIn", true);
+        if(response?.status == 200){
+          localStorage.setItem("userDetails", JSON.stringify(response?.data?.data));
+          localStorage.setItem("token", JSON.stringify(response?.data?.data?.authoriztion));
+          navigate("/dashboard");
         }
-        localStorage.setItem("userDetails", JSON.stringify(response?.userDetails));
-        navigate("/dashboard");
       })
       .catch((err) => {
         console.log("err", err);
@@ -73,13 +72,13 @@ const Login = () => {
         </div>
         <div className="mt-2 flex flex-col gap-2">
           <InputTextComponent
-            value={values?.email}
+            value={values?.userName}
             onChange={handleChange}
-            type="email"
-            placeholder={t("your_email")}
-            name="email"
-            error={errors?.email}
-            touched={touched?.email}
+            type="userName"
+            placeholder={t("your_user_name")}
+            name="userName"
+            error={errors?.userName}
+            touched={touched?.userName}
             className="w-full rounded border-[1px] border-[#ddd] px-[1rem] py-[8px] text-[11px] focus:outline-none"
           />
           <InputTextComponent
@@ -95,15 +94,6 @@ const Login = () => {
         </div>
         <div className="mt-2 flex items-center justify-between">
           <div className="flex gap-2">
-            <div>
-              <input
-                type="checkbox"
-                onChange={() => {
-                  setChecked(!checked);
-                }}
-              />
-            </div>
-            <div className="text-[0.8rem]">{t("keep_me_logged_in")}</div>
           </div>
           <div className="z-10 text-[0.8rem] text-BgTertiaryColor underline underline-offset-2 hover:cursor-pointer">
             <Link href="/forgot-password">{t("forgot_password")}</Link>

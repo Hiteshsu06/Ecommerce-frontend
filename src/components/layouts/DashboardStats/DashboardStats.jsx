@@ -102,7 +102,7 @@ const DashboardStats = () => {
           </div>
         </div>
       </div>
-      <div class="grid grid-cols-1 gap-4 mt-16">
+      <div className="grid grid-cols-1 gap-4 mt-16">
         <div className="flex justify-end">
             <Chart
                 options={linechart.options}
@@ -113,7 +113,7 @@ const DashboardStats = () => {
             />
         </div>
       </div>
-      <div class="grid grid-cols-2 gap-4 mt-4">
+      <div className="grid grid-cols-2 gap-4 mt-4">
         <div className="flex justify-center"> 
         <Chart 
             options={donutChart.options} 
