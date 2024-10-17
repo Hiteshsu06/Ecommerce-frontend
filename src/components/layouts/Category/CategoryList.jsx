@@ -1,5 +1,5 @@
 // hooks
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 
@@ -9,8 +9,12 @@ import DataTable from "@common/DataTable";
 import ButtonComponent from "@common/ButtonComponent";
 import Confirmbox from "@common/Confirmbox";
 import { allApi } from "@api/api";
+import { ROUTES_CONSTANTS } from "../../../constants/routesurl";
+import { API_CONSTANTS } from "../../../constants/apiurl";
+import { Toast } from "primereact/toast";
 
 const CatergoryList = () => {
+  const toast = useRef(null);
   const { t } = useTranslation("msg");
   const navigate = useNavigate();
   const [isConfirm, setIsConfirm] = useState(false);
@@ -18,8 +22,8 @@ const CatergoryList = () => {
   const item = {
     heading: t("category"),
     routes: [
-      { label: t("dashboard"), route: "/dashboard" },
-      { label: t("category"), route: "/dashboard" },
+      { label: t("dashboard"), route: ROUTES_CONSTANTS.DASHBOARD },
+      { label: t("category"), route: ROUTES_CONSTANTS.CATEGORIES },
     ],
   };
 
@@ -41,8 +45,8 @@ const CatergoryList = () => {
     );
   };
   const columns = [
-    { field: "name", header: t("name") },
-    { field: "description", header: t("description") },
+    { field: "categoryType", header: t("name") },
+    { field: "categoryDesc", header: t("description") },
     { header: t("action"), body: actionBodyTemplate, headerStyle: { paddingLeft: '3%'} },
   ];
 
@@ -52,7 +56,7 @@ const CatergoryList = () => {
 
   const confirmDeleteCategory = (item) => {
     setIsConfirm(!isConfirm);
-    setDeleteId(item?.id);
+    setDeleteId(item?.categoryId);
   };
 
   const closeDialogbox = () => {
@@ -62,23 +66,58 @@ const CatergoryList = () => {
 
   const confirmDialogbox = () => {
     setIsConfirm(!isConfirm);
-    allApi(`category/${deleteId}`, "", "delete")
+    allApi(API_CONSTANTS.DELETE_CATEGORY_DETAILS, { id: deleteId }, "post")
       .then((response) => {
-        fetchCategoryList();
+        if (response.status === 200 && response.data.status.toLowerCase() === "success") {
+          fetchCategoryList();
+        } else {
+          toast.current.show({
+            severity: "error",
+            summary: "Error",
+            detail: response?.data?.statusMessage,
+            life: 3000,
+          });
+        }
       })
       .catch((err) => {
-        console.log("err", err);
+        console.error("err", err);
+        toast.current.show({
+          severity: "error",
+          summary: "Error",
+          detail: "Something Went Wrong",
+          life: 3000,
+        });
       });
   };
 
   const fetchCategoryList = () => {
     // To get all users stored in json
-    allApi("category", "", "get")
+    allApi(API_CONSTANTS.GET_ALL_CATEGORY_DETAILS, {
+        "pageNo" : "1",
+        "limit" : "1000",
+        "searchText" : "",
+        "categoryId" : null
+    }, "post")
       .then((response) => {
-        setData(response?.data);
+        if (response.status === 200 && response.data?.status.toLowerCase() === "success") {
+          setData(response?.data?.data);
+        } else {
+          toast.current.show({
+            severity: "error",
+            summary: "Error",
+            detail: response?.data?.data?.statusMessage,
+            life: 3000,
+          });
+        }
       })
       .catch((err) => {
-        console.log("err", err);
+        console.error("err", err);
+        toast.current.show({
+          severity: "error",
+          summary: "Error",
+          detail: "Something Went Wrong",
+          life: 3000,
+        });
       });
   };
 
@@ -92,6 +131,7 @@ const CatergoryList = () => {
 
   return (
     <div className="text-TextPrimaryColor">
+      <Toast ref={toast} position="top-right" />
       <Confirmbox
         isConfirm={isConfirm}
         closeDialogbox={closeDialogbox}

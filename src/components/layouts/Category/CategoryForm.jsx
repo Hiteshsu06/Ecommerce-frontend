@@ -9,25 +9,31 @@ import * as yup from "yup";
 import { useFormik } from "formik";
 import { useNavigate, useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { Toast } from "primereact/toast";
+import { API_CONSTANTS } from "../../../constants/apiurl";
+import { ROUTES_CONSTANTS } from "../../../constants/routesurl";
 
 const structure = {
-  name: "",
-  description: ""
+  categoryType: "",
+  categoryDescription: ""
 };
 
 const CategoryForm = () => {
+  const toast = useRef(null);
   const { t } = useTranslation("msg");
   const navigate = useNavigate();
   const [data, setData] = useState(structure);
   const { id } = useParams();
 
   const validationSchema = yup.object().shape({
-    name: yup.string().required(t("name_is_required")),
-    description: yup.string().required(t("description_is_required"))
+    categoryType: yup.string().required(t("name_is_required")),
+    categoryDescription: yup.string().required(t("description_is_required"))
   });
 
   const onHandleSubmit = async (value) => {
+          console.log("value", value);
+
     if (id) {
       // Update
       updateCategory(value);
@@ -38,9 +44,9 @@ const CategoryForm = () => {
   };
 
   const createCategory = (value) => {
-    allApi("category", value, "post")
+    allApi(API_CONSTANTS.ADD_UPDATE_CATEGORY_DETAILS, value, "post")
       .then(() => {
-        navigate("/dashboard");
+        navigate(ROUTES_CONSTANTS.CATEGORIES);
       })
       .catch((err) => {
         console.log("err", err);
@@ -48,7 +54,8 @@ const CategoryForm = () => {
   };
 
   const updateCategory = (value) => {
-    allApi(`category/${id}`, value, "put")
+    value.categoryId = id;
+    allApi(API_CONSTANTS.ADD_UPDATE_CATEGORY_DETAILS, value, "put")
       .then(() => {
         navigate("/dashboard");
       })
@@ -65,10 +72,25 @@ const CategoryForm = () => {
     if (id) {
       allApi(`category/${id}`, "", "get")
         .then((response) => {
-          setData(response?.data);
+          if (response.status === 200 && response.data.status.toLowerCase() === "success") {
+            setData(response?.data);
+          } else {
+            toast.current.show({
+              severity: "error",
+              summary: "Error",
+              detail: response?.data?.statusMessage,
+              life: 3000,
+            });
+          }
         })
         .catch((err) => {
-          console.log("err", err);
+          console.error("err", err);
+          toast.current.show({
+            severity: "error",
+            summary: "Error",
+            detail: "Something Went Wrong",
+            life: 3000,
+          });
         });
     }
   }, []);
@@ -82,39 +104,38 @@ const CategoryForm = () => {
   });
 
   const { values, errors, handleSubmit, handleChange, touched } = formik;
-
+ console.log("errors",errors)
   return (
     <div className="flex h-screen bg-BgPrimaryColor">
+      <Toast ref={toast} position="top-right" />
       <div className="mx-16 my-auto grid h-fit w-full grid-cols-4 gap-4 bg-BgSecondaryColor p-8 border rounded border-BorderColor">
         <div className="col-span-4">
-             {t("create_category")}
+            {t("create_category")}
         </div>
-        <div className="col-span-4">
-            <FileUpload/>
-        </div>
+        
         <div className="col-span-2">
           <InputTextComponent
-            value={values?.name}
+            value={values?.categoryType}
             onChange={handleChange}
-            type="name"
+            type="text"
             placeholder={t("category_name")}
-            name="name"
+            name="categoryType"
             isLabel={true}
-            error={errors?.name}
-            touched={touched?.name}
+            error={errors?.categoryType}
+            touched={touched?.categoryType}
             className="w-full rounded border-[1px] border-[#ddd] px-[1rem] py-[8px] text-[11px] focus:outline-none"
           />
         </div>
         <div className="col-span-2">
           <InputTextComponent
-            value={values?.description}
+            value={values?.categoryDescription}
             onChange={handleChange}
-            type="description"
+            type="text"
             placeholder={t("category_description")}
-            name="description"
+            name="categoryDescription"
             isLabel={true}
-            error={errors?.description}
-            touched={touched?.description}
+            error={errors?.categoryDescription}
+            touched={touched?.categoryDescription}
             className="col-span-2 w-full rounded border-[1px] border-[#ddd] px-[1rem] py-[8px] text-[11px] focus:outline-none"
           />
         </div>

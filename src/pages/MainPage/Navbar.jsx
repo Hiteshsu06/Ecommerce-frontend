@@ -28,7 +28,7 @@ const Navbar = ({categories}) => {
             <div className='col-span-8 flex flex-wrap gap-10 text[#1F1F1F] items-center'>
                {categories?.map((item)=>{
                     return(
-                        <NavbarSubmenu data={item}/>
+                        <NavbarSubmenu data={item} key={item.id? item.id : Math.random()}/>
                 )
                })}
             </div>

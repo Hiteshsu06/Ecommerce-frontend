@@ -2,7 +2,6 @@
 import ButtonComponent from "@common/ButtonComponent";
 import InputTextComponent from "@common/InputTextComponent";
 import FileUpload from "@common/FileUpload";
-import DropdownComponent from "@common/DropdownComponent";
 import { allApi } from "@api/api";
 
 // external libraries
@@ -10,6 +9,11 @@ import * as yup from "yup";
 import { useFormik } from "formik";
 import { useNavigate, useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
+import { Toast } from "primereact/toast";
+import { useRef } from "react";
+import { API_CONSTANTS } from "../../../constants/apiurl";
+import { ROUTES_CONSTANTS } from "../../../constants/routesurl";
+import { allApiWithHeaderToken } from "../../../api/api";
 
 const data = {
   category: "",
@@ -21,6 +25,7 @@ const data = {
 };
 
 const ProductForm = () => {
+  const toast = useRef(null);
   const { t } = useTranslation("msg");
   const navigate = useNavigate();
   const { id } = useParams();
@@ -45,22 +50,52 @@ const ProductForm = () => {
   };
 
   const createStock = (value) => {
-    allApi("stockManagement", value, "post")
-      .then(() => {
-        navigate("/dashboard/stock-management");
+    allApiWithHeaderToken(API_CONSTANTS.ADD_UPDATE_PRODUCT_DETAILS, value, "post",'multipart/form-data')
+      .then((response) => {
+        if (response.status === 200 && response.data.status.toLowerCase() === "success") {
+          navigate(ROUTES_CONSTANTS.STOCK_MANAGEMENT);
+        } else {
+          toast.current.show({
+            severity: "error",
+            summary: "Error",
+            detail: response?.data?.statusMessage,
+            life: 3000,
+          });
+        }
       })
       .catch((err) => {
-        console.log("err", err);
+        console.error("err", err);
+        toast.current.show({
+            severity: "error",
+            summary: "Error",
+            detail: "Something went wrong",
+            life: 3000,
+        });
       });
   };
 
   const updateStock = (value) => {
-    allApi(`stockManagement/${id}`, value, "put")
-      .then(() => {
-        navigate("/dashboard/stock-management");
+    allApi(API_CONSTANTS.ADD_UPDATE_PRODUCT_DETAILS, value, "post")
+      .then((response) => {
+        if (response.status === 200 && response.data.status.toLowerCase() === "success") {
+          navigate(ROUTES_CONSTANTS.STOCK_MANAGEMENT);
+        }else {
+          toast.current.show({
+            severity: "error",
+            summary: "Error",
+            detail: response?.data?.statusMessage,
+            life: 3000,
+          });
+        }
       })
       .catch((err) => {
-        console.log("err", err);
+        console.error("err", err);
+        toast.current.show({
+            severity: "error",
+            summary: "Error",
+            detail: "Something went wrong",
+            life: 3000,
+        });
       });
   };
 
@@ -79,9 +114,10 @@ const ProductForm = () => {
   const { values, errors, handleSubmit, handleChange, touched } = formik;
   return (
     <div className="flex h-screen bg-BgPrimaryColor">
+      <Toast ref={toast} position="top-right" />
       <div className="mx-16 my-auto grid h-fit w-full grid-cols-4 gap-4 bg-BgSecondaryColor p-8 border rounded border-BorderColor">
         <div className="col-span-4">
-             {t("create_product")}
+            {t("create_product")}
         </div>
         <div className="col-span-4">
             <FileUpload/>

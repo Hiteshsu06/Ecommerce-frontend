@@ -48,7 +48,7 @@ const AvatarProfile = ({ size, shape, userDetails }) => {
       label: t("logout"),
       icon: "ri-logout-circle-r-line",
       command: () => {
-        navigate("/");
+        navigate("/login");
         let theme = localStorage.getItem("theme");
         localStorage.clear();
         localStorage.setItem("theme", theme);
@@ -59,8 +59,8 @@ const AvatarProfile = ({ size, shape, userDetails }) => {
   return (
     <div className="card justify-content-center flex text-TextPrimaryColor">
       <div className="me-4">
-        <div className="text-[0.8rem]">{userDetails?.firstname || 'Test Name'}</div>
-        <div className="text-[0.6rem]">{t("super_admin")}</div>
+        <div className="text-[0.8rem]">{userDetails?.firstName || 'Test Name'}</div>
+        <div className="text-[0.6rem]">{userDetails?.role}</div>
       </div>
       <Avatar
         image="https://primefaces.org/cdn/primereact/images/avatar/amyelsner.png"

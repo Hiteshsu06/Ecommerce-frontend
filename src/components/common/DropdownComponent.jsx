@@ -15,7 +15,7 @@ const DropdownComponent = ({selectedCity, cities, optionLabel, placeholder, clas
             optionLabel={optionLabel}
             placeholder={placeholder}
             className={className}
-         />
+        />
     </div>
   )
 }

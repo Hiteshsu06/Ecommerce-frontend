@@ -2,7 +2,6 @@
 import ButtonComponent from "@common/ButtonComponent";
 import InputTextComponent from "@common/InputTextComponent";
 import FileUpload from "@common/FileUpload";
-import DropdownComponent from "@common/DropdownComponent";
 import { allApiWithHeaderToken } from "@api/api";
 
 // external libraries
@@ -10,28 +9,44 @@ import * as yup from "yup";
 import { useFormik } from "formik";
 import { useNavigate, useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
+import { ROUTES_CONSTANTS } from "../../../constants/routesurl";
+import { useRef } from "react";
+import { Toast } from "primereact/toast";
+import { API_CONSTANTS } from "../../../constants/apiurl";
 
 const data = {
-  category: "",
-  productName: "",
-  price: "",
-  image: "",
-  qty: "",
-  shopName: ""
+  shopName: "",
+  addressLine1: "",
+  addressLine2: "",
+  addressLine3: "",
+  landmark: "",
+  district: "",
+  stateName: "",
+  pinCode: "",
+  country: "",
+  shopImageUrl: "",
+  shopImage: "",
+  city: "",
 };
 
 const ShopForm = () => {
+  const toast = useRef(null);
   const { t } = useTranslation("msg");
   const navigate = useNavigate();
   const { id } = useParams();
 
   const validationSchema = yup.object().shape({
-    category: yup.string().required(t("category_is_required")),
-    productName: yup.string().required(t("product_name_is_required")),
-    price: yup.string().required(t("price_is_required")),
-    qty: yup.string().required(t("qty_is_required")),
-    image: yup.string().required(t("image_is_required")),
-    shopName: yup.string().required(t("shop_name_is_required"))
+    shopName: yup.string().required(t("shopName_is_required")),
+    addressLine1: yup.string().required(),
+    addressLine2: yup.string(),
+    addressLine3: yup.string(),
+    landmark: yup.string(),
+    district: yup.string().required(t("district_is_required")),
+    stateName: yup.string().required(t("state_is_required")),
+    pinCode: yup.string().required(t("pincode_is_required")),
+    country: yup.string().required(t("country_is_required")),
+    shopImageUrl: yup.string(),
+    city: yup.string().required(),
   });
 
   const onHandleSubmit = async (value) => {
@@ -45,27 +60,60 @@ const ShopForm = () => {
   };
 
   const createStock = (value) => {
-    allApiWithHeaderToken("shopDetails/addShopDetails", value, "post")
-      .then(() => {
-        navigate("/dashboard/stock-management");
+    console.log("value", value);
+    value.userId = localStorage.getItem("id");
+    allApiWithHeaderToken(API_CONSTANTS.ADD_UPDATE_SHOP_DETAILS, value, "post", "multipart/form-data")
+      .then((response) => {
+        if(response?.status === 200 && response?.data?.status?.toLowerCase() === "success"){
+          navigate(ROUTES_CONSTANTS.SHOPS);
+        } else {
+          toast.current.show({
+            severity: "error",
+            summary: "Error",
+            detail: response?.data?.statusMessage,
+            life: 3000,
+          });
+        }
       })
       .catch((err) => {
-        console.log("err", err);
+        console.error("err", err);
+        toast.current.show({
+          severity: "error",
+          summary: "Error",
+          detail: "Something went wrong",
+          life: 3000,
+        });
       });
   };
 
   const updateStock = (value) => {
-    allApiWithHeaderToken(`stockManagement/${id}`, value, "put")
-      .then(() => {
-        navigate("/dashboard/stock-management");
+    value.shopDtlsId=id;
+    allApiWithHeaderToken(API_CONSTANTS.ADD_UPDATE_SHOP_DETAILS, value, "POST")
+      .then((response) => {
+        if(response?.status === 200 && response?.data?.status?.toLowerCase() === "success"){
+          navigate(ROUTES_CONSTANTS.SHOPS);
+        } else {
+          toast.current.show({
+            severity: "error",
+            summary: "Error",
+            detail: response?.data?.statusMessage,
+            life: 3000,
+          });
+        }
       })
       .catch((err) => {
-        console.log("err", err);
+        console.error("err", err);
+        toast.current.show({
+          severity: "error",
+          summary: "Error",
+          detail: "Something went wrong",
+          life: 3000,
+        });
       });
   };
 
   const handleBack = () => {
-    navigate("/dashboard/products");
+    navigate(ROUTES_CONSTANTS.PRODUCTS);
   };
 
   const formik = useFormik({
@@ -76,67 +124,23 @@ const ShopForm = () => {
     validateOnBlur: true,
   });
 
-  const { values, errors, handleSubmit, handleChange, touched } = formik;
+  const { values, errors, handleSubmit,setFieldValue, handleChange, touched } = formik;
   return (
     <div className="flex h-screen bg-BgPrimaryColor">
+      <Toast ref={toast} position="top-right" />
       <div className="mx-16 my-auto grid h-fit w-full grid-cols-4 gap-4 bg-BgSecondaryColor p-8 border rounded border-BorderColor">
         <div className="col-span-4">
-             {t("create_shop")}
+            {t("create_shop")}
         </div>
         <div className="col-span-4">
-            <FileUpload/>
-        </div>
-        <div className="col-span-2">
-          <InputTextComponent
-            value={values?.category}
-            onChange={handleChange}
-            type="category"
-            placeholder={t("category")}
-            name="category"
-            isLabel={true}
-            error={errors?.category}
-            touched={touched?.category}
-            className="w-full rounded border-[1px] border-[#ddd] px-[1rem] py-[8px] text-[11px] focus:outline-none"
-          />
-        </div>
-        <div className="col-span-2">
-          <InputTextComponent
-            value={values?.productName}
-            onChange={handleChange}
-            type="productName"
-            placeholder={t("product_name")}
-            name="productName"
-            isLabel={true}
-            error={errors?.productName}
-            touched={touched?.productName}
-            className="col-span-2 w-full rounded border-[1px] border-[#ddd] px-[1rem] py-[8px] text-[11px] focus:outline-none"
-          />
-        </div>
-        <div className="col-span-2">
-          <InputTextComponent
-            value={values?.price}
-            onChange={handleChange}
-            type="price"
-            placeholder={t("price")}
-            name="price"
-            isLabel={true}
-            error={errors?.price}
-            touched={touched?.price}
-            className="col-span-2 w-full rounded border-[1px] border-[#ddd] px-[1rem] py-[8px] text-[11px] focus:outline-none"
-          />
-        </div>
-        <div className="col-span-2">
-          <InputTextComponent
-            value={values?.qty}
-            onChange={handleChange}
-            type="qty"
-            placeholder={t("qty")}
-            name="qty"
-            isLabel={true}
-            error={errors?.qty}
-            touched={touched?.qty}
-            className="col-span-2 w-full rounded border-[1px] border-[#ddd] px-[1rem] py-[8px] text-[11px] focus:outline-none"
-          />
+            <FileUpload 
+              isLabel={t("stock_long_term_chart")}
+              value={values?.shopImage}
+              name="shopImageUrl"
+              onChange={(e)=> {
+                setFieldValue('shopImageUrl', e?.currentTarget?.files[0]);
+                setFieldValue('shopImage', URL.createObjectURL(e?.target?.files[0]));
+              }}/>    
         </div>
         <div className="col-span-2">
           <InputTextComponent
@@ -148,6 +152,123 @@ const ShopForm = () => {
             isLabel={true}
             error={errors?.shopName}
             touched={touched?.shopName}
+            className="w-full rounded border-[1px] border-[#ddd] px-[1rem] py-[8px] text-[11px] focus:outline-none"
+          />
+        </div>
+        <div className="col-span-2">
+          <InputTextComponent
+            value={values?.addressLine1}
+            onChange={handleChange}
+            type="addressLine1"
+            placeholder={t("addressLine1")}
+            name="addressLine1"
+            isLabel={true}
+            error={errors?.addressLine1}
+            touched={touched?.addressLine1}
+            className="col-span-2 w-full rounded border-[1px] border-[#ddd] px-[1rem] py-[8px] text-[11px] focus:outline-none"
+          />
+        </div>
+        <div className="col-span-2">
+          <InputTextComponent
+            value={values?.addressLine2}
+            onChange={handleChange}
+            type="addressLine2"
+            placeholder={t("addressLine2")}
+            name="addressLine2"
+            isLabel={true}
+            error={errors?.addressLine2}
+            touched={touched?.addressLine2}
+            className="col-span-2 w-full rounded border-[1px] border-[#ddd] px-[1rem] py-[8px] text-[11px] focus:outline-none"
+          />
+        </div>
+        <div className="col-span-2">
+          <InputTextComponent
+            value={values?.addressLine3}
+            onChange={handleChange}
+            type="addressLine3"
+            placeholder={t("addressLine3")}
+            name="addressLine3"
+            isLabel={true}
+            error={errors?.addressLine3}
+            touched={touched?.addressLine3}
+            className="col-span-2 w-full rounded border-[1px] border-[#ddd] px-[1rem] py-[8px] text-[11px] focus:outline-none"
+          />
+        </div>
+        <div className="col-span-2">
+          <InputTextComponent
+            value={values?.landmark}
+            onChange={handleChange}
+            type="landmark"
+            placeholder={t("landmark")}
+            name="landmark"
+            isLabel={true}
+            error={errors?.landmark}
+            touched={touched?.landmark}
+            className="col-span-2 w-full rounded border-[1px] border-[#ddd] px-[1rem] py-[8px] text-[11px] focus:outline-none"
+          />
+        </div>
+        <div className="col-span-2">
+          <InputTextComponent
+            value={values?.district}
+            onChange={handleChange}
+            type="district"
+            placeholder={t("district")}
+            name="district"
+            isLabel={true}
+            error={errors?.district}
+            touched={touched?.district}
+            className="col-span-2 w-full rounded border-[1px] border-[#ddd] px-[1rem] py-[8px] text-[11px] focus:outline-none"
+          />
+        </div>
+        <div className="col-span-2">
+          <InputTextComponent
+            value={values?.stateName}
+            onChange={handleChange}
+            type="stateName"
+            placeholder={t("stateName")}
+            name="stateName"
+            isLabel={true}
+            error={errors?.stateName}
+            touched={touched?.stateName}
+            className="col-span-2 w-full rounded border-[1px] border-[#ddd] px-[1rem] py-[8px] text-[11px] focus:outline-none"
+          />
+        </div>
+        <div className="col-span-2">
+          <InputTextComponent
+            value={values?.pinCode}
+            onChange={handleChange}
+            type="pincode"
+            placeholder={t("pincode")}
+            name="pinCode"
+            isLabel={true}
+            error={errors?.pinCode}
+            touched={touched?.pinCode}
+            className="col-span-2 w-full rounded border-[1px] border-[#ddd] px-[1rem] py-[8px] text-[11px] focus:outline-none"
+          />
+        </div>
+        <div className="col-span-2">
+          <InputTextComponent
+            value={values?.city}
+            onChange={handleChange}
+            type="city"
+            placeholder={t("city")}
+            name="city"
+            isLabel={true}
+            error={errors?.city}
+            touched={touched?.city}
+            className="col-span-2 w-full rounded border-[1px] border-[#ddd] px-[1rem] py-[8px] text-[11px] focus:outline-none"
+          />
+        </div>
+        <div className="col-span-2">
+          <InputTextComponent
+            value={values?.country}
+            onChange={handleChange}
+            type="country"
+            placeholder={t("country")}
+            name="country"
+            isLabel={true}
+            error={errors?.country}
+            touched={touched?.country}
             className="col-span-2 w-full rounded border-[1px] border-[#ddd] px-[1rem] py-[8px] text-[11px] focus:outline-none"
           />
         </div>

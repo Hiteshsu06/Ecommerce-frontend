@@ -1,5 +1,5 @@
 // hooks
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 
@@ -8,9 +8,14 @@ import Breadcrum from "@common/Breadcrum";
 import DataTable from "@common/DataTable";
 import ButtonComponent from "@common/ButtonComponent";
 import Confirmbox from "@common/Confirmbox";
-import { allApi } from "@api/api";
+import { allApiWithHeaderToken } from "@api/api";
+import { Toast } from "primereact/toast";
+import { API_CONSTANTS } from "../../../constants/apiurl";
+import { ROUTES_CONSTANTS } from "../../../constants/routesurl";
+import { allApi } from "../../../api/api";
 
 const ShopList = () => {
+  const toast = useRef(null);
   const [data, setData] = useState([]);
   const { t } = useTranslation("msg");
   const navigate = useNavigate();
@@ -20,8 +25,8 @@ const ShopList = () => {
   const item = {
     heading: t("shop"),
     routes: [
-      { label: t("dashboard"), route: "/dashboard" },
-      { label: t("shop"), route: "/dashboard/shops" },
+      { label: t("dashboard"), route: ROUTES_CONSTANTS.DASHBOARD },
+      { label: t("shop"), route: ROUTES_CONSTANTS.SHOPS },
     ],
   };
 
@@ -42,12 +47,14 @@ const ShopList = () => {
     );
   };
   const columns = [
-    { field: "name", header: t("name") },
-    { field: "description", header: t("description") },
-    { field: "gstNo", header: t("gst_no") },
-    { field: "image", header: t("image") },
-    { field: "address", header: t("address") },
-    { field: "contactNumber", header: t("contact_number") },
+    { field: "shopName", header: t("name") },
+    { header: t("address"), body: (data) => data?.addressLine1 + " " + data?.addressLine2 + " " + data?.addressLine3 },
+    { field: "landmark", header: t("landmark") },
+    { field: "pinCode", header: t("pinCode") },
+    { field: "city", header: t("city") },
+    { field: "district", header: t("district") },
+    { field: "stateName", header: t("stateName") },
+    { field: "country", header: t("country") },
     { header: t("action"), body: actionBodyTemplate, headerStyle: { paddingLeft: '3%'} },
   ];
 
@@ -67,12 +74,33 @@ const ShopList = () => {
 
   const confirmDialogbox = () => {
     setIsConfirm(!isConfirm);
-    allApi(`shop/${deleteId}`, "", "delete")
+    allApiWithHeaderToken(API_CONSTANTS.DELETE_SHOP_DETAILS, { id: deleteId }, "post")
       .then((response) => {
-        fetchShopList();
+        if (response.status === 200 && response.data.status.toLowerCase() === "success") {
+          toast.current.show({
+            severity: "success",
+            summary: "Success",
+            detail: "Shop deleted successfully",
+            life: 3000,
+          });
+          fetchShopList();
+        } else {
+          toast.current.show({
+            severity: "error",
+            summary: "Error",
+            detail: response?.data?.statusMessage,
+            life: 3000,
+          });
+        }
       })
       .catch((err) => {
-        console.log("err", err);
+        console.error("err", err);
+        toast.current.show({
+            severity: "error",
+            summary: "Error",
+            detail: "Invalid Username or Password",
+            life: 3000,
+        });
       });
   };
 
@@ -82,21 +110,39 @@ const ShopList = () => {
 
   const fetchShopList = () => {
     // To get all stocks stored in json
-    allApi("shop", "", "get")
+    allApiWithHeaderToken(API_CONSTANTS.GET_ALL_SHOP_DETAILS, {
+      id: localStorage.getItem("id"),
+    }, "post")
       .then((response) => {
-        setData(response?.data);
+        if (response.status === 200 && response.data.status.toLowerCase() === "success") {
+          setData(response?.data?.data);
+        } else {
+          toast.current.show({
+            severity: "error",
+            summary: "Error",
+            detail: response?.data?.statusMessage,
+            life: 3000,
+          });
+        }
       })
       .catch((err) => {
-        console.log("err", err);
+        console.error("err", err);
+        toast.current.show({
+            severity: "error",
+            summary: "Error",
+            detail: "Something went wrong",
+            life: 3000,
+        });
       });
   };
 
   const createShop = () => {
-    navigate("/create-shop");
+    navigate(ROUTES_CONSTANTS.CREATE_SHOP);
   };
 
   return (
     <div className="text-TextPrimaryColor">
+      <Toast ref={toast} position="top-right" />
       <Confirmbox
         isConfirm={isConfirm}
         closeDialogbox={closeDialogbox}

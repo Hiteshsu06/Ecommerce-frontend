@@ -1,6 +1,7 @@
 import { Menu } from "primereact/menu";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
+import { ROUTES_CONSTANTS } from "../constants/routesurl";
 
 const Sidebar = () => {
   const { t } = useTranslation("msg");
@@ -10,35 +11,35 @@ const Sidebar = () => {
       label: t("dashboard"),
       icon: "ri-dashboard-line",
       command: () => {
-        navigate("/dashboard");
+        navigate(ROUTES_CONSTANTS.DASHBOARD);
       },
     },
     {
       label: t("shops"),
       icon: "ri-store-3-line",
       command: () => {
-        navigate("/dashboard/shops");
+        navigate(ROUTES_CONSTANTS.SHOPS);
       },
     },
     {
       label: t("categories"),
       icon: "ri-archive-drawer-line",
       command: () => {
-        navigate("/dashboard/categories");
+        navigate(ROUTES_CONSTANTS.CATEGORIES);
       },
     },
     {
       label: t("products"),
       icon: "ri-instance-line",
       command: () => {
-        navigate("/dashboard/products");
+        navigate(ROUTES_CONSTANTS.PRODUCTS);
       },
     },
     {
       label: t("inventory"),
       icon: "ri-archive-stack-line",
       command: () => {
-        navigate("/dashboard/inventory");
+        navigate(ROUTES_CONSTANTS.INVENTORY);
       },
     },
   ];

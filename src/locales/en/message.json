@@ -77,5 +77,6 @@
    "create_shop" : "Create Shop",
    "gst_no" : "GST No.",
    "gujrati" : "Gujrati",
-   "import_products" : "Import Products"
+   "import_products" : "Import Products",
+   "your_user_name": "Your User Name"
 }

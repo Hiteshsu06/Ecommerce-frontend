@@ -12,6 +12,8 @@ import { useFormik } from "formik";
 import { Toast } from "primereact/toast";
 import { Link, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
+import { ROUTES_CONSTANTS } from "../constants/routesurl";
+import { API_CONSTANTS } from "../constants/apiurl";
 
 const data = {
   userName: "",
@@ -36,16 +38,30 @@ const Login = () => {
   });
 
   const onHandleSubmit = async (value) => {
-    allApi("admin/login", value, "post")
+    allApi(API_CONSTANTS.LOGIN, value, "post")
       .then((response) => {
-        if(response?.status == 200){
+        if(response?.status === 200 && response?.data?.status?.toLowerCase() === "success"){
+          localStorage.setItem("id",response?.data?.data?.userId);
           localStorage.setItem("userDetails", JSON.stringify(response?.data?.data));
           localStorage.setItem("token", JSON.stringify(response?.data?.data?.authoriztion));
-          navigate("/dashboard");
+          navigate(ROUTES_CONSTANTS.DASHBOARD);
+        } else {
+          toast.current.show({
+            severity: "error",
+            summary: "Error",
+            detail: "Invalid Username or Password",
+            life: 3000,
+          });
         }
       })
       .catch((err) => {
-        console.log("err", err);
+        console.error("err", err);
+        toast.current.show({
+          severity: "error",
+          summary: "Error",
+          detail: "Something went wrong",
+          life: 3000,
+        });
       });
   };
 

@@ -27,7 +27,7 @@ const Topbar = ({ toggleExpansionSwitch }) => {
   };
 
   useEffect(() => {
-    setUserDetails(JSON.parse(localStorage.getItem("userDetails")));
+    setUserDetails(JSON.parse(localStorage.getItem("userDetails")));    
     const selectedTheme = localStorage.getItem("theme");
     if (selectedTheme === "dark") {
       setTheme(true);

@@ -1,5 +1,7 @@
 import React from 'react';
 import Navbar from './Navbar';
+import Footer from './Footer';
+import HomePage from './Home/HomePage';
 
 const MainPage = () => {
   const allCategories = [
@@ -32,6 +34,8 @@ const MainPage = () => {
   return (
     <div>
       <Navbar categories={allCategories}/>
+      <HomePage/>
+      <Footer/>
     </div>
   )
 }

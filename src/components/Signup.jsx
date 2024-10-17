@@ -12,6 +12,8 @@ import { useFormik } from "formik";
 import { Toast } from "primereact/toast";
 import { Link, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
+import { API_CONSTANTS } from "../constants/apiurl";
+import { ROUTES_CONSTANTS } from "../constants/routesurl";
 
 const data = {
   firstname: "",
@@ -51,21 +53,44 @@ const Signup = () => {
   });
 
   const onHandleSubmit = async (value) => {
-    let body = structuredClone(value);
-      allApi("users", body, "post")
-      .then(() => {
-        toast.current.show({
-          severity: "success",
-          summary: "Success",
-          detail: "User has been created successfully",
-          life: 3000,
-        });
-        setTimeout(() => {
-          navigate("/");
-        }, 3000);
+    let body = structuredClone({
+      firstName: value.firstname,
+      lastName: value.lastname,
+      userName: value.userName,
+      email: value.email,
+      password: value.password,
+      mobileNo: value.mobileNo,
+      role : "ADMIN"
+    });
+      allApi(API_CONSTANTS.SINGNUP, body, "post")
+      .then((response) => {
+        if(response?.status === 200 && response?.data?.status?.toLowerCase() === "success"){
+          toast.current.show({
+            severity: "success",
+            summary: "Success",
+            detail: "User has been created successfully",
+            life: 3000,
+          });
+          setTimeout(() => {
+            navigate(ROUTES_CONSTANTS.LOGIN);
+          }, 3000);
+        } else {
+          toast.current.show({
+            severity: "error",
+            summary: "Error",
+            detail: "Something went wrong",
+            life: 3000,
+          });
+        }
       })
       .catch((err) => {
-        console.log("err", err);
+        console.error("err", err);
+        toast.current.show({
+          severity: "error",
+          summary: "Error",
+          detail: "Something went wrong",
+          life: 3000,
+        });
       });
     };
 
@@ -113,6 +138,18 @@ const Signup = () => {
           </div>
           <div>
             <InputTextComponent
+              value={values?.userName}
+              onChange={handleChange}
+              type="userName"
+              placeholder={t("your_userName")}
+              name="userName"
+              error={errors?.userName}
+              touched={touched?.userName}
+              className="w-full rounded border-[1px] border-[#ddd] px-[1rem] py-[8px] text-[11px] focus:outline-none"
+            />
+          </div>
+          <div>
+            <InputTextComponent
               value={values?.email}
               onChange={handleChange}
               type="email"
@@ -120,6 +157,18 @@ const Signup = () => {
               name="email"
               error={errors?.email}
               touched={touched?.email}
+              className="w-full rounded border-[1px] border-[#ddd] px-[1rem] py-[8px] text-[11px] focus:outline-none"
+            />
+          </div>
+          <div>
+            <InputTextComponent
+              value={values?.mobileNo}
+              onChange={handleChange}
+              type="mobileNo"
+              placeholder={t("your_mobileNo")}
+              name="mobileNo"
+              error={errors?.mobileNo}
+              touched={touched?.mobileNo}
               className="w-full rounded border-[1px] border-[#ddd] px-[1rem] py-[8px] text-[11px] focus:outline-none"
             />
           </div>

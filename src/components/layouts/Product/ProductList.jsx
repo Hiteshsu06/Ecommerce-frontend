@@ -1,5 +1,5 @@
 // hooks
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 
@@ -9,8 +9,12 @@ import DataTable from "@common/DataTable";
 import ButtonComponent from "@common/ButtonComponent";
 import Confirmbox from "@common/Confirmbox";
 import { allApi } from "@api/api";
+import { ROUTES_CONSTANTS } from "../../../constants/routesurl";
+import { Toast } from "primereact/toast";
+import { API_CONSTANTS } from "../../../constants/apiurl";
 
 const ProductList = () => {
+  const toast = useRef(null);
   const [data, setData] = useState([]);
   const { t } = useTranslation("msg");
   const navigate = useNavigate();
@@ -20,8 +24,8 @@ const ProductList = () => {
   const item = {
     heading: t("product"),
     routes: [
-      { label: t("dashboard"), route: "/dashboard" },
-      { label: t("product"), route: "/dashboard/products" },
+      { label: t("dashboard"), route: ROUTES_CONSTANTS.DASHBOARD },
+      { label: t("product"), route: ROUTES_CONSTANTS.PRODUCTS },
     ],
   };
 
@@ -73,10 +77,25 @@ const ProductList = () => {
     setIsConfirm(!isConfirm);
     allApi(`stockManagement/${deleteId}`, "", "delete")
       .then((response) => {
-        fetchStockList();
+        if (response.status === 200 && response.data.status.toLowerCase() === "success") {
+          fetchStockList();
+        } else {
+          toast.current.show({
+            severity: "error",
+            summary: "Error",
+            detail: response?.data?.statusMessage,
+            life: 3000,
+          });
+        }
       })
       .catch((err) => {
-        console.log("err", err);
+        console.error("err", err);
+        toast.current.show({
+          severity: "error",
+          summary: "Error",
+          detail: "Something Went Wrong",
+          life: 3000,
+        });
       });
   };
 
@@ -86,21 +105,42 @@ const ProductList = () => {
 
   const fetchStockList = () => {
     // To get all stocks stored in json
-    allApi("stockManagement", "", "get")
+    allApi(API_CONSTANTS.GET_ALL_PRODUCT_DETAILS, {
+    "pageNo" : "1",
+    "limit" : "10",
+    "searchText" : "",
+    "categoryId" : null
+  }, "post")
       .then((response) => {
-        setData(response?.data);
+        if (response.status === 200 && response.data.status.toLowerCase() === "success") {
+          setData(response?.data?.data);
+        } else {
+          toast.current.show({
+            severity: "error",
+            summary: "Error",
+            detail: response?.data?.statusMessage,
+            life: 3000,
+          });
+        }
       })
       .catch((err) => {
-        console.log("err", err);
+        console.error("err", err);
+        toast.current.show({
+            severity: "error",
+            summary: "Error",
+            detail: "Something Went Wrong",
+            life: 3000,
+        });
       });
   };
 
   const createStock = () => {
-    navigate("/create-product");
+    navigate(ROUTES_CONSTANTS.CREATE_PRODUCT);
   };
 
   return (
     <div className="text-TextPrimaryColor">
+      <Toast ref={toast} position="top-right" />
       <Confirmbox
         isConfirm={isConfirm}
         closeDialogbox={closeDialogbox}
