@@ -56,7 +56,7 @@ const ProductList = () => {
   ];
 
   const editStock = (item) => {
-    navigate(`/edit-product/${item?.id}`);
+    navigate(`/edit-product/${item?.productId}`);
   };
 
   const confirmDeleteStock = (item) => {

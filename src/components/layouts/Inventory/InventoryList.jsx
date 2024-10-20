@@ -9,6 +9,7 @@ import DataTable from "@common/DataTable";
 import ButtonComponent from "@common/ButtonComponent";
 import Confirmbox from "@common/Confirmbox";
 import { allApi } from "@api/api";
+import { ROUTES_CONSTANTS } from "../../../constants/routesurl";
 
 const InventoryList = () => {
   const { t } = useTranslation("msg");
@@ -18,8 +19,8 @@ const InventoryList = () => {
   const item = {
     heading: t("inventory"),
     routes: [
-      { label: t("dashboard"), route: "/dashboard" },
-      { label: t("inventory"), route: "/dashboard/inventory" },
+      { label: t("dashboard"), route: ROUTES_CONSTANTS.DASHBOARD },
+      { label: t("inventory"), route: ROUTES_CONSTANTS.INVENTORY },
     ],
   };
 

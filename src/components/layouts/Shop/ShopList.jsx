@@ -115,7 +115,7 @@ const ShopList = () => {
     }, "post")
       .then((response) => {
         if (response.status === 200 && response.data.status.toLowerCase() === "success") {
-          setData(response?.data?.data);
+          setData(response?.data?.data?.shopDetailsList);
         } else {
           toast.current.show({
             severity: "error",

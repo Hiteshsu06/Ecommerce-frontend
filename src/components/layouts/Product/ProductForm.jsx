@@ -10,33 +10,38 @@ import { useFormik } from "formik";
 import { useNavigate, useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { Toast } from "primereact/toast";
-import { useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { API_CONSTANTS } from "../../../constants/apiurl";
 import { ROUTES_CONSTANTS } from "../../../constants/routesurl";
 import { allApiWithHeaderToken } from "../../../api/api";
+import DropdownComponent from "../../common/DropdownComponent";
 
-const data = {
-  category: "",
-  productName: "",
-  price: "",
-  image: "",
-  qty: "",
-  shopName: ""
-};
 
 const ProductForm = () => {
   const toast = useRef(null);
   const { t } = useTranslation("msg");
   const navigate = useNavigate();
+  
+  const [data,setData] = useState({
+    category: {},
+    productName: "",
+    price: "",
+    file: "",
+    stockAvailable: "",
+    shop: {},
+    image: "",
+  });
+  const [shopData, setShopData] = useState([]);
+  const [categoryData, setCategoryData] = useState([]);
   const { id } = useParams();
 
   const validationSchema = yup.object().shape({
-    category: yup.string().required(t("category_is_required")),
+    category: yup.object().required(t("category_is_required")),
     productName: yup.string().required(t("product_name_is_required")),
-    price: yup.string().required(t("price_is_required")),
-    qty: yup.string().required(t("qty_is_required")),
-    image: yup.string().required(t("image_is_required")),
-    shopName: yup.string().required(t("shop_name_is_required"))
+    price: yup.number().required(t("price_is_required")),
+    stockAvailable: yup.number().required(t("qty_is_required")),
+    file: yup.string().required(t("image_is_required")),
+    shop: yup.object().required(t("shop_name_is_required")),
   });
 
   const onHandleSubmit = async (value) => {
@@ -50,10 +55,24 @@ const ProductForm = () => {
   };
 
   const createStock = (value) => {
-    allApiWithHeaderToken(API_CONSTANTS.ADD_UPDATE_PRODUCT_DETAILS, value, "post",'multipart/form-data')
+    console.log("value", value);
+    allApiWithHeaderToken(API_CONSTANTS.ADD_UPDATE_PRODUCT_DETAILS, {
+      shopRefId: value.shop.id,
+      productName: value.productName,
+      price: value.price,
+      stockAvailable: value.stockAvailable,
+      categoryId: value.category.categoryId,
+      file: value.file,
+    }, "post",'multipart/form-data')
       .then((response) => {
         if (response.status === 200 && response.data.status.toLowerCase() === "success") {
-          navigate(ROUTES_CONSTANTS.STOCK_MANAGEMENT);
+          navigate(ROUTES_CONSTANTS.PRODUCTS);
+          toast.current.show({
+            severity: "success",
+            summary: "Success",
+            detail: "Product added successfully",
+            life: 3000,
+          });
         } else {
           toast.current.show({
             severity: "error",
@@ -99,8 +118,89 @@ const ProductForm = () => {
       });
   };
 
+  useEffect(()=>{
+      allApi(API_CONSTANTS.GET_ALL_SHOP_DETAILS, {id:localStorage.getItem("id")}, "post")
+      .then((response) => {
+        if (response.status === 200 && response.data.status.toLowerCase() === "success") {
+          setShopData(response?.data?.data?.shopDetailsList);
+        } else {
+          toast.current.show({
+            severity: "error",
+            summary: "Error",
+            detail: response?.data?.statusMessage,
+            life: 3000,
+          });
+        }
+      })
+      .catch((err) => {
+        console.error("err", err);
+        toast.current.show({
+            severity: "error",
+            summary: "Error",
+            detail: "Something went wrong",
+            life: 3000,
+        });
+      });
+      allApi(API_CONSTANTS.GET_ALL_CATEGORY_DETAILS, {
+        "pageNo" : "1",
+        "limit" : "1000",
+        "searchText" : "",
+        "categoryId" : null
+      }, "post")
+      .then((response) => {
+        if (response.status === 200 && response.data.status.toLowerCase() === "success") {
+          setCategoryData(response?.data?.data);
+        } else {
+          toast.current.show({
+            severity: "error",
+            summary: "Error",
+            detail: response?.data?.statusMessage,
+            life: 3000,
+          });
+        }
+      })
+      .catch((err) => {
+        console.error("err", err);
+        toast.current.show({
+            severity: "error",
+            summary: "Error",
+            detail: "Something went wrong",
+            life: 3000,
+        });
+      });
+
+      if(id){
+        allApiWithHeaderToken(API_CONSTANTS.GET_ALL_PRODUCT_DETAILS_BY_PRODUCT_ID, {id:id}, "post")
+        .then((response) => {
+          if (response.status === 200 && response.data.status.toLowerCase() === "success") {
+              setData({
+                  ...response?.data?.data,
+                  shop: shopData?.find((item)=>item?.shopRefId === response?.data?.data?.shopRefId),
+                  category: categoryData?.find((item)=>item?.categoryId === response?.data?.data?.categoryId),
+              })
+          } else {
+            toast.current.show({
+              severity: "error",
+              summary: "Error",
+              detail: response?.data?.statusMessage,
+              life: 3000,
+            });
+          }
+        })
+        .catch((err) => {
+          console.error("err", err);
+          toast.current.show({
+              severity: "error",
+              summary: "Error",
+              detail: "Something went wrong",
+              life: 3000,
+          });
+        });
+      }
+  },[id])
+
   const handleBack = () => {
-    navigate("/dashboard/products");
+    navigate(ROUTES_CONSTANTS.PRODUCTS);
   };
 
   const formik = useFormik({
@@ -111,7 +211,8 @@ const ProductForm = () => {
     validateOnBlur: true,
   });
 
-  const { values, errors, handleSubmit, handleChange, touched } = formik;
+  const { values, errors, setFieldValue,handleSubmit, handleChange, touched } = formik;
+  console.log(errors)
   return (
     <div className="flex h-screen bg-BgPrimaryColor">
       <Toast ref={toast} position="top-right" />
@@ -119,20 +220,40 @@ const ProductForm = () => {
         <div className="col-span-4">
             {t("create_product")}
         </div>
-        <div className="col-span-4">
-            <FileUpload/>
+       <div className="col-span-4">
+            <FileUpload 
+              isLabel={t("stock_long_term_chart")}
+              value={values?.image}
+              name="file"
+              onChange={(e)=> {
+                setFieldValue('file', e?.currentTarget?.files[0]);
+                setFieldValue('image', URL.createObjectURL(e?.target?.files[0]));
+              }}/>    
         </div>
         <div className="col-span-2">
-          <InputTextComponent
+          <DropdownComponent 
+            value={values?.shop}
+            onChange={handleChange}
+            data= {shopData}
+            placeholder={t("select_shop")}
+            name="shop"
+            error={errors?.shop}
+            touched={touched?.shop}
+            className="col-span-2 w-full rounded border-[1px] border-[#ddd] custom-dropdown focus:outline-none"
+            optionLabel="shopName"
+          />
+        </div>
+        <div className="col-span-2">
+          <DropdownComponent 
             value={values?.category}
             onChange={handleChange}
-            type="category"
-            placeholder={t("category")}
+            data= {categoryData}
+            placeholder={t("select_category")}
             name="category"
-            isLabel={true}
             error={errors?.category}
             touched={touched?.category}
-            className="w-full rounded border-[1px] border-[#ddd] px-[1rem] py-[8px] text-[11px] focus:outline-none"
+            className="col-span-2 w-full rounded border-[1px] border-[#ddd] custom-dropdown focus:outline-none"
+            optionLabel="categoryType"
           />
         </div>
         <div className="col-span-2">
@@ -163,27 +284,14 @@ const ProductForm = () => {
         </div>
         <div className="col-span-2">
           <InputTextComponent
-            value={values?.qty}
+            value={values?.stockAvailable}
             onChange={handleChange}
-            type="qty"
-            placeholder={t("qty")}
-            name="qty"
+            type="stockAvailable"
+            placeholder={t("stockAvailable")}
+            name="stockAvailable"
             isLabel={true}
-            error={errors?.qty}
-            touched={touched?.qty}
-            className="col-span-2 w-full rounded border-[1px] border-[#ddd] px-[1rem] py-[8px] text-[11px] focus:outline-none"
-          />
-        </div>
-        <div className="col-span-2">
-          <InputTextComponent
-            value={values?.shopName}
-            onChange={handleChange}
-            type="shopName"
-            placeholder={t("shop_name")}
-            name="shopName"
-            isLabel={true}
-            error={errors?.shopName}
-            touched={touched?.shopName}
+            error={errors?.stockAvailable}
+            touched={touched?.stockAvailable}
             className="col-span-2 w-full rounded border-[1px] border-[#ddd] px-[1rem] py-[8px] text-[11px] focus:outline-none"
           />
         </div>

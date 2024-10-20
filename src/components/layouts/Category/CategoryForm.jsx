@@ -1,7 +1,6 @@
 // components
 import ButtonComponent from "@common/ButtonComponent";
 import InputTextComponent from "@common/InputTextComponent";
-import FileUpload from "@common/FileUpload";
 import { allApi } from "@api/api";
 
 // external libraries
@@ -13,6 +12,7 @@ import { useEffect, useRef, useState } from "react";
 import { Toast } from "primereact/toast";
 import { API_CONSTANTS } from "../../../constants/apiurl";
 import { ROUTES_CONSTANTS } from "../../../constants/routesurl";
+import { allApiWithHeaderToken } from "../../../api/api";
 
 const structure = {
   categoryType: "",
@@ -32,8 +32,6 @@ const CategoryForm = () => {
   });
 
   const onHandleSubmit = async (value) => {
-          console.log("value", value);
-
     if (id) {
       // Update
       updateCategory(value);
@@ -45,35 +43,68 @@ const CategoryForm = () => {
 
   const createCategory = (value) => {
     allApi(API_CONSTANTS.ADD_UPDATE_CATEGORY_DETAILS, value, "post")
-      .then(() => {
-        navigate(ROUTES_CONSTANTS.CATEGORIES);
+      .then((response) => {
+        if (response.status === 200 && response.data.status.toLowerCase() === "success") {
+          navigate(ROUTES_CONSTANTS.CATEGORIES);
+        } else {
+            toast.current.show({
+              severity: "error",
+              summary: "Error",
+              detail: response?.data?.statusMessage,
+              life: 3000,
+            });
+          }
       })
       .catch((err) => {
-        console.log("err", err);
+        toast.current.show({
+          severity: "error",
+          summary: "Error",
+          detail: "Something Went Wrong",
+          life: 3000,
+        });
       });
   };
 
   const updateCategory = (value) => {
     value.categoryId = id;
-    allApi(API_CONSTANTS.ADD_UPDATE_CATEGORY_DETAILS, value, "put")
-      .then(() => {
-        navigate("/dashboard");
+    allApi(API_CONSTANTS.ADD_UPDATE_CATEGORY_DETAILS, value, "post")
+      .then((response) => {
+        if (response.status === 200 && response.data.status.toLowerCase() === "success") {
+          navigate(ROUTES_CONSTANTS.CATEGORIES);
+        } else {
+            toast.current.show({
+              severity: "error",
+              summary: "Error",
+              detail: response?.data?.statusMessage,
+              life: 3000,
+            });
+          }
       })
       .catch((err) => {
-        console.log("err", err);
+        console.error("err", err);
+        toast.current.show({
+          severity: "error",
+          summary: "Error",
+          detail: "Something Went Wrong",
+          life: 3000,
+        });
       });
   };
 
   const handleBack = () => {
-    navigate("/dashboard/categories");
+    navigate(ROUTES_CONSTANTS.CATEGORIES);
   };
 
   useEffect(() => {
     if (id) {
-      allApi(`category/${id}`, "", "get")
+      allApiWithHeaderToken(API_CONSTANTS.GET_ALL_CATEGORY_DETAILS_BY_CATEGORY_ID, { id: id }, "post")
         .then((response) => {
           if (response.status === 200 && response.data.status.toLowerCase() === "success") {
-            setData(response?.data);
+            setData({
+              categoryType: response?.data?.data?.categoryType,
+              categoryDescription: response?.data?.data?.categoryDesc,
+              categoryId: response?.data?.data?.categoryId
+            });
           } else {
             toast.current.show({
               severity: "error",
@@ -104,7 +135,6 @@ const CategoryForm = () => {
   });
 
   const { values, errors, handleSubmit, handleChange, touched } = formik;
- console.log("errors",errors)
   return (
     <div className="flex h-screen bg-BgPrimaryColor">
       <Toast ref={toast} position="top-right" />

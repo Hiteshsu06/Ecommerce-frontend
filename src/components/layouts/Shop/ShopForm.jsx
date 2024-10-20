@@ -10,26 +10,26 @@ import { useFormik } from "formik";
 import { useNavigate, useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { ROUTES_CONSTANTS } from "../../../constants/routesurl";
-import { useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Toast } from "primereact/toast";
 import { API_CONSTANTS } from "../../../constants/apiurl";
-
-const data = {
-  shopName: "",
-  addressLine1: "",
-  addressLine2: "",
-  addressLine3: "",
-  landmark: "",
-  district: "",
-  stateName: "",
-  pinCode: "",
-  country: "",
-  shopImageUrl: "",
-  shopImage: "",
-  city: "",
-};
+import { use } from "i18next";
 
 const ShopForm = () => {
+  const [data,setData] = useState({
+    shopName: "",
+    addressLine1: "",
+    addressLine2: "",
+    addressLine3: "",
+    landmark: "",
+    district: "",
+    stateName: "",
+    pinCode: "",
+    country: "",
+    shopImageUrl: "",
+    shopImage: "",
+    city: "",
+  });
   const toast = useRef(null);
   const { t } = useTranslation("msg");
   const navigate = useNavigate();
@@ -60,7 +60,6 @@ const ShopForm = () => {
   };
 
   const createStock = (value) => {
-    console.log("value", value);
     value.userId = localStorage.getItem("id");
     allApiWithHeaderToken(API_CONSTANTS.ADD_UPDATE_SHOP_DETAILS, value, "post", "multipart/form-data")
       .then((response) => {
@@ -88,7 +87,8 @@ const ShopForm = () => {
 
   const updateStock = (value) => {
     value.shopDtlsId=id;
-    allApiWithHeaderToken(API_CONSTANTS.ADD_UPDATE_SHOP_DETAILS, value, "POST")
+    value.userId = localStorage.getItem("id");
+    allApiWithHeaderToken(API_CONSTANTS.ADD_UPDATE_SHOP_DETAILS, value, "post", "multipart/form-data")
       .then((response) => {
         if(response?.status === 200 && response?.data?.status?.toLowerCase() === "success"){
           navigate(ROUTES_CONSTANTS.SHOPS);
@@ -111,6 +111,34 @@ const ShopForm = () => {
         });
       });
   };
+
+  useEffect(() => {
+    if (id) {
+      allApiWithHeaderToken(API_CONSTANTS.GET_ALL_SHOP_DETAILS_BY_SHOP_ID, { id: id }, "post")
+        .then(async (response) => {
+          if (response?.status === 200 && response?.data?.status?.toLowerCase() === "success") {
+            let fileres = await fetch(response?.data?.data?.shopImageUrl).then(res => res.blob()).then(blob => new File([blob], response?.data?.data?.shopImageName, { type: blob.type }));
+            setData({ ...response?.data?.data,shopImageUrl: fileres,shopImage: response?.data?.data?.shopImageUrl });
+          } else {
+            toast.current.show({
+              severity: "error",
+              summary: "Error",
+              detail: response?.data?.statusMessage,
+              life: 3000,
+            });
+          }
+        })
+        .catch((err) => {
+          console.error("err", err);
+          toast.current.show({
+            severity: "error",
+            summary: "Error",
+            detail: "Something went wrong",
+            life: 3000,
+          });
+        });
+    }
+  }, []);
 
   const handleBack = () => {
     navigate(ROUTES_CONSTANTS.PRODUCTS);

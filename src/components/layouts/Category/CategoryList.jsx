@@ -51,7 +51,7 @@ const CatergoryList = () => {
   ];
 
   const editCategory = (item) => {
-    navigate(`/edit-category/${item?.id}`);
+    navigate(`/edit-category/${item?.categoryId}`);
   };
 
   const confirmDeleteCategory = (item) => {
@@ -126,7 +126,7 @@ const CatergoryList = () => {
   }, []);
 
   const createCategory = () => {
-    navigate("/create-category");
+    navigate(ROUTES_CONSTANTS.CREATE_CATEGORY);
   };
 
   return (

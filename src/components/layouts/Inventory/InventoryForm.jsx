@@ -9,6 +9,7 @@ import { useFormik } from "formik";
 import { useNavigate, useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { useEffect, useState } from "react";
+import { ROUTES_CONSTANTS } from "../../../constants/routesurl";
 
 const structure = {
   name: "",
@@ -44,7 +45,7 @@ const InventoryForm = () => {
   const createCompany = (value) => {
     allApi("company", value, "post")
       .then(() => {
-        navigate("/dashboard");
+        navigate(ROUTES_CONSTANTS.INVENTORY);
       })
       .catch((err) => {
         console.log("err", err);
@@ -54,7 +55,7 @@ const InventoryForm = () => {
   const updateCompany = (value) => {
     allApi(`company/${id}`, value, "put")
       .then(() => {
-        navigate("/dashboard");
+        navigate(ROUTES_CONSTANTS.INVENTORY);
       })
       .catch((err) => {
         console.log("err", err);
@@ -62,7 +63,7 @@ const InventoryForm = () => {
   };
 
   const handleBack = () => {
-    navigate("/dashboard/inventory");
+    navigate(ROUTES_CONSTANTS.INVENTORY);
   };
 
   useEffect(() => {
