@@ -55,7 +55,6 @@ const ProductForm = () => {
   };
 
   const createStock = (value) => {
-    console.log("value", value);
     allApiWithHeaderToken(API_CONSTANTS.ADD_UPDATE_PRODUCT_DETAILS, {
       shopRefId: value.shop.id,
       productName: value.productName,
@@ -94,10 +93,19 @@ const ProductForm = () => {
   };
 
   const updateStock = (value) => {
-    allApi(API_CONSTANTS.ADD_UPDATE_PRODUCT_DETAILS, value, "post")
+    const payload = {
+      productId: id,
+      shopRefId: value.shop.id,
+      productName: value.productName,
+      price: value.price,
+      stockAvailable: value.stockAvailable,
+      categoryId: value.category.categoryId,
+      file: value.file,
+    }
+    allApiWithHeaderToken(API_CONSTANTS.ADD_UPDATE_PRODUCT_DETAILS, payload, "post", "multipart/form-data")
       .then((response) => {
         if (response.status === 200 && response.data.status.toLowerCase() === "success") {
-          navigate(ROUTES_CONSTANTS.STOCK_MANAGEMENT);
+          navigate(ROUTES_CONSTANTS.PRODUCTS);
         }else {
           toast.current.show({
             severity: "error",
@@ -171,12 +179,17 @@ const ProductForm = () => {
 
       if(id){
         allApiWithHeaderToken(API_CONSTANTS.GET_ALL_PRODUCT_DETAILS_BY_PRODUCT_ID, {id:id}, "post")
-        .then((response) => {
+        .then(async (response) => {
           if (response.status === 200 && response.data.status.toLowerCase() === "success") {
+              let fileres = await fetch(response?.data?.data?.imageUrl).then(res => res.blob()).then(blob => new File([blob], response?.data?.data?.imageName, { type: blob.type }));
               setData({
-                  ...response?.data?.data,
-                  shop: shopData?.find((item)=>item?.shopRefId === response?.data?.data?.shopRefId),
-                  category: categoryData?.find((item)=>item?.categoryId === response?.data?.data?.categoryId),
+                  file: fileres,
+                  image: response.data?.data?.imageUrl,
+                  productName: response.data?.data?.productName,
+                  price: response.data?.data?.price,
+                  stockAvailable: response.data?.data?.stockAvailable,
+                  shop: shopData.find(item=>item.id === response.data?.data?.shopDetails?.shopDtlsId),
+                  category:  categoryData.find(item=>item.categoryId === response.data?.data?.categoryDtls?.categoryId),
               })
           } else {
             toast.current.show({
@@ -212,7 +225,6 @@ const ProductForm = () => {
   });
 
   const { values, errors, setFieldValue,handleSubmit, handleChange, touched } = formik;
-  console.log(errors)
   return (
     <div className="flex h-screen bg-BgPrimaryColor">
       <Toast ref={toast} position="top-right" />
@@ -224,11 +236,14 @@ const ProductForm = () => {
             <FileUpload 
               isLabel={t("stock_long_term_chart")}
               value={values?.image}
+              error={errors?.file}
+              touched={touched?.file}
               name="file"
               onChange={(e)=> {
                 setFieldValue('file', e?.currentTarget?.files[0]);
                 setFieldValue('image', URL.createObjectURL(e?.target?.files[0]));
               }}/>    
+             <label htmlFor="file" className="error text-red-500">{errors?.file}</label>
         </div>
         <div className="col-span-2">
           <DropdownComponent 
