@@ -13,4 +13,5 @@ export const API_CONSTANTS = {
     ADD_UPDATE_PRODUCT_DETAILS: "admin/addProductDetails",
     GET_ALL_PRODUCT_DETAILS: "admin/getAllProducts",
     GET_ALL_PRODUCT_DETAILS_BY_PRODUCT_ID: "admin/getProductDtlsByProductId",
+    DELETE_PRODUCT_DETAILS: "admin/deleteProductDtlsById",
 }

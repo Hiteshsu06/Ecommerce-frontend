@@ -8,7 +8,7 @@ import Breadcrum from "@common/Breadcrum";
 import DataTable from "@common/DataTable";
 import ButtonComponent from "@common/ButtonComponent";
 import Confirmbox from "@common/Confirmbox";
-import { allApi } from "@api/api";
+import { allApi, allApiWithHeaderToken } from "@api/api";
 import { ROUTES_CONSTANTS } from "../../../constants/routesurl";
 import { Toast } from "primereact/toast";
 import { API_CONSTANTS } from "../../../constants/apiurl";
@@ -61,7 +61,7 @@ const ProductList = () => {
 
   const confirmDeleteStock = (item) => {
     setIsConfirm(!isConfirm);
-    setDeleteId(item?.id);
+    setDeleteId(item?.productId);
   };
 
   const closeDialogbox = () => {
@@ -75,7 +75,7 @@ const ProductList = () => {
 
   const confirmDialogbox = () => {
     setIsConfirm(!isConfirm);
-    allApi(`stockManagement/${deleteId}`, "", "delete")
+    allApiWithHeaderToken(API_CONSTANTS.DELETE_PRODUCT_DETAILS, { id: deleteId }, "post")
       .then((response) => {
         if (response.status === 200 && response.data.status.toLowerCase() === "success") {
           fetchStockList();
