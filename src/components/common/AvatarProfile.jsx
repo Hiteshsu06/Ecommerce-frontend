@@ -1,12 +1,17 @@
-import React, { useRef } from "react";
+import React, { useRef, useState } from "react";
 import { TieredMenu } from "primereact/tieredmenu";
 import { Avatar } from "primereact/avatar";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
+import { API_CONSTANTS } from "../../constants/apiurl";
+import { allApiWithHeaderToken } from "../../api/api";
+import { Toast } from "primereact/toast";
 
 const AvatarProfile = ({ size, shape, userDetails }) => {
   const menu = useRef(null);
+  const toast = useRef(null);
   const { t } = useTranslation("msg");
+  const [toastType, setToastType] = useState(''); 
   const navigate = useNavigate();
   const items = [
     {
@@ -48,7 +53,7 @@ const AvatarProfile = ({ size, shape, userDetails }) => {
       label: t("logout"),
       icon: "ri-logout-circle-r-line",
       command: () => {
-        navigate("/login");
+        logout();
         let theme = localStorage.getItem("theme");
         localStorage.clear();
         localStorage.setItem("theme", theme);
@@ -56,12 +61,51 @@ const AvatarProfile = ({ size, shape, userDetails }) => {
     },
   ];
 
+  const logout=()=>{
+    allApiWithHeaderToken(API_CONSTANTS.LOGOUT, "" , "get")
+      .then((response) => {
+        if (response.status === 200){
+          setToastType('success');
+          toast.current.show({
+            severity: "success",
+            summary: t("success"),
+            detail: "You have successfully logout",
+            life: 1000
+          });
+        } 
+        else {
+          toast.current.show({
+            severity: "error",
+            summary: "Error",
+            detail: "Something went wrong",
+            life: 3000,
+          });
+        }
+      })
+      .catch((err) => {
+        console.error("err", err);
+        toast.current.show({
+            severity: "error",
+            summary: "Error",
+            detail: "Something went wrong",
+            life: 3000,
+        });
+      });
+  }
+  
+  const toastHandler=()=>{
+    if (toastType === 'success') {
+      navigate("/login");
+     }
+   };
+
   return (
     <div className="card justify-content-center flex text-TextPrimaryColor">
       <div className="me-4">
         <div className="text-[0.8rem]">{userDetails?.firstName || 'Test Name'}</div>
         <div className="text-[0.6rem]">{userDetails?.role}</div>
       </div>
+      <Toast ref={toast} position="top-right" style={{scale: '0.7'}} onHide={toastHandler}/>
       <Avatar
         image="https://primefaces.org/cdn/primereact/images/avatar/amyelsner.png"
         className="mr-2"

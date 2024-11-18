@@ -1,5 +1,5 @@
 import axios from 'axios';
-const apiBaseURL = 'http://13.201.163.153:5050/v1';
+const apiBaseURL = 'https://ecommerce-backend-l5mh.onrender.com/api';
 
 export const allApi = (dataurl, data, method) => {
     const headers = {
@@ -20,10 +20,10 @@ export const allApi = (dataurl, data, method) => {
 };
 
 export const allApiWithHeaderToken = (dataurl, data, method, contentType) => {
-    let token = localStorage.getItem('token');
+    let token = JSON.parse(localStorage.getItem('token'));
     const headers = {
         'Content-Type': 'application/json',
-        'Authorization': token
+        'Authorization': `Bearer ${token}`
     }
     const axiosInstance = axios.create({
         baseURL: apiBaseURL,
@@ -54,7 +54,7 @@ export const allApiWithHeaderToken = (dataurl, data, method, contentType) => {
             // If error response has a status of 401, redirect to login
             if (error.response && error.response.status === 401) {
                 localStorage.removeItem('token');  // Remove invalid token
-                window.location.href = '/';  
+                window.location.href = '/login';  
             }
             return Promise.reject(error); // Reject promise if something goes wrong
         }

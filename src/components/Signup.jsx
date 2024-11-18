@@ -21,6 +21,10 @@ const data = {
   email: "",
   password: "",
   confirmPassword: "",
+  address: "",
+  city: "",
+  country: "",
+  pincode: ""
 };
 
 const Signup = () => {
@@ -54,17 +58,18 @@ const Signup = () => {
 
   const onHandleSubmit = async (value) => {
     let body = structuredClone({
-      firstName: value.firstname,
-      lastName: value.lastname,
-      userName: value.userName,
+      fname: value.firstname,
+      lname: value.lastname,
       email: value.email,
       password: value.password,
-      mobileNo: value.mobileNo,
-      role : "ADMIN"
+      address: value.address,
+      city: value.city,
+      country: value.country,
+      pincode: value.pincode
     });
       allApi(API_CONSTANTS.SINGNUP, body, "post")
       .then((response) => {
-        if(response?.status === 200 && response?.data?.status?.toLowerCase() === "success"){
+        if(response?.status === 201 && response?.data?.status === "success"){
           toast.current.show({
             severity: "success",
             summary: "Success",
@@ -78,7 +83,7 @@ const Signup = () => {
           toast.current.show({
             severity: "error",
             summary: "Error",
-            detail: "Something went wrong",
+            detail: response?.data?.message,
             life: 3000,
           });
         }
@@ -105,7 +110,7 @@ const Signup = () => {
     formik;
 
   return (
-    <div className="my-16 flex justify-center">
+    <div className="h-screen items-center flex justify-center">
       <div className="w-1/4 border px-5 max-lg:px-10 max-md:px-5">
         <Toast ref={toast} position="top-right" />
         <div className="my-2 text-left text-[1.5rem] font-[600] tracking-wide max-xl:text-center max-lg:text-[1.4em] max-sm:text-[1rem]">
@@ -138,18 +143,6 @@ const Signup = () => {
           </div>
           <div>
             <InputTextComponent
-              value={values?.userName}
-              onChange={handleChange}
-              type="userName"
-              placeholder={t("your_userName")}
-              name="userName"
-              error={errors?.userName}
-              touched={touched?.userName}
-              className="w-full rounded border-[1px] border-[#ddd] px-[1rem] py-[8px] text-[11px] focus:outline-none"
-            />
-          </div>
-          <div>
-            <InputTextComponent
               value={values?.email}
               onChange={handleChange}
               type="email"
@@ -162,15 +155,51 @@ const Signup = () => {
           </div>
           <div>
             <InputTextComponent
-              value={values?.mobileNo}
+              value={values?.address}
               onChange={handleChange}
-              type="mobileNo"
-              placeholder={t("your_mobileNo")}
-              name="mobileNo"
-              error={errors?.mobileNo}
-              touched={touched?.mobileNo}
+              type="address"
+              placeholder={t("your_address")}
+              name="address"
+              error={errors?.address}
+              touched={touched?.address}
               className="w-full rounded border-[1px] border-[#ddd] px-[1rem] py-[8px] text-[11px] focus:outline-none"
             />
+          </div>
+          <div>
+            <InputTextComponent
+              value={values?.city}
+              onChange={handleChange}
+              type="city"
+              placeholder={t("your_city")}
+              name="city"
+              error={errors?.city}
+              touched={touched?.city}
+              className="w-full rounded border-[1px] border-[#ddd] px-[1rem] py-[8px] text-[11px] focus:outline-none"
+            />
+          </div>
+          <div>
+            <InputTextComponent
+              value={values?.country}
+              onChange={handleChange}
+              type="country"
+              placeholder={t("your_country")}
+              name="country"
+              error={errors?.country}
+              touched={touched?.country}
+              className="w-full rounded border-[1px] border-[#ddd] px-[1rem] py-[8px] text-[11px] focus:outline-none"
+            />
+          </div>
+          <div>
+            <InputTextComponent
+                value={values?.pincode}
+                onChange={handleChange}
+                type="pincode"
+                placeholder={t("your_pincode")}
+                name="pincode"
+                error={errors?.pincode}
+                touched={touched?.pincode}
+                className="w-full rounded border-[1px] border-[#ddd] px-[1rem] py-[8px] text-[11px] focus:outline-none"
+              />
           </div>
           <div>
             <InputTextComponent
@@ -220,7 +249,7 @@ const Signup = () => {
         <div className="mb-4 mt-2 text-center text-[0.8rem]">
           {t("already_have_an_account?")}
           <span className="ps-2 font-[500] text-BgTertiaryColor underline">
-            <Link to="/">{t("sign_in")}</Link>
+            <Link to="/login">{t("sign_in")}</Link>
           </span>
         </div>
       </div>

@@ -1,6 +1,10 @@
 export const API_CONSTANTS = {
-    SINGNUP: "admin/userRegistration",
-    LOGIN: "admin/login",
+    SINGNUP: "auth/create-user",
+    LOGIN: "auth/login",
+    VERIFY_TOKEN: "auth/verify-token",
+    FORGOT_PASSWORD: "auth/forgot-password",
+    RESET_PASSWORD: "auth/reset-password",
+    LOGOUT: "auth/logout",
     ADD_UPDATE_SHOP_DETAILS: "admin/addShopDetails",
     GET_ALL_SHOP_DETAILS: "admin/getAllShopDtlsByUserId", 
     GET_ALL_SHOP_DETAILS_BY_SHOP_ID: "admin/getShopDetailsByShopId",

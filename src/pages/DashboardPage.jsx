@@ -13,7 +13,7 @@ const DashboardPage = () => {
   const toggleExpansionSwitch = (key) => {
     setToggle(key);
   };
-
+ 
   return (
     <div className="flex h-screen overflow-hidden bg-BgPrimaryColor">
       <div className={`sidebar ${toggle ? "open" : "closed"} h-full`}>

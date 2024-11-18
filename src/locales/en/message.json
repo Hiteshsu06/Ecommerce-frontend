@@ -78,5 +78,13 @@
    "gst_no" : "GST No.",
    "gujrati" : "Gujrati",
    "import_products" : "Import Products",
-   "your_user_name": "Your User Name"
+   "your_user_name": "Your User Name",
+
+   "login" : "Login",
+   "your_address" : "Your Address",
+   "your_city" : "Your City",
+   "your_country" : "Your Country",
+   "your_pincode" : "Your Pincode",
+   "back_to_login" : "Back To Login",
+   "request_reset_link" : "Request Reset Link"
 }

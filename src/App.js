@@ -18,6 +18,8 @@ const ProductForm = lazy(() => import("@components/Product/ProductForm"));
 const InventoryForm = lazy(() => import("@components/Inventory/InventoryForm"));
 const ShopForm = lazy(()=> import("@components/Shop/ShopForm"));
 const MainPage = lazy(()=> import("@pages/MainPage/MainPage"));
+const ForgotPassword = lazy(() => import("@pages/ForgotPasswordPage"));
+const ResetPassword = lazy(() => import("@pages/ResetPasswordPage"));
 
 function App() {
   const theme = localStorage.getItem('theme');
@@ -30,6 +32,8 @@ function App() {
         <Routes>
           <Route path="/" element={<MainPage />}/>
           <Route path="/login" element={<Login />}/>
+          <Route path="/forgot-password" element={<ForgotPassword />}/>
+          <Route path="/reset_password/:id" element={<ResetPassword />}/>
           <Route path="/signup" element={<Signup />}/>
           <Route path="/dashboard/*" element={<DashboardPage />}/>
           <Route path="/create-category" element={<CategoryForm />}/>
