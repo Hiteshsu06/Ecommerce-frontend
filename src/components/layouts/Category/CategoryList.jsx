@@ -8,7 +8,7 @@ import Breadcrum from "@common/Breadcrum";
 import DataTable from "@common/DataTable";
 import ButtonComponent from "@common/ButtonComponent";
 import Confirmbox from "@common/Confirmbox";
-import { allApi } from "@api/api";
+import { allApiWithHeaderToken } from "@api/api";
 import { ROUTES_CONSTANTS } from "../../../constants/routesurl";
 import { API_CONSTANTS } from "../../../constants/apiurl";
 import { Toast } from "primereact/toast";
@@ -19,6 +19,8 @@ const CatergoryList = () => {
   const navigate = useNavigate();
   const [isConfirm, setIsConfirm] = useState(false);
   const [deleteId, setDeleteId] = useState(null);
+  const [loader, setLoader] = useState(false);
+
   const item = {
     heading: t("category"),
     routes: [
@@ -45,8 +47,8 @@ const CatergoryList = () => {
     );
   };
   const columns = [
-    { field: "categoryType", header: t("name") },
-    { field: "categoryDesc", header: t("description") },
+    { field: "name", header: t("name") },
+    { field: "description", header: t("description") },
     { header: t("action"), body: actionBodyTemplate, headerStyle: { paddingLeft: '3%'} },
   ];
 
@@ -56,7 +58,7 @@ const CatergoryList = () => {
 
   const confirmDeleteCategory = (item) => {
     setIsConfirm(!isConfirm);
-    setDeleteId(item?.categoryId);
+    setDeleteId(item?.id);
   };
 
   const closeDialogbox = () => {
@@ -66,9 +68,10 @@ const CatergoryList = () => {
 
   const confirmDialogbox = () => {
     setIsConfirm(!isConfirm);
-    allApi(API_CONSTANTS.DELETE_CATEGORY_DETAILS, { id: deleteId }, "post")
+    allApiWithHeaderToken(`${API_CONSTANTS.DELETE_CATEGORY_DETAILS}/${deleteId}`, '', "delete")
       .then((response) => {
-        if (response.status === 200 && response.data.status.toLowerCase() === "success") {
+        console.log("response",response)
+        if (response.status === 200 && response.data.status === "success") {
           fetchCategoryList();
         } else {
           toast.current.show({
@@ -91,15 +94,10 @@ const CatergoryList = () => {
   };
 
   const fetchCategoryList = () => {
-    // To get all users stored in json
-    allApi(API_CONSTANTS.GET_ALL_CATEGORY_DETAILS, {
-        "pageNo" : "1",
-        "limit" : "1000",
-        "searchText" : "",
-        "categoryId" : null
-    }, "post")
+    setLoader(true);
+    allApiWithHeaderToken(API_CONSTANTS.GET_ALL_CATEGORY_DETAILS, "" , "get")
       .then((response) => {
-        if (response.status === 200 && response.data?.status.toLowerCase() === "success") {
+        if (response.status === 200 && response.data?.status=== "success") {
           setData(response?.data?.data);
         } else {
           toast.current.show({
@@ -118,6 +116,8 @@ const CatergoryList = () => {
           detail: "Something Went Wrong",
           life: 3000,
         });
+      }).finally(()=>{
+        setLoader(false);
       });
   };
 
@@ -153,6 +153,7 @@ const CatergoryList = () => {
           className="bg-BgPrimaryColor border rounded border-BorderColor"
           columns={columns}
           data={data}
+          loader={loader}
           showGridlines={true}
         />
       </div>

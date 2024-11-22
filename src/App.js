@@ -15,8 +15,6 @@ const Signup = lazy(() => import("@pages/SignupPage"));
 const DashboardPage = lazy(() => import("@pages/DashboardPage"));
 const CategoryForm = lazy(() => import("@components/Category/CategoryForm"));
 const ProductForm = lazy(() => import("@components/Product/ProductForm"));
-const InventoryForm = lazy(() => import("@components/Inventory/InventoryForm"));
-const ShopForm = lazy(()=> import("@components/Shop/ShopForm"));
 const MainPage = lazy(()=> import("@pages/MainPage/MainPage"));
 const ForgotPassword = lazy(() => import("@pages/ForgotPasswordPage"));
 const ResetPassword = lazy(() => import("@pages/ResetPasswordPage"));
@@ -40,10 +38,6 @@ function App() {
           <Route path="/edit-category/:id" element={<CategoryForm />}/>
           <Route path="/create-product" element={<ProductForm />}/>
           <Route path="/edit-product/:id" element={<ProductForm />}/>
-          <Route path="/create-inventory" element={<InventoryForm />}/>
-          <Route path="/edit-inventory/:id" element={<InventoryForm />}/>
-          <Route path="/create-shop" element={<ShopForm />}/>
-          <Route path="/edit-shop/:id" element={<ShopForm />}/>
         </Routes>
     </Suspense>
   );

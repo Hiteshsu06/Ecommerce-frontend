@@ -102,7 +102,7 @@ const DashboardStats = () => {
           </div>
         </div>
       </div>
-      <div className="grid grid-cols-1 gap-4 mt-16">
+      {/* <div className="grid grid-cols-1 gap-4 mt-16">
         <div className="flex justify-end">
             <Chart
                 options={linechart.options}
@@ -130,7 +130,7 @@ const DashboardStats = () => {
             width="500"
           />
         </div>
-      </div>
+      </div> */}
     </div>
   )
 }

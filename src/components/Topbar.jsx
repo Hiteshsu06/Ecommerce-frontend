@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import InputTextComponent from "@common/InputTextComponent";
 import AvatarProfile from "@common/AvatarProfile";
 import { useTranslation } from "react-i18next";
 
@@ -56,12 +55,6 @@ const Topbar = ({ toggleExpansionSwitch }) => {
       </button>
       <div className="grid w-full grid-cols-12 gap-2">
         <div className="col-span-8 flex items-center">
-          <InputTextComponent
-            type="text"
-            placeholder={t("search")}
-            name="search"
-            className="w-full rounded border-[1px] border-[#ddd] px-[1rem] py-[8px] text-[11px] focus:outline-none"
-          />
         </div>
         <div className="col-span-4 flex justify-end text-TextPrimaryColor">
           <button onClick={toggleTheme} className="me-8 text-xl">

@@ -15,22 +15,24 @@ import { API_CONSTANTS } from "../../../constants/apiurl";
 import { ROUTES_CONSTANTS } from "../../../constants/routesurl";
 import { allApiWithHeaderToken } from "../../../api/api";
 import DropdownComponent from "../../common/DropdownComponent";
+import Loading from '@common/Loading';
 
-
+const initialValues = {
+  category: {},
+  productName: "",
+  price: "",
+  file: "",
+  stockAvailable: "",
+  shop: {},
+  image: "",
+}
 const ProductForm = () => {
   const toast = useRef(null);
   const { t } = useTranslation("msg");
   const navigate = useNavigate();
-  
-  const [data,setData] = useState({
-    category: {},
-    productName: "",
-    price: "",
-    file: "",
-    stockAvailable: "",
-    shop: {},
-    image: "",
-  });
+  const [loader, setLoader] = useState(false);
+
+  const [data,setData] = useState(initialValues);
   const [shopData, setShopData] = useState([]);
   const [categoryData, setCategoryData] = useState([]);
   const { id } = useParams();
@@ -55,6 +57,7 @@ const ProductForm = () => {
   };
 
   const createStock = (value) => {
+    setLoader(true);
     allApiWithHeaderToken(API_CONSTANTS.ADD_UPDATE_PRODUCT_DETAILS, {
       shopRefId: value.shop.id,
       productName: value.productName,
@@ -89,7 +92,9 @@ const ProductForm = () => {
             detail: "Something went wrong",
             life: 3000,
         });
-      });
+      }).finally(()=>{
+        setLoader(false);
+      });;
   };
 
   const updateStock = (value) => {
@@ -227,6 +232,7 @@ const ProductForm = () => {
   const { values, errors, setFieldValue,handleSubmit, handleChange, touched } = formik;
   return (
     <div className="flex h-screen bg-BgPrimaryColor">
+      {loader && <Loading/>}
       <Toast ref={toast} position="top-right" />
       <div className="mx-16 my-auto grid h-fit w-full grid-cols-4 gap-4 bg-BgSecondaryColor p-8 border rounded border-BorderColor">
         <div className="col-span-4">

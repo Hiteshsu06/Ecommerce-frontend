@@ -15,13 +15,6 @@ const Sidebar = () => {
       },
     },
     {
-      label: t("shops"),
-      icon: "ri-store-3-line",
-      command: () => {
-        navigate(ROUTES_CONSTANTS.SHOPS);
-      },
-    },
-    {
       label: t("categories"),
       icon: "ri-archive-drawer-line",
       command: () => {
@@ -34,14 +27,7 @@ const Sidebar = () => {
       command: () => {
         navigate(ROUTES_CONSTANTS.PRODUCTS);
       },
-    },
-    {
-      label: t("inventory"),
-      icon: "ri-archive-stack-line",
-      command: () => {
-        navigate(ROUTES_CONSTANTS.INVENTORY);
-      },
-    },
+    }
   ];
 
   return (

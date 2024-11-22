@@ -8,11 +8,10 @@ import Breadcrum from "@common/Breadcrum";
 import DataTable from "@common/DataTable";
 import ButtonComponent from "@common/ButtonComponent";
 import Confirmbox from "@common/Confirmbox";
-import { allApi, allApiWithHeaderToken } from "@api/api";
+import { allApiWithHeaderToken } from "@api/api";
 import { ROUTES_CONSTANTS } from "../../../constants/routesurl";
 import { Toast } from "primereact/toast";
 import { API_CONSTANTS } from "../../../constants/apiurl";
-import Loading from '@common/Loading';
 
 const ProductList = () => {
   const toast = useRef(null);
@@ -98,7 +97,7 @@ const ProductList = () => {
       .then((response) => {
         console.log("R",response)
         if (response?.status === 200 && response?.data?.status === "success") {
-          fetchStockList();
+          fetchProductList();
         } else {
           toast.current.show({
             severity: "error",
@@ -118,16 +117,16 @@ const ProductList = () => {
         });
       }).finally(()=>{
         setLoader(false);
-      });;
+      });
   };
 
   useEffect(() => {
-    fetchStockList();
+    fetchProductList();
   }, []);
 
-  const fetchStockList = () => {
-    // To get all stocks stored in json
-    allApi(API_CONSTANTS.GET_ALL_PRODUCT_DETAILS, "", "get")
+  const fetchProductList = () => {
+    setLoader(true);
+    allApiWithHeaderToken(API_CONSTANTS.GET_ALL_PRODUCT_DETAILS, "" , "get")
       .then((response) => {
         if (response?.status === 200 && response?.data?.status === "success") {
           setData(response?.data?.data);
@@ -149,6 +148,8 @@ const ProductList = () => {
             detail: "Something Went Wrong",
             life: 3000,
         });
+      }).finally(()=>{
+        setLoader(false);
       });
   };
 

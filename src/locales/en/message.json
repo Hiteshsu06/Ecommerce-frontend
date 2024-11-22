@@ -87,5 +87,7 @@
    "your_pincode" : "Your Pincode",
    "back_to_login" : "Back To Login",
    "request_reset_link" : "Request Reset Link",
-   "select_category" : "Select Category"
+   "select_category" : "Select Category",
+   "category_name": "Category Name",
+   "category_description": "Category Description"
 }

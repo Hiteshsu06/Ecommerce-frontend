@@ -1,7 +1,7 @@
 // components
 import ButtonComponent from "@common/ButtonComponent";
 import InputTextComponent from "@common/InputTextComponent";
-import { allApi } from "@api/api";
+import { allApiWithHeaderToken } from "@api/api";
 
 // external libraries
 import * as yup from "yup";
@@ -12,7 +12,7 @@ import { useEffect, useRef, useState } from "react";
 import { Toast } from "primereact/toast";
 import { API_CONSTANTS } from "../../../constants/apiurl";
 import { ROUTES_CONSTANTS } from "../../../constants/routesurl";
-import { allApiWithHeaderToken } from "../../../api/api";
+import Loading from '@common/Loading';
 
 const structure = {
   categoryType: "",
@@ -24,6 +24,7 @@ const CategoryForm = () => {
   const { t } = useTranslation("msg");
   const navigate = useNavigate();
   const [data, setData] = useState(structure);
+  const [loader, setLoader] = useState(false);
   const { id } = useParams();
 
   const validationSchema = yup.object().shape({
@@ -42,9 +43,14 @@ const CategoryForm = () => {
   };
 
   const createCategory = (value) => {
-    allApi(API_CONSTANTS.ADD_UPDATE_CATEGORY_DETAILS, value, "post")
+    let data = {
+      name: value?.categoryType,
+      description: value?.categoryDescription
+    }
+    setLoader(true);
+    allApiWithHeaderToken(API_CONSTANTS.ADD_CATEGORY_DETAILS, data , "post")
       .then((response) => {
-        if (response.status === 200 && response.data.status.toLowerCase() === "success") {
+        if (response.status === 201 && response.data.status === "success") {
           navigate(ROUTES_CONSTANTS.CATEGORIES);
         } else {
             toast.current.show({
@@ -62,12 +68,15 @@ const CategoryForm = () => {
           detail: "Something Went Wrong",
           life: 3000,
         });
-      });
+      }).finally(()=>{
+        setLoader(false);
+      });;
   };
 
   const updateCategory = (value) => {
     value.categoryId = id;
-    allApi(API_CONSTANTS.ADD_UPDATE_CATEGORY_DETAILS, value, "post")
+    setLoader(true);
+    allApiWithHeaderToken(API_CONSTANTS.UPDATE_CATEGORY_DETAILS, value, "post")
       .then((response) => {
         if (response.status === 200 && response.data.status.toLowerCase() === "success") {
           navigate(ROUTES_CONSTANTS.CATEGORIES);
@@ -88,6 +97,8 @@ const CategoryForm = () => {
           detail: "Something Went Wrong",
           life: 3000,
         });
+      }).finally(()=>{
+        setLoader(false);
       });
   };
 
@@ -97,6 +108,7 @@ const CategoryForm = () => {
 
   useEffect(() => {
     if (id) {
+      setLoader(true);
       allApiWithHeaderToken(API_CONSTANTS.GET_ALL_CATEGORY_DETAILS_BY_CATEGORY_ID, { id: id }, "post")
         .then((response) => {
           if (response.status === 200 && response.data.status.toLowerCase() === "success") {
@@ -122,6 +134,8 @@ const CategoryForm = () => {
             detail: "Something Went Wrong",
             life: 3000,
           });
+        }).finally(()=>{
+          setLoader(false);
         });
     }
   }, []);
@@ -137,6 +151,7 @@ const CategoryForm = () => {
   const { values, errors, handleSubmit, handleChange, touched } = formik;
   return (
     <div className="flex h-screen bg-BgPrimaryColor">
+      {loader && <Loading/>}
       <Toast ref={toast} position="top-right" />
       <div className="mx-16 my-auto grid h-fit w-full grid-cols-4 gap-4 bg-BgSecondaryColor p-8 border rounded border-BorderColor">
         <div className="col-span-4">
