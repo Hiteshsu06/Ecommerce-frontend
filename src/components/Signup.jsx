@@ -5,6 +5,7 @@ import { useRef, useState } from "react";
 import ButtonComponent from "@common/ButtonComponent";
 import InputTextComponent from "@common/InputTextComponent";
 import { allApi } from "@api/api";
+import Loading from '@common/Loading';
 
 // external libraries
 import * as yup from "yup";
@@ -31,6 +32,7 @@ const Signup = () => {
   const toast = useRef(null);
   const { t } = useTranslation("msg");
   const [checked, setChecked] = useState(false);
+  const [loader, setLoader] = useState(false);
   const navigate = useNavigate();
 
   const validationSchema = yup.object().shape({
@@ -57,6 +59,7 @@ const Signup = () => {
   });
 
   const onHandleSubmit = async (value) => {
+    setLoader(true);
     let body = structuredClone({
       fname: value.firstname,
       lname: value.lastname,
@@ -96,7 +99,7 @@ const Signup = () => {
           detail: "Something went wrong",
           life: 3000,
         });
-      });
+      }).finally(()=>{setLoader(true);});
     };
 
   const formik = useFormik({
@@ -111,6 +114,7 @@ const Signup = () => {
 
   return (
     <div className="h-screen items-center flex justify-center">
+      {loader && <Loading/>}
       <div className="w-1/4 border px-5 max-lg:px-10 max-md:px-5">
         <Toast ref={toast} position="top-right" />
         <div className="my-2 text-left text-[1.5rem] font-[600] tracking-wide max-xl:text-center max-lg:text-[1.4em] max-sm:text-[1rem]">

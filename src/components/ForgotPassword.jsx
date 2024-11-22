@@ -89,7 +89,7 @@ const ForgotPassword = () => {
   return (
     <div className="h-screen items-center flex justify-center max-sm:px-4">
       {loader && <Loading/>}
-      <div className="w-1/3 h-[40%] max-lg:w-1/2 max-sm:w-full border px-5 py-5 max-lg:px-10 max-md:px-5">
+      <div className="w-1/3 h-[35%] max-lg:w-1/2 max-sm:w-full border px-5 py-5 max-lg:px-10 max-md:px-5">
         <Toast ref={toast} position="top-right" style={{scale: '0.7'}} onHide={toastHandler}/>
         <div className="text-center text-[1.5rem] font-[600] tracking-wide max-lg:text-[1.4em] max-sm:text-[1rem]">
           {t("forgot_password")}
@@ -118,7 +118,7 @@ const ForgotPassword = () => {
         </div>
         <div className="mt-2 text-center text-[0.8rem]">
           <span className="ps-2 font-[500] text-BgTertiaryColor underline">
-            <Link to="/">{t("back_to_login")}</Link>
+            <Link to="/login">{t("back_to_login")}</Link>
           </span>
         </div>
       </div>

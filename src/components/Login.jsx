@@ -14,6 +14,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { ROUTES_CONSTANTS } from "../constants/routesurl";
 import { API_CONSTANTS } from "../constants/apiurl";
+import Loading from '@common/Loading';
 
 const data = {
   email: "",
@@ -24,6 +25,7 @@ const Login = () => {
   const toast = useRef(null);
   const { t } = useTranslation("msg");
   const [toastType, setToastType] = useState(''); 
+  const [loader, setLoader] = useState(false);
   const navigate = useNavigate();
 
   const validationSchema = yup.object().shape({
@@ -38,6 +40,7 @@ const Login = () => {
   });
 
   const onHandleSubmit = async (value) => {
+    setLoader(true);
     let data = {...value, "remember": true}
     allApi(API_CONSTANTS.LOGIN, data, "post")
       .then((response) => {
@@ -93,6 +96,8 @@ const Login = () => {
             detail: "Something went wrong",
             life: 3000,
         });
+      }).finally(()=>{
+        setLoader(false);
       });
    }
 
@@ -115,6 +120,7 @@ const Login = () => {
 
   return (
     <div className="h-screen flex items-center justify-center">
+      {loader && <Loading/>}
       <div className="w-1/4 border px-5 py-5 max-lg:px-10 max-md:px-5">
         <Toast ref={toast} position="top-right" style={{scale: '0.7'}} onHide={toastHandler}/>
         <div className="text-center text-[1.5rem] font-[600] tracking-wide max-lg:text-[1.4em] max-sm:text-[1rem]">

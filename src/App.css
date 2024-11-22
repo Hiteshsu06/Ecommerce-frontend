@@ -45,6 +45,25 @@
     transform: translateX(-100%);
 }
 
+.p-toast-message-content {
+  font-size: 12px;
+}
+.p-toast-message-icon {
+  scale: 0.6;
+}
+.p-toast {
+  max-width: 19rem;
+}
+
+.custom-dropdown > .p-dropdown-label {
+  font-size: 11px !important;
+  padding-top: 8px !important;
+  padding-bottom: 8px !important;
+}
+.p-dropdown-items-wrapper {
+  font-size: 11px !important;
+}
+
 .sidebar.open {
     transform: translateX(0);
 }

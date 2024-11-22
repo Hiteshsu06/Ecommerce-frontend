@@ -87,8 +87,8 @@ const DashboardStats = () => {
           <div className="flex gap-5">
           <img src={Customers} alt="img" width="35" height="20"/>
             <div>
-                <div className="font-bold">1600+</div>
-                <div className="text-[0.8rem]">Total Sales</div>
+                <div className="font-bold">16+</div>
+                <div className="text-[0.8rem]">Total Category</div>
             </div>
           </div>
         </div>

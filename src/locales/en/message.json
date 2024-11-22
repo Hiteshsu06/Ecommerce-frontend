@@ -86,5 +86,6 @@
    "your_country" : "Your Country",
    "your_pincode" : "Your Pincode",
    "back_to_login" : "Back To Login",
-   "request_reset_link" : "Request Reset Link"
+   "request_reset_link" : "Request Reset Link",
+   "select_category" : "Select Category"
 }

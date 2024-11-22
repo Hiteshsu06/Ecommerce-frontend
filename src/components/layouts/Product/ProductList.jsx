@@ -12,6 +12,7 @@ import { allApi, allApiWithHeaderToken } from "@api/api";
 import { ROUTES_CONSTANTS } from "../../../constants/routesurl";
 import { Toast } from "primereact/toast";
 import { API_CONSTANTS } from "../../../constants/apiurl";
+import Loading from '@common/Loading';
 
 const ProductList = () => {
   const toast = useRef(null);
@@ -20,6 +21,7 @@ const ProductList = () => {
   const navigate = useNavigate();
   const [isConfirm, setIsConfirm] = useState(false);
   const [deleteId, setDeleteId] = useState(null);
+  const [loader, setLoader] = useState(false);
 
   const item = {
     heading: t("product"),
@@ -45,13 +47,33 @@ const ProductList = () => {
       </div>
     );
   };
+
+  const categoryBodyTemplate = (rowData) => {
+    return (
+      <div className="flex">
+         {rowData?.name}
+      </div>
+    );
+  };
+
+  const imageBodyTemplate = (rowData) => {
+    return (
+      <div className="flex">
+        {rowData?.productImage?.map((item)=>{
+          return(<>{
+            <img src={item} alt="" />
+          }</>)
+        })}
+      </div>
+    );
+  };
+
   const columns = [
-    { field: "category", header: t("category") },
-    { field: "productName", header: t("product_name") },
+    { body: categoryBodyTemplate, header: t("category") },
+    { field: "name", header: t("product_name") },
     { field: "price", header: t("price") },
-    { field: "image", header: t("image") },
-    { field: "stockAvailable", header: t("qty") },
-    { field: "shopName", header: t("shop_name") },
+    { body: imageBodyTemplate, header: t("image") },
+    { field: "description", header: t("description") },
     { header: t("action"), body: actionBodyTemplate, headerStyle: { paddingLeft: '3%'} },
   ];
 
@@ -61,7 +83,7 @@ const ProductList = () => {
 
   const confirmDeleteStock = (item) => {
     setIsConfirm(!isConfirm);
-    setDeleteId(item?.productId);
+    setDeleteId(item?.id);
   };
 
   const closeDialogbox = () => {
@@ -69,15 +91,13 @@ const ProductList = () => {
     setIsConfirm(!isConfirm);
   };
 
-  const importBulkStock = () => {
-
-  }
-
   const confirmDialogbox = () => {
+    setLoader(true);
     setIsConfirm(!isConfirm);
-    allApiWithHeaderToken(API_CONSTANTS.DELETE_PRODUCT_DETAILS, { id: deleteId }, "post")
+    allApiWithHeaderToken(`${API_CONSTANTS.DELETE_PRODUCT_DETAILS}/${deleteId}`,"", "delete")
       .then((response) => {
-        if (response.status === 200 && response.data.status.toLowerCase() === "success") {
+        console.log("R",response)
+        if (response?.status === 200 && response?.data?.status === "success") {
           fetchStockList();
         } else {
           toast.current.show({
@@ -96,7 +116,9 @@ const ProductList = () => {
           detail: "Something Went Wrong",
           life: 3000,
         });
-      });
+      }).finally(()=>{
+        setLoader(false);
+      });;
   };
 
   useEffect(() => {
@@ -105,15 +127,11 @@ const ProductList = () => {
 
   const fetchStockList = () => {
     // To get all stocks stored in json
-    allApi(API_CONSTANTS.GET_ALL_PRODUCT_DETAILS, {
-    "pageNo" : "1",
-    "limit" : "10",
-    "searchText" : "",
-    "categoryId" : null
-  }, "post")
+    allApi(API_CONSTANTS.GET_ALL_PRODUCT_DETAILS, "", "get")
       .then((response) => {
-        if (response.status === 200 && response.data.status.toLowerCase() === "success") {
+        if (response?.status === 200 && response?.data?.status === "success") {
           setData(response?.data?.data);
+          console.log("R",response?.data?.data)
         } else {
           toast.current.show({
             severity: "error",
@@ -137,6 +155,10 @@ const ProductList = () => {
   const createStock = () => {
     navigate(ROUTES_CONSTANTS.CREATE_PRODUCT);
   };
+
+  const importBulkStock = ()=>{
+    
+  }
 
   return (
     <div className="text-TextPrimaryColor">
@@ -169,6 +191,7 @@ const ProductList = () => {
         <DataTable
           className="bg-BgPrimaryColor border rounded border-BorderColor"
           columns={columns}
+          loader={loader}
           data={data}
           showGridlines={true}
         />

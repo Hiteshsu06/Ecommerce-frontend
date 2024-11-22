@@ -247,19 +247,6 @@ const ProductForm = () => {
         </div>
         <div className="col-span-2">
           <DropdownComponent 
-            value={values?.shop}
-            onChange={handleChange}
-            data= {shopData}
-            placeholder={t("select_shop")}
-            name="shop"
-            error={errors?.shop}
-            touched={touched?.shop}
-            className="col-span-2 w-full rounded border-[1px] border-[#ddd] custom-dropdown focus:outline-none"
-            optionLabel="shopName"
-          />
-        </div>
-        <div className="col-span-2">
-          <DropdownComponent 
             value={values?.category}
             onChange={handleChange}
             data= {categoryData}

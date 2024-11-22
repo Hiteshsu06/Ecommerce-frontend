@@ -15,7 +15,7 @@ export const API_CONSTANTS = {
     DELETE_CATEGORY_DETAILS: "admin/deleteCategoryDtls",
     GET_CATEGORY_DETAILS_BY_ID: "admin/getCategoryDtlsById",
     ADD_UPDATE_PRODUCT_DETAILS: "admin/addProductDetails",
-    GET_ALL_PRODUCT_DETAILS: "admin/getAllProducts",
+    GET_ALL_PRODUCT_DETAILS: "product/list",
     GET_ALL_PRODUCT_DETAILS_BY_PRODUCT_ID: "admin/getProductDtlsByProductId",
-    DELETE_PRODUCT_DETAILS: "admin/deleteProductDtlsById",
+    DELETE_PRODUCT_DETAILS: "product/delete",
 }
