@@ -31,7 +31,7 @@ function App() {
           <Route path="/" element={<MainPage />}/>
           <Route path="/login" element={<Login />}/>
           <Route path="/forgot-password" element={<ForgotPassword />}/>
-          <Route path="/reset_password/:id" element={<ResetPassword />}/>
+          <Route path="/reset-password" element={<ResetPassword />}/>
           <Route path="/signup" element={<Signup />}/>
           <Route path="/dashboard/*" element={<DashboardPage />}/>
           <Route path="/create-category" element={<CategoryForm />}/>

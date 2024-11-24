@@ -6,12 +6,13 @@ import ButtonComponent from "@common/ButtonComponent";
 import InputTextComponent from "@common/InputTextComponent";
 import { allApi } from "@api/api";
 import Loading from '@common/Loading';
+import { API_CONSTANTS } from "../constants/apiurl";
 
 // external libraries
 import * as yup from "yup";
 import { useFormik } from "formik";
 import { Toast } from "primereact/toast";
-import { Link, useNavigate, useParams } from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 
 const data = {
@@ -24,8 +25,9 @@ const ResetPassword = () => {
   const { t } = useTranslation("msg");
   const [loader, setLoader] = useState(false);
   const [toastType, setToastType] = useState('');
-  const { id } = useParams();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const token = searchParams.get('token');
 
   const validationSchema = yup.object().shape({
     password: yup
@@ -46,17 +48,13 @@ const ResetPassword = () => {
 
   const onHandleSubmit = async (value) => {
     let body = {
-      user: {
-        password: value?.password,
-        reset_password_token: id,
-        password_confirmation: value?.confirmPassword
-      }
+      newPassword: value?.password,
+      token: token
     }
     setLoader(true);
-    // To Handle Normal submit
-    allApi(`users/password`, body, "put")
+    allApi(API_CONSTANTS.RESET_PASSWORD, body, "post")
     .then((response) => {
-      if(response?.status === 200){
+      if(response?.status === 201 && response?.data?.status === "success"){
         setToastType('success');
         toast.current.show({
           severity: "success",

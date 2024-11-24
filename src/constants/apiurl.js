@@ -1,5 +1,5 @@
 export const API_CONSTANTS = {
-    SINGNUP: "auth/create-user",
+    SINGNUP: "auth/signup",
     LOGIN: "auth/login",
     VERIFY_TOKEN: "auth/verify-token",
     FORGOT_PASSWORD: "auth/forgot-password",

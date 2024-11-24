@@ -89,5 +89,6 @@
    "request_reset_link" : "Request Reset Link",
    "select_category" : "Select Category",
    "category_name": "Category Name",
-   "category_description": "Category Description"
+   "category_description": "Category Description",
+   "reset_password": "Reset Password"
 }

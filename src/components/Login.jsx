@@ -54,6 +54,7 @@ const Login = () => {
             detail: response?.data?.message,
             life: 3000,
           });
+          setLoader(false);
         }
       })
       .catch(() => {
@@ -63,6 +64,7 @@ const Login = () => {
           detail: "Something went wrong",
           life: 3000,
         });
+        setLoader(false);
       });
   };
 
