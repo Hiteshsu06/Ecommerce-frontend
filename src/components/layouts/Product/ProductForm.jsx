@@ -33,39 +33,51 @@ const ProductForm = () => {
   const [loader, setLoader] = useState(false);
 
   const [data,setData] = useState(initialValues);
-  const [shopData, setShopData] = useState([]);
   const [categoryData, setCategoryData] = useState([]);
   const { id } = useParams();
 
   const validationSchema = yup.object().shape({
-    category: yup.object().required(t("category_is_required")),
-    productName: yup.string().required(t("product_name_is_required")),
+    name: yup.string().required(t("product_name_is_required")),
     price: yup.number().required(t("price_is_required")),
-    stockAvailable: yup.number().required(t("qty_is_required")),
-    file: yup.string().required(t("image_is_required")),
-    shop: yup.object().required(t("shop_name_is_required")),
+    category: yup.object().required(t("category_is_required")),
+    weight: yup.object().required(t("category_is_required")),
+    description: yup.object().required(t("category_is_required")),
+    stock: yup.object().required(t("category_is_required")),
+    lowStockThresold: yup.object().required(t("category_is_required")),
+    salePrice: yup.string(),
+    noOfSaleQuantity: yup.string(),
+    saleStartDate: yup.string(),
+    saleEndDate: yup.string(),
+    productImages: yup.string()
   });
 
   const onHandleSubmit = async (value) => {
     if (id) {
-      // Update Stock
-      updateStock(value);
+      // Update Product
+      updateProduct(value);
     } else {
-      // Create Stock
-      createStock(value);
+      // Create Product
+      createProduct(value);
     }
   };
 
-  const createStock = (value) => {
+  const createProduct = (value) => {
     setLoader(true);
-    allApiWithHeaderToken(API_CONSTANTS.ADD_UPDATE_PRODUCT_DETAILS, {
-      shopRefId: value.shop.id,
-      productName: value.productName,
-      price: value.price,
-      stockAvailable: value.stockAvailable,
-      categoryId: value.category.categoryId,
-      file: value.file,
-    }, "post",'multipart/form-data')
+    allApiWithHeaderToken(API_CONSTANTS.ADD_PRODUCT_DETAILS, {
+        name: value.shop.id,
+        weight: value.productName,
+        price: value.price,
+        description: value.stockAvailable,
+        categoryId: value.category.categoryId,
+        productImages: value.file,
+        isHidden: false,
+        stock: 0,
+        lowStockThresold : 0,
+        salePrice: 0,
+        noOfSaleQuantity: 0,
+        saleStartDate: "string",
+        saleEndDate: "string"
+    }, "post")
       .then((response) => {
         if (response.status === 200 && response.data.status.toLowerCase() === "success") {
           navigate(ROUTES_CONSTANTS.PRODUCTS);
@@ -94,20 +106,26 @@ const ProductForm = () => {
         });
       }).finally(()=>{
         setLoader(false);
-      });;
+      });
   };
 
-  const updateStock = (value) => {
+  const updateProduct = (value) => {
     const payload = {
-      productId: id,
-      shopRefId: value.shop.id,
-      productName: value.productName,
-      price: value.price,
-      stockAvailable: value.stockAvailable,
-      categoryId: value.category.categoryId,
-      file: value.file,
+        name: value.shop.id,
+        weight: value.productName,
+        price: value.price,
+        description: value.stockAvailable,
+        categoryId: value.category.categoryId,
+        productImages: value.file,
+        isHidden: true,
+        stock: 0,
+        lowStockThresold : 0,
+        salePrice: 0,
+        noOfSaleQuantity: 0,
+        saleStartDate: "string",
+        saleEndDate: "string"
     }
-    allApiWithHeaderToken(API_CONSTANTS.ADD_UPDATE_PRODUCT_DETAILS, payload, "post", "multipart/form-data")
+    allApiWithHeaderToken(API_CONSTANTS.UPDATE_PRODUCT_DETAILS, payload, "patch" )
       .then((response) => {
         if (response.status === 200 && response.data.status.toLowerCase() === "success") {
           navigate(ROUTES_CONSTANTS.PRODUCTS);
@@ -132,56 +150,7 @@ const ProductForm = () => {
   };
 
   useEffect(()=>{
-      allApi(API_CONSTANTS.GET_ALL_SHOP_DETAILS, {id:localStorage.getItem("id")}, "post")
-      .then((response) => {
-        if (response.status === 200 && response.data.status.toLowerCase() === "success") {
-          setShopData(response?.data?.data?.shopDetailsList);
-        } else {
-          toast.current.show({
-            severity: "error",
-            summary: "Error",
-            detail: response?.data?.statusMessage,
-            life: 3000,
-          });
-        }
-      })
-      .catch((err) => {
-        console.error("err", err);
-        toast.current.show({
-            severity: "error",
-            summary: "Error",
-            detail: "Something went wrong",
-            life: 3000,
-        });
-      });
-      allApi(API_CONSTANTS.GET_ALL_CATEGORY_DETAILS, {
-        "pageNo" : "1",
-        "limit" : "1000",
-        "searchText" : "",
-        "categoryId" : null
-      }, "post")
-      .then((response) => {
-        if (response.status === 200 && response.data.status.toLowerCase() === "success") {
-          setCategoryData(response?.data?.data);
-        } else {
-          toast.current.show({
-            severity: "error",
-            summary: "Error",
-            detail: response?.data?.statusMessage,
-            life: 3000,
-          });
-        }
-      })
-      .catch((err) => {
-        console.error("err", err);
-        toast.current.show({
-            severity: "error",
-            summary: "Error",
-            detail: "Something went wrong",
-            life: 3000,
-        });
-      });
-
+     fetchCategoryList();
       if(id){
         allApiWithHeaderToken(API_CONSTANTS.GET_ALL_PRODUCT_DETAILS_BY_PRODUCT_ID, {id:id}, "post")
         .then(async (response) => {
@@ -193,7 +162,6 @@ const ProductForm = () => {
                   productName: response.data?.data?.productName,
                   price: response.data?.data?.price,
                   stockAvailable: response.data?.data?.stockAvailable,
-                  shop: shopData.find(item=>item.id === response.data?.data?.shopDetails?.shopDtlsId),
                   category:  categoryData.find(item=>item.categoryId === response.data?.data?.categoryDtls?.categoryId),
               })
           } else {
@@ -215,7 +183,35 @@ const ProductForm = () => {
           });
         });
       }
-  },[id])
+  },[id]);
+
+  const fetchCategoryList = () => {
+    setLoader(true);
+    allApiWithHeaderToken(API_CONSTANTS.GET_ALL_CATEGORY_DETAILS, "" , "get")
+      .then((response) => {
+        if (response.status === 200 && response.data?.status=== "success") {
+          setCategoryData(response?.data?.data);
+        } else {
+          toast.current.show({
+            severity: "error",
+            summary: "Error",
+            detail: response?.data?.data?.statusMessage,
+            life: 3000,
+          });
+        }
+      })
+      .catch((err) => {
+        console.error("err", err);
+        toast.current.show({
+          severity: "error",
+          summary: "Error",
+          detail: "Something Went Wrong",
+          life: 3000,
+        });
+      }).finally(()=>{
+        setLoader(false);
+      });
+  };  
 
   const handleBack = () => {
     navigate(ROUTES_CONSTANTS.PRODUCTS);
@@ -240,7 +236,7 @@ const ProductForm = () => {
         </div>
        <div className="col-span-4">
             <FileUpload 
-              isLabel={t("stock_long_term_chart")}
+              isLabel={t("product_image")}
               value={values?.image}
               error={errors?.file}
               touched={touched?.file}
@@ -248,7 +244,7 @@ const ProductForm = () => {
               onChange={(e)=> {
                 setFieldValue('file', e?.currentTarget?.files[0]);
                 setFieldValue('image', URL.createObjectURL(e?.target?.files[0]));
-              }}/>    
+          }}/>    
              <label htmlFor="file" className="error text-red-500">{errors?.file}</label>
         </div>
         <div className="col-span-2">
@@ -261,7 +257,7 @@ const ProductForm = () => {
             error={errors?.category}
             touched={touched?.category}
             className="col-span-2 w-full rounded border-[1px] border-[#ddd] custom-dropdown focus:outline-none"
-            optionLabel="categoryType"
+            optionLabel="name"
           />
         </div>
         <div className="col-span-2">

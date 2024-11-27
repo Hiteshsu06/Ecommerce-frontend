@@ -103,6 +103,9 @@
     color:var(--custom-secondary-color) !important;
     font-size: 0.7rem;
   }
+  .nested > div > table > tbody > tr > td {
+    padding: 0rem 1rem;
+  }
   .custom-menu-container > ul > li > .p-menuitem-content:hover{
     background-color: var(--quater-background-color);
   }

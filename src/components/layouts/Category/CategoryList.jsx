@@ -5,7 +5,7 @@ import { useNavigate } from "react-router-dom";
 
 // components
 import Breadcrum from "@common/Breadcrum";
-import DataTable from "@common/DataTable";
+import NestedDatatable from "@common/NestedDatatable";
 import ButtonComponent from "@common/ButtonComponent";
 import Confirmbox from "@common/Confirmbox";
 import { allApiWithHeaderToken } from "@api/api";
@@ -46,10 +46,34 @@ const CatergoryList = () => {
       </div>
     );
   };
+
+  const nestedActionBodyTemplate= (rowData) => {
+    return (
+      <div className="flex">
+        <ButtonComponent
+          icon="ri-pencil-line"
+          className="text-[1rem]"
+          // onClick={() => editCategory(rowData)}
+        />
+        <ButtonComponent
+          icon="ri-delete-bin-line"
+          className="text-[1rem]"
+          // onClick={() => confirmDeleteCategory(rowData)}
+        />
+      </div>
+    );
+  };
+
   const columns = [
     { field: "name", header: t("name") },
     { field: "description", header: t("description") },
     { header: t("action"), body: actionBodyTemplate, headerStyle: { paddingLeft: '3%'} },
+  ];
+
+  const nestedColumns = [
+    { field: "name", header: t("name") },
+    { field: "description", header: t("description") },
+    { header: t("action"), body: nestedActionBodyTemplate, headerStyle: { paddingLeft: '3%'} },
   ];
 
   const editCategory = (item) => {
@@ -70,7 +94,6 @@ const CatergoryList = () => {
     setIsConfirm(!isConfirm);
     allApiWithHeaderToken(`${API_CONSTANTS.DELETE_CATEGORY_DETAILS}/${deleteId}`, '', "delete")
       .then((response) => {
-        console.log("response",response)
         if (response.status === 200 && response.data.status === "success") {
           fetchCategoryList();
         } else {
@@ -149,10 +172,11 @@ const CatergoryList = () => {
         />
       </div>
       <div className="mt-4">
-        <DataTable
+        <NestedDatatable
           className="bg-BgPrimaryColor border rounded border-BorderColor"
           columns={columns}
           data={data}
+          nestedColumns={nestedColumns}
           loader={loader}
           showGridlines={true}
         />

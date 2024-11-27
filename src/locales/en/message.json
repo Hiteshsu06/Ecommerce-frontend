@@ -90,5 +90,6 @@
    "select_category" : "Select Category",
    "category_name": "Category Name",
    "category_description": "Category Description",
-   "reset_password": "Reset Password"
+   "reset_password": "Reset Password",
+   "product_image": "Product Image"
 }
