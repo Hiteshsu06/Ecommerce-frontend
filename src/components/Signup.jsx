@@ -80,7 +80,7 @@ const Signup = () => {
             life: 3000,
           });
           setTimeout(() => {
-            navigate(ROUTES_CONSTANTS.LOGIN);
+            navigate(ROUTES_CONSTANTS.LOGIN); 
           }, 3000);
         } else {
           toast.current.show({
