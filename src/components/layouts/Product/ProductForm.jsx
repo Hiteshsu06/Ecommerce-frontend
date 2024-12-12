@@ -18,13 +18,19 @@ import DropdownComponent from "../../common/DropdownComponent";
 import Loading from '@common/Loading';
 
 const initialValues = {
-  category: {},
-  productName: "",
+  name: "",
+  weight: "",
   price: "",
-  file: "",
-  stockAvailable: "",
-  shop: {},
-  image: "",
+  description: "",
+  categoryId: "",
+  productImages: "",
+  isHidden: false,
+  stock: 0,
+  lowStockThresold : 0,
+  salePrice: 0,
+  noOfSaleQuantity: 0,
+  saleStartDate: "",
+  saleEndDate: ""
 }
 const ProductForm = () => {
   const toast = useRef(null);
@@ -33,60 +39,81 @@ const ProductForm = () => {
   const [loader, setLoader] = useState(false);
 
   const [data,setData] = useState(initialValues);
+  const [toastType, setToastType] = useState(''); 
   const [categoryData, setCategoryData] = useState([]);
   const { id } = useParams();
 
   const validationSchema = yup.object().shape({
     name: yup.string().required(t("product_name_is_required")),
     price: yup.number().required(t("price_is_required")),
-    category: yup.object().required(t("category_is_required")),
-    weight: yup.object().required(t("category_is_required")),
-    description: yup.object().required(t("category_is_required")),
-    stock: yup.object().required(t("category_is_required")),
-    lowStockThresold: yup.object().required(t("category_is_required")),
-    salePrice: yup.string(),
-    noOfSaleQuantity: yup.string(),
+    weight: yup.number().required(t("weight_is_required")),
+    description: yup.string().required(t("description_is_required")),
+    stock: yup.number(),
+    lowStockThresold: yup.number(),
+    salePrice: yup.number(),
+    noOfSaleQuantity: yup.number(),
     saleStartDate: yup.string(),
     saleEndDate: yup.string(),
     productImages: yup.string()
   });
 
   const onHandleSubmit = async (value) => {
-    if (id) {
-      // Update Product
-      updateProduct(value);
-    } else {
+    // if (id) {
+    //   // Update Product
+    //   updateProduct(value);
+    // } else {
       // Create Product
       createProduct(value);
-    }
+    // }
+  };
+
+  
+  const toastHandler=()=>{
+    if (toastType === 'success') {
+       navigate(ROUTES_CONSTANTS.PRODUCTS);
+     }
+  }
+
+  const successToaster=(response)=>{
+    setToastType('success');
+    return toast.current.show({
+      severity: "success",
+      summary: t("success"),
+      detail: response?.data?.message,
+      life: 500
+    });
+  };
+
+  const errorToaster=(err)=>{
+    setToastType('error');
+    return toast.current.show({
+      severity: "error",
+      summary: t("error"),
+      detail: err,
+      life: 1000
+    });
   };
 
   const createProduct = (value) => {
     setLoader(true);
-    allApiWithHeaderToken(API_CONSTANTS.ADD_PRODUCT_DETAILS, {
-        name: value.shop.id,
-        weight: value.productName,
+    allApiWithHeaderToken(API_CONSTANTS.ADD_PRODUCT, {
+        name: value.name,
+        weight: value.weight,
         price: value.price,
-        description: value.stockAvailable,
-        categoryId: value.category.categoryId,
-        productImages: value.file,
-        isHidden: false,
-        stock: 0,
-        lowStockThresold : 0,
-        salePrice: 0,
-        noOfSaleQuantity: 0,
-        saleStartDate: "string",
-        saleEndDate: "string"
-    }, "post")
-      .then((response) => {
-        if (response.status === 200 && response.data.status.toLowerCase() === "success") {
-          navigate(ROUTES_CONSTANTS.PRODUCTS);
-          toast.current.show({
-            severity: "success",
-            summary: "Success",
-            detail: "Product added successfully",
-            life: 3000,
-          });
+        description: value.description,
+        categoryId: value.category.id,
+        productImages: value.image,
+        isHidden: true,
+        stock: value?.stock,
+        lowStockThresold : value?.lowStockThresold,
+        salePrice: value?.salePrice,
+        noOfSaleQuantity: value?.noOfSaleQuantity,
+        saleStartDate: value.saleStartDate ? new Date(value.saleStartDate).toISOString() : null,
+        saleEndDate: value.saleEndDate ? new Date(value.saleEndDate).toISOString() : null,
+    }, "post").then((response) => {
+        console.log("R",response)
+        if (response.status === 201 && response?.data?.status === "success") {
+          successToaster(response);
         } else {
           toast.current.show({
             severity: "error",
@@ -97,13 +124,7 @@ const ProductForm = () => {
         }
       })
       .catch((err) => {
-        console.error("err", err);
-        toast.current.show({
-            severity: "error",
-            summary: "Error",
-            detail: "Something went wrong",
-            life: 3000,
-        });
+        errorToaster(err?.response?.data);
       }).finally(()=>{
         setLoader(false);
       });
@@ -111,12 +132,12 @@ const ProductForm = () => {
 
   const updateProduct = (value) => {
     const payload = {
-        name: value.shop.id,
-        weight: value.productName,
+        name: value.name,
+        weight: value.weight,
         price: value.price,
-        description: value.stockAvailable,
+        description: value.description,
         categoryId: value.category.categoryId,
-        productImages: value.file,
+        productImages: value.image,
         isHidden: true,
         stock: 0,
         lowStockThresold : 0,
@@ -125,7 +146,7 @@ const ProductForm = () => {
         saleStartDate: "string",
         saleEndDate: "string"
     }
-    allApiWithHeaderToken(API_CONSTANTS.UPDATE_PRODUCT_DETAILS, payload, "patch" )
+    allApiWithHeaderToken(API_CONSTANTS.UPDATE_PRODUCT, payload, "patch" )
       .then((response) => {
         if (response.status === 200 && response.data.status.toLowerCase() === "success") {
           navigate(ROUTES_CONSTANTS.PRODUCTS);
@@ -211,7 +232,17 @@ const ProductForm = () => {
       }).finally(()=>{
         setLoader(false);
       });
-  };  
+  }; 
+  
+  const imageHandler= async (file)=>{
+    let data = await new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = () => resolve(reader.result);
+      reader.onerror = error => reject(error);
+    });
+    setFieldValue('image', data);
+  }
 
   const handleBack = () => {
     navigate(ROUTES_CONSTANTS.PRODUCTS);
@@ -227,9 +258,9 @@ const ProductForm = () => {
 
   const { values, errors, setFieldValue,handleSubmit, handleChange, touched } = formik;
   return (
-    <div className="flex h-screen bg-BgPrimaryColor">
+    <div className="flex h-full bg-BgPrimaryColor py-5">
       {loader && <Loading/>}
-      <Toast ref={toast} position="top-right" />
+      <Toast ref={toast} position="top-right" style={{scale: '0.7'}} onHide={toastHandler}/>
       <div className="mx-16 my-auto grid h-fit w-full grid-cols-4 gap-4 bg-BgSecondaryColor p-8 border rounded border-BorderColor">
         <div className="col-span-4">
             {t("create_product")}
@@ -242,8 +273,7 @@ const ProductForm = () => {
               touched={touched?.file}
               name="file"
               onChange={(e)=> {
-                setFieldValue('file', e?.currentTarget?.files[0]);
-                setFieldValue('image', URL.createObjectURL(e?.target?.files[0]));
+                imageHandler(e?.target?.files[0]);
           }}/>    
              <label htmlFor="file" className="error text-red-500">{errors?.file}</label>
         </div>
@@ -262,14 +292,27 @@ const ProductForm = () => {
         </div>
         <div className="col-span-2">
           <InputTextComponent
-            value={values?.productName}
+            value={values?.name}
             onChange={handleChange}
-            type="productName"
+            type="text"
             placeholder={t("product_name")}
-            name="productName"
+            name="name"
             isLabel={true}
-            error={errors?.productName}
-            touched={touched?.productName}
+            error={errors?.name}
+            touched={touched?.name}
+            className="col-span-2 w-full rounded border-[1px] border-[#ddd] px-[1rem] py-[8px] text-[11px] focus:outline-none"
+          />
+        </div>
+        <div className="col-span-2">
+          <InputTextComponent
+            value={values?.weight}
+            onChange={handleChange}
+            type="number"
+            placeholder={t("product_weight")}
+            name="weight"
+            isLabel={true}
+            error={errors?.weight}
+            touched={touched?.weight}
             className="col-span-2 w-full rounded border-[1px] border-[#ddd] px-[1rem] py-[8px] text-[11px] focus:outline-none"
           />
         </div>
@@ -277,7 +320,7 @@ const ProductForm = () => {
           <InputTextComponent
             value={values?.price}
             onChange={handleChange}
-            type="price"
+            type="number"
             placeholder={t("price")}
             name="price"
             isLabel={true}
@@ -288,14 +331,92 @@ const ProductForm = () => {
         </div>
         <div className="col-span-2">
           <InputTextComponent
-            value={values?.stockAvailable}
+            value={values?.description}
             onChange={handleChange}
-            type="stockAvailable"
-            placeholder={t("stockAvailable")}
-            name="stockAvailable"
+            type="text"
+            placeholder={t("description")}
+            name="description"
             isLabel={true}
-            error={errors?.stockAvailable}
-            touched={touched?.stockAvailable}
+            error={errors?.description}
+            touched={touched?.description}
+            className="col-span-2 w-full rounded border-[1px] border-[#ddd] px-[1rem] py-[8px] text-[11px] focus:outline-none"
+          />
+        </div>
+        <div className="col-span-2">
+          <InputTextComponent
+            value={values?.stock}
+            onChange={handleChange}
+            type="number"
+            placeholder={t("available_qty")}
+            name="stock"
+            isLabel={true}
+            error={errors?.stock}
+            touched={touched?.stock}
+            className="col-span-2 w-full rounded border-[1px] border-[#ddd] px-[1rem] py-[8px] text-[11px] focus:outline-none"
+          />
+        </div>
+        <div className="col-span-2">
+          <InputTextComponent
+            value={values?.lowStockThresold}
+            onChange={handleChange}
+            type="number"
+            placeholder={t("minimum_stock_available")}
+            name="lowStockThresold"
+            isLabel={true}
+            error={errors?.lowStockThresold}
+            touched={touched?.lowStockThresold}
+            className="col-span-2 w-full rounded border-[1px] border-[#ddd] px-[1rem] py-[8px] text-[11px] focus:outline-none"
+          />
+        </div>
+        <div className="col-span-2">
+          <InputTextComponent
+            value={values?.salePrice}
+            onChange={handleChange}
+            type="number"
+            placeholder={t("sale_price")}
+            name="salePrice"
+            isLabel={true}
+            error={errors?.salePrice}
+            touched={touched?.salePrice}
+            className="col-span-2 w-full rounded border-[1px] border-[#ddd] px-[1rem] py-[8px] text-[11px] focus:outline-none"
+          />
+        </div>
+        <div className="col-span-2">
+          <InputTextComponent
+            value={values?.noOfSaleQuantity}
+            onChange={handleChange}
+            type="number"
+            placeholder={t("no_of_sale_quantity")}
+            name="noOfSaleQuantity"
+            isLabel={true}
+            error={errors?.noOfSaleQuantity}
+            touched={touched?.noOfSaleQuantity}
+            className="col-span-2 w-full rounded border-[1px] border-[#ddd] px-[1rem] py-[8px] text-[11px] focus:outline-none"
+          />
+        </div>
+        <div className="col-span-2">
+          <InputTextComponent
+            value={values?.saleStartDate}
+            onChange={handleChange}
+            type="date"
+            placeholder={t("sale_start_date")}
+            name="saleStartDate"
+            isLabel={true}
+            error={errors?.saleStartDate}
+            touched={touched?.saleStartDate}
+            className="col-span-2 w-full rounded border-[1px] border-[#ddd] px-[1rem] py-[8px] text-[11px] focus:outline-none"
+          />
+        </div>
+        <div className="col-span-2">
+          <InputTextComponent
+            value={values?.saleEndDate}
+            onChange={handleChange}
+            type="date"
+            placeholder={t("sale_end_date")}
+            name="saleEndDate"
+            isLabel={true}
+            error={errors?.saleEndDate}
+            touched={touched?.saleEndDate}
             className="col-span-2 w-full rounded border-[1px] border-[#ddd] px-[1rem] py-[8px] text-[11px] focus:outline-none"
           />
         </div>

@@ -11,9 +11,11 @@ export const API_CONSTANTS = {
     GET_ALL_CATEGORY_DETAILS_BY_CATEGORY_ID: "admin/getCategoryByCategoryId",
     DELETE_CATEGORY_DETAILS: "category/delete",
     GET_CATEGORY_DETAILS_BY_ID: "admin/getCategoryDtlsById",
-    ADD_PRODUCT_DETAILS: "admin/addProductDetails",
-    UPDATE_PRODUCT_DETAILS: "admin/addProductDetails",
+    
+    
     GET_ALL_PRODUCT_DETAILS: "product/list",
-    GET_ALL_PRODUCT_DETAILS_BY_PRODUCT_ID: "admin/getProductDtlsByProductId",
-    DELETE_PRODUCT_DETAILS: "product/delete",
+    ADD_PRODUCT: "product/create",
+    UPDATE_PRODUCT: "product/create/update",
+    DELETE_PRODUCT: "product/delete",
+    GET_PRODUCT_BY_ID: "product"
 }

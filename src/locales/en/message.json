@@ -91,5 +91,12 @@
    "category_name": "Category Name",
    "category_description": "Category Description",
    "reset_password": "Reset Password",
-   "product_image": "Product Image"
+   "product_image": "Product Image",
+   "product_weight": "Product Weight",
+   "available_qty": "Available Qty",
+   "minimum_stock_available": "Minimum Stock Available",
+   "sale_price": "Sale Price",
+   "no_of_sale_quantity": "No of sale quantity",
+   "sale_start_date": "Sale start date",
+   "sale_end_date": "Sale end date"
 }
