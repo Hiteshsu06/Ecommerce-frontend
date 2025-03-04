@@ -43,32 +43,14 @@ const ShopOurRange = () => {
     ];
 
     return (
-        <div className="container p-10">
+        <div className="p-10">
             <h1 className="text-3xl font-bold pb-10">Shop Our Range</h1>
             <Swiper
-                spaceBetween={10}
+                spaceBetween={50}
                 slidesPerView={4}
                 allowTouchMove={true}
                 loop={true}
-                breakpoints={{
-                    300: {
-                        slidesPerView: 1,
-                        spaceBetween: 10,
-                    },
-                    640: {
-                        slidesPerView: 2,
-                        spaceBetween: 10,
-                    },
-                    768: {
-                        slidesPerView: 3,
-                        spaceBetween: 10,
-                    },
-                    1024: {
-                        slidesPerView: 4,
-                        spaceBetween: 10,
-                    },
-                }}
-            >
+                >
                 {category.map((item) => (
                     <SwiperSlide key={item.id}>
                         <RangeCard data={item} />

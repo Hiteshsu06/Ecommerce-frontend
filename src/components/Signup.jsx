@@ -17,15 +17,11 @@ import { API_CONSTANTS } from "../constants/apiurl";
 import { ROUTES_CONSTANTS } from "../constants/routesurl";
 
 const data = {
-  firstname: "",
-  lastname: "",
+  name: "",
   email: "",
   password: "",
   confirmPassword: "",
-  address: "",
-  city: "",
-  country: "",
-  pincode: ""
+  phoneNumber: ""
 };
 
 const Signup = () => {
@@ -36,8 +32,7 @@ const Signup = () => {
   const navigate = useNavigate();
 
   const validationSchema = yup.object().shape({
-    firstname: yup.string().required(t("first_name_is_required")),
-    lastname: yup.string().required(t("last_name_is_required")),
+    name: yup.string().required(t("name_is_required")),
     email: yup
       .string()
       .email(t("please_enter_valid_email"))
@@ -60,19 +55,18 @@ const Signup = () => {
 
   const onHandleSubmit = async (value) => {
     setLoader(true);
-    let body = structuredClone({
-      fname: value.firstname,
-      lname: value.lastname,
-      email: value.email,
-      password: value.password,
-      address: value.address,
-      city: value.city,
-      country: value.country,
-      pincode: value.pincode
-    });
+    let body = structuredClone(
+      {
+        user: {
+            name: value.name,
+            email: value.email,
+            password: value.password,
+            phone_number: value.phoneNumber
+          }
+      });
       allApi(API_CONSTANTS.SINGNUP, body, "post")
       .then((response) => {
-        if(response?.status === 201 && response?.data?.status === "success"){
+        if(response?.status === 200){
           toast.current.show({
             severity: "success",
             summary: "Success",
@@ -81,25 +75,20 @@ const Signup = () => {
           });
           setTimeout(() => {
             navigate(ROUTES_CONSTANTS.LOGIN); 
-          }, 3000);
-        } else {
-          toast.current.show({
-            severity: "error",
-            summary: "Error",
-            detail: response?.data?.message,
-            life: 3000,
-          });
+          }, 2000);
         }
       })
       .catch((err) => {
-        console.error("err", err);
         toast.current.show({
           severity: "error",
           summary: "Error",
-          detail: "Something went wrong",
+          detail: err?.response?.data?.errors,
           life: 3000,
         });
-      }).finally(()=>{setLoader(true);});
+        setLoader(false);
+      }).finally(()=>{
+        setLoader(false);
+      });
     };
 
   const formik = useFormik({
@@ -123,25 +112,13 @@ const Signup = () => {
         <div className="mt-4 flex flex-col gap-2">
           <div>
             <InputTextComponent
-              value={values?.firstname}
+              value={values?.name}
               onChange={handleChange}
               type="text"
-              placeholder={t("first_name")}
-              name="firstname"
-              error={errors?.firstname}
-              touched={touched?.firstname}
-              className="w-full rounded border-[1px] border-[#ddd] px-[1rem] py-[8px] text-[11px] focus:outline-none"
-            />
-          </div>
-          <div>
-            <InputTextComponent
-              value={values?.lastname}
-              onChange={handleChange}
-              type="text"
-              placeholder={t("last_name")}
-              name="lastname"
-              error={errors?.lastname}
-              touched={touched?.lastname}
+              placeholder={t("full_name")}
+              name="name"
+              error={errors?.name}
+              touched={touched?.name}
               className="w-full rounded border-[1px] border-[#ddd] px-[1rem] py-[8px] text-[11px] focus:outline-none"
             />
           </div>
@@ -150,7 +127,7 @@ const Signup = () => {
               value={values?.email}
               onChange={handleChange}
               type="email"
-              placeholder={t("your_email")}
+              placeholder={t("email")}
               name="email"
               error={errors?.email}
               touched={touched?.email}
@@ -159,49 +136,11 @@ const Signup = () => {
           </div>
           <div>
             <InputTextComponent
-              value={values?.address}
-              onChange={handleChange}
-              type="address"
-              placeholder={t("your_address")}
-              name="address"
-              error={errors?.address}
-              touched={touched?.address}
-              className="w-full rounded border-[1px] border-[#ddd] px-[1rem] py-[8px] text-[11px] focus:outline-none"
-            />
-          </div>
-          <div>
-            <InputTextComponent
-              value={values?.city}
-              onChange={handleChange}
-              type="city"
-              placeholder={t("your_city")}
-              name="city"
-              error={errors?.city}
-              touched={touched?.city}
-              className="w-full rounded border-[1px] border-[#ddd] px-[1rem] py-[8px] text-[11px] focus:outline-none"
-            />
-          </div>
-          <div>
-            <InputTextComponent
-              value={values?.country}
-              onChange={handleChange}
-              type="country"
-              placeholder={t("your_country")}
-              name="country"
-              error={errors?.country}
-              touched={touched?.country}
-              className="w-full rounded border-[1px] border-[#ddd] px-[1rem] py-[8px] text-[11px] focus:outline-none"
-            />
-          </div>
-          <div>
-            <InputTextComponent
-                value={values?.pincode}
+                value={values?.phoneNumber}
                 onChange={handleChange}
-                type="pincode"
-                placeholder={t("your_pincode")}
-                name="pincode"
-                error={errors?.pincode}
-                touched={touched?.pincode}
+                type="phoneNumber"
+                placeholder={t("phone_number")}
+                name="phoneNumber"
                 className="w-full rounded border-[1px] border-[#ddd] px-[1rem] py-[8px] text-[11px] focus:outline-none"
               />
           </div>
@@ -210,7 +149,7 @@ const Signup = () => {
               value={values?.password}
               onChange={handleChange}
               type="password"
-              placeholder={t("your_password")}
+              placeholder={t("password")}
               name="password"
               error={errors?.password}
               touched={touched?.password}
@@ -222,7 +161,7 @@ const Signup = () => {
               value={values?.confirmPassword}
               onChange={handleChange}
               type="password"
-              placeholder={t("your_confirm_password")}
+              placeholder={t("confirm_password")}
               name="confirmPassword"
               error={errors?.confirmPassword}
               touched={touched?.confirmPassword}

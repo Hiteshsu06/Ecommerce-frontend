@@ -13,10 +13,11 @@ const NestedDatatable = ({ columns, data = [], nestedColumns, className, showGri
     return input.map((item, index) => ({
       key: `${index}`,
       data: {
-        name: item.name,
-        description: item.description,
-        createdAt: item.createdAt,
-        updatedAt: item.updatedAt,
+        id: item?.id,
+        name: item?.name,
+        description: item?.description,
+        createdAt: item?.createdAt,
+        updatedAt: item?.updatedAt,
       },
       children: (item.children || []).map((child, childIndex) => ({
         key: `${index}-${childIndex}`,

@@ -14,7 +14,7 @@ const HeroSection = () => {
 
     return (
         <>
-            <a href={Hero.navigateUrl} className="hero-section flex box-border justify-center items-center max-sm:flex-col">
+            <a className="hero-section flex box-border justify-center items-center max-sm:flex-col">
                 <div className="hero-section-image w-[60%] h-[560px] max-sm:w-full max-sm:h-[300px] max-md:w[50%]">
                     <img src={Hero.imageUrl} alt="hero" className="w-full h-full object-cover" />
                 </div>

@@ -12,9 +12,9 @@ import { allApiWithHeaderToken } from "@api/api";
 import { ROUTES_CONSTANTS } from "../../../constants/routesurl";
 import { API_CONSTANTS } from "../../../constants/apiurl";
 import { Toast } from "primereact/toast";
-import DefaultImage from "../../../assets/no-image.jpeg";
+import { refactorPrefilledDate } from '../../../helper/helper';
 
-const CatergoryList = () => {
+const CouponList = () => {
   const toast = useRef(null);
   const { t } = useTranslation("msg");
   const navigate = useNavigate();
@@ -23,65 +23,45 @@ const CatergoryList = () => {
   const [loader, setLoader] = useState(false);
 
   const item = {
-    heading: t("category"),
+    heading: t("coupon"),
     routes: [
       { label: t("dashboard"), route: ROUTES_CONSTANTS.DASHBOARD },
-      { label: t("category"), route: ROUTES_CONSTANTS.CATEGORIES },
+      { label: t("coupon"), route: ROUTES_CONSTANTS.COUPONS },
     ],
   };
 
   const [data, setData] = useState([]);
-
   const actionBodyTemplate = (rowData) => {
     return (
       <div className="flex">
         <ButtonComponent
           icon="ri-pencil-line"
           className="text-[1rem]"
-          onClick={() => editCategory(rowData)}
+          onClick={() => editCoupon(rowData)}
         />
         <ButtonComponent
           icon="ri-delete-bin-line"
           className="text-[1rem]"
-          onClick={() => confirmDeleteCategory(rowData)}
+          onClick={() => confirmDeleteCoupon(rowData)}
         />
       </div>
     );
   };
 
-  const nameBodyTemplate= (rowData) => {
-    return (
-      <div className="flex items-center gap-4">
-        <div className="w-[60px] overflow-hidden h-[60px]">
-          <img src={rowData?.image_url ? rowData?.image_url : DefaultImage} alt="" width={80} style={{height: "100%"}}/>
-        </div>
-        <span>{rowData?.name}</span>
-      </div>
-    );
-  };
-
-  const statusBodyTemplate= (rowData) => {
-    return (
-      <div className="flex items-center gap-4">
-        {rowData?.status === 1 ? <span className="text-[green]">Active</span> : <span className="text-[red]">Inactive</span>}
-      </div>
-    );
-  };
-
-
   const columns = [
-    { header: t("name"), body: nameBodyTemplate, headerStyle: { paddingLeft: '3%'} },
-    { field: "description", header: t("description")},
-    { header: t("status"), body: statusBodyTemplate },
+    { field: "code", header: t("code")},
+    { field: "discount_type", header: t("discount_type")},
+    { field: "discount_value", header: t("discount_value")},
+    { field: "valid_from", header: t("valid_from")},
+    { field: "valid_until", header: t("valid_until")},
     { header: t("action"), body: actionBodyTemplate, headerStyle: { paddingLeft: '3%'} },
   ];
 
-  const editCategory = (item) => {
-    console.log("item",item)
-    navigate(`/edit-category/${item?.id}`);
+  const editCoupon = (item) => {
+    navigate(`/edit-coupon/${item?.id}`);
   };
 
-  const confirmDeleteCategory = (item) => {
+  const confirmDeleteCoupon = (item) => {
     setIsConfirm(!isConfirm);
     setDeleteId(item?.id);
   };
@@ -93,11 +73,11 @@ const CatergoryList = () => {
 
   const confirmDialogbox = () => {
     setIsConfirm(!isConfirm);
-    allApiWithHeaderToken(`${API_CONSTANTS.COMMON_CATEGORIES_URL}/${deleteId}`, '', "delete")
+    allApiWithHeaderToken(`${API_CONSTANTS.COMMON_COUPON_URL}/${deleteId}`, '', "delete")
       .then((response) => {
         if (response.status === 200) {
           fetchCategoryList();
-        }
+        } 
       })
       .catch((err) => {
         toast.current.show({
@@ -111,14 +91,23 @@ const CatergoryList = () => {
 
   const fetchCategoryList = () => {
     setLoader(true);
-    allApiWithHeaderToken(API_CONSTANTS.COMMON_CATEGORIES_URL, "" , "get")
+    allApiWithHeaderToken(API_CONSTANTS.COMMON_COUPON_URL, "" , "get")
       .then((response) => {
         if (response.status === 200) {
-          setData(response?.data);
-        } 
+          let updatedArray = [];
+          response?.data.forEach((item)=>{
+            let obj = {
+              ...item, 
+              valid_until: refactorPrefilledDate(item?.valid_until), 
+              valid_from: refactorPrefilledDate(item?.valid_from),
+              discount_type: item?.discount_type == 0 ? "Percentage" : "Fixed"
+            }
+            updatedArray.push(obj)
+          })
+          setData(updatedArray);
+        }
       })
       .catch((err) => {
-        console.error("err", err);
         toast.current.show({
           severity: "error",
           summary: "Error",
@@ -135,8 +124,8 @@ const CatergoryList = () => {
     fetchCategoryList();
   }, []);
 
-  const createCategory = () => {
-    navigate(ROUTES_CONSTANTS.CREATE_CATEGORY);
+  const createCoupon = () => {
+    navigate(ROUTES_CONSTANTS.CREATE_COUPON);
   };
 
   return (
@@ -150,10 +139,12 @@ const CatergoryList = () => {
       <Breadcrum item={item} />
       <div className="mt-4 flex justify-end bg-BgSecondaryColor border rounded border-BorderColor p-2">
         <ButtonComponent
-          onClick={() => createCategory()}
+          onClick={() => createCoupon()}
           type="submit"
-          label={t("create_category")}
+          label={t("create_coupon")}
           className="rounded bg-BgTertiaryColor px-6 py-2 text-[12px] text-white"
+          icon="pi pi-arrow-right"
+          iconPos="right"
         />
       </div>
       <div className="mt-4">
@@ -169,4 +160,4 @@ const CatergoryList = () => {
   );
 };
 
-export default CatergoryList;
+export default CouponList;

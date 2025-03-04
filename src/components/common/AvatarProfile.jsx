@@ -62,7 +62,7 @@ const AvatarProfile = ({ size, shape, userDetails }) => {
   ];
 
   const logout=()=>{
-    allApiWithHeaderToken(API_CONSTANTS.LOGOUT, "" , "get")
+    allApiWithHeaderToken(API_CONSTANTS.LOGOUT, "" , "delete")
       .then((response) => {
         if (response.status === 200){
           setToastType('success');
@@ -70,7 +70,7 @@ const AvatarProfile = ({ size, shape, userDetails }) => {
             severity: "success",
             summary: t("success"),
             detail: "You have successfully logout",
-            life: 1000
+            life: 500
           });
         } 
         else {

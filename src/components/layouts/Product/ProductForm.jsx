@@ -2,7 +2,6 @@
 import ButtonComponent from "@common/ButtonComponent";
 import InputTextComponent from "@common/InputTextComponent";
 import FileUpload from "@common/FileUpload";
-import { allApi } from "@api/api";
 
 // external libraries
 import * as yup from "yup";
@@ -17,20 +16,18 @@ import { allApiWithHeaderToken } from "../../../api/api";
 import DropdownComponent from "../../common/DropdownComponent";
 import Loading from '@common/Loading';
 
+const statusList = [
+  { name: "Active", value: "1"},
+  { name: "Inactive", value: "0"}
+];
+
 const initialValues = {
   name: "",
-  weight: "",
-  price: "",
   description: "",
-  categoryId: "",
-  productImages: "",
-  isHidden: false,
-  stock: 0,
-  lowStockThresold : 0,
-  salePrice: 0,
-  noOfSaleQuantity: 0,
-  saleStartDate: "",
-  saleEndDate: ""
+  subCategory: {},
+  image: "",
+  price: "",
+  status: ""
 }
 const ProductForm = () => {
   const toast = useRef(null);
@@ -46,25 +43,21 @@ const ProductForm = () => {
   const validationSchema = yup.object().shape({
     name: yup.string().required(t("product_name_is_required")),
     price: yup.number().required(t("price_is_required")),
-    weight: yup.number().required(t("weight_is_required")),
     description: yup.string().required(t("description_is_required")),
-    stock: yup.number(),
-    lowStockThresold: yup.number(),
-    salePrice: yup.number(),
-    noOfSaleQuantity: yup.number(),
-    saleStartDate: yup.string(),
-    saleEndDate: yup.string(),
-    productImages: yup.string()
+    subCategory: yup.object()
+    .test('non-empty-object', t("sub_category_is_required"), (value) => {
+      return value && Object.keys(value).length > 0;
+    })
   });
 
-  const onHandleSubmit = async (value) => {
-    // if (id) {
-    //   // Update Product
-    //   updateProduct(value);
-    // } else {
+  const onHandleSubmit = (value) => {
+    if (id) {
+      // Update Product
+      updateProduct(value);
+    } else {
       // Create Product
       createProduct(value);
-    // }
+    }
   };
 
   
@@ -95,154 +88,105 @@ const ProductForm = () => {
   };
 
   const createProduct = (value) => {
+    let data = {
+      name: value?.name,
+      description: value?.description,
+      status: 1,
+      image: value?.image,
+      sub_category_id: value?.subCategory?.id,
+      price: value?.price
+    }
     setLoader(true);
-    allApiWithHeaderToken(API_CONSTANTS.ADD_PRODUCT, {
-        name: value.name,
-        weight: value.weight,
-        price: value.price,
-        description: value.description,
-        categoryId: value.category.id,
-        productImages: value.image,
-        isHidden: true,
-        stock: value?.stock,
-        lowStockThresold : value?.lowStockThresold,
-        salePrice: value?.salePrice,
-        noOfSaleQuantity: value?.noOfSaleQuantity,
-        saleStartDate: value.saleStartDate ? new Date(value.saleStartDate).toISOString() : null,
-        saleEndDate: value.saleEndDate ? new Date(value.saleEndDate).toISOString() : null,
-    }, "post").then((response) => {
-        console.log("R",response)
-        if (response.status === 201 && response?.data?.status === "success") {
+    allApiWithHeaderToken(API_CONSTANTS.COMMON_PRODUCTS_URL, data, "post", 'multipart/form-data').then((response) => {
+        if (response.status === 201) {
           successToaster(response);
-        } else {
-          toast.current.show({
-            severity: "error",
-            summary: "Error",
-            detail: response?.data?.statusMessage,
-            life: 3000,
-          });
         }
       })
-      .catch((err) => {
-        errorToaster(err?.response?.data);
-      }).finally(()=>{
-        setLoader(false);
-      });
+    .catch((err) => {
+      errorToaster(err?.response?.data?.errors);
+      setLoader(false);
+    }).finally(()=>{
+      setLoader(false);
+    });
   };
 
   const updateProduct = (value) => {
-    const payload = {
-        name: value.name,
-        weight: value.weight,
-        price: value.price,
-        description: value.description,
-        categoryId: value.category.categoryId,
-        productImages: value.image,
-        isHidden: true,
-        stock: 0,
-        lowStockThresold : 0,
-        salePrice: 0,
-        noOfSaleQuantity: 0,
-        saleStartDate: "string",
-        saleEndDate: "string"
+    setLoader(true);
+    let body = {
+      name: value?.name,
+      description: value?.description,
+      status: Number(value?.status),
+      price: value?.price
     }
-    allApiWithHeaderToken(API_CONSTANTS.UPDATE_PRODUCT, payload, "patch" )
+    if(value?.image){
+      body['image'] = value?.image
+    }
+
+    allApiWithHeaderToken(`${API_CONSTANTS.COMMON_PRODUCTS_URL}/${id}`, body, "put", 'multipart/form-data' )
       .then((response) => {
-        if (response.status === 200 && response.data.status.toLowerCase() === "success") {
+        if (response.status === 200) {
           navigate(ROUTES_CONSTANTS.PRODUCTS);
-        }else {
-          toast.current.show({
-            severity: "error",
-            summary: "Error",
-            detail: response?.data?.statusMessage,
-            life: 3000,
-          });
         }
       })
       .catch((err) => {
-        console.error("err", err);
         toast.current.show({
             severity: "error",
             summary: "Error",
-            detail: "Something went wrong",
+            detail: err?.response?.data?.errors,
             life: 3000,
         });
+        setLoader(false);
       });
   };
 
-  useEffect(()=>{
-     fetchCategoryList();
-      if(id){
-        allApiWithHeaderToken(API_CONSTANTS.GET_ALL_PRODUCT_DETAILS_BY_PRODUCT_ID, {id:id}, "post")
-        .then(async (response) => {
-          if (response.status === 200 && response.data.status.toLowerCase() === "success") {
-              let fileres = await fetch(response?.data?.data?.imageUrl).then(res => res.blob()).then(blob => new File([blob], response?.data?.data?.imageName, { type: blob.type }));
-              setData({
-                  file: fileres,
-                  image: response.data?.data?.imageUrl,
-                  productName: response.data?.data?.productName,
-                  price: response.data?.data?.price,
-                  stockAvailable: response.data?.data?.stockAvailable,
-                  category:  categoryData.find(item=>item.categoryId === response.data?.data?.categoryDtls?.categoryId),
-              })
-          } else {
-            toast.current.show({
-              severity: "error",
-              summary: "Error",
-              detail: response?.data?.statusMessage,
-              life: 3000,
-            });
-          }
-        })
-        .catch((err) => {
-          console.error("err", err);
-          toast.current.show({
-              severity: "error",
-              summary: "Error",
-              detail: "Something went wrong",
-              life: 3000,
-          });
-        });
-      }
-  },[id]);
-
-  const fetchCategoryList = () => {
+  const fetchSubCategoryList = async () => {
     setLoader(true);
-    allApiWithHeaderToken(API_CONSTANTS.GET_ALL_CATEGORY_DETAILS, "" , "get")
-      .then((response) => {
-        if (response.status === 200 && response.data?.status=== "success") {
-          setCategoryData(response?.data?.data);
-        } else {
-          toast.current.show({
-            severity: "error",
-            summary: "Error",
-            detail: response?.data?.data?.statusMessage,
-            life: 3000,
+    try{
+       const categoryResponse = await allApiWithHeaderToken(`${API_CONSTANTS.COMMON_SUB_CATEGORIES_URL}/active_sub_categories_list`, "", "get");
+        if (categoryResponse.status === 200) {  
+          setCategoryData(categoryResponse?.data);
+        } 
+        if(categoryResponse.status === 200 && id){
+          allApiWithHeaderToken(`${API_CONSTANTS.COMMON_PRODUCTS_URL}/${id}`, "", "get")
+          .then((response) => {
+            if (response.status === 200) {
+              const subCategoryId = response?.data?.sub_category_id;
+              const selectedSubCategory = categoryResponse.data.find((category) => category.id == subCategoryId);
+              let data = {
+                name: response?.data?.name,
+                description: response?.data?.description,
+                image_url: response?.data?.image_url,
+                status: String(response?.data?.status),
+                price: response?.data?.price,
+                subCategory: selectedSubCategory
+              }
+              setData(data);
+            } 
+          })
+          .catch((err) => {
+            toast.current.show({
+                severity: "error",
+                summary: "Error",
+                detail: err?.response?.data?.errors,
+                life: 3000,
+            });
           });
         }
-      })
-      .catch((err) => {
-        console.error("err", err);
-        toast.current.show({
-          severity: "error",
-          summary: "Error",
-          detail: "Something Went Wrong",
-          life: 3000,
-        });
-      }).finally(()=>{
-        setLoader(false);
+    } catch (err){
+      toast.current.show({
+        severity: "error",
+        summary: "Error",
+        detail: "Something Went Wrong",
+        life: 3000,
       });
+    }finally {
+      setLoader(false);
+    }
   }; 
-  
-  const imageHandler= async (file)=>{
-    let data = await new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.readAsDataURL(file);
-      reader.onload = () => resolve(reader.result);
-      reader.onerror = error => reject(error);
-    });
-    setFieldValue('image', data);
-  }
+
+  useEffect(()=>{
+    fetchSubCategoryList();
+ },[id]);
 
   const handleBack = () => {
     navigate(ROUTES_CONSTANTS.PRODUCTS);
@@ -257,35 +201,36 @@ const ProductForm = () => {
   });
 
   const { values, errors, setFieldValue,handleSubmit, handleChange, touched } = formik;
+
   return (
     <div className="flex h-full bg-BgPrimaryColor py-5">
       {loader && <Loading/>}
       <Toast ref={toast} position="top-right" style={{scale: '0.7'}} onHide={toastHandler}/>
       <div className="mx-16 my-auto grid h-fit w-full grid-cols-4 gap-4 bg-BgSecondaryColor p-8 border rounded border-BorderColor">
         <div className="col-span-4">
-            {t("create_product")}
+            {id ? t("update_product") : t("create_product")}
         </div>
        <div className="col-span-4">
             <FileUpload 
-              isLabel={t("product_image")}
-              value={values?.image}
-              error={errors?.file}
-              touched={touched?.file}
-              name="file"
-              onChange={(e)=> {
-                imageHandler(e?.target?.files[0]);
-          }}/>    
+                value={values?.image_url}
+                name="image"
+                isLabel={t("category_sub_image")} 
+                onChange={(e)=> {
+                  setFieldValue('image', e?.currentTarget?.files[0]);
+                  setFieldValue('image_url', URL.createObjectURL(e?.target?.files[0]));
+                }}
+              />    
              <label htmlFor="file" className="error text-red-500">{errors?.file}</label>
         </div>
         <div className="col-span-2">
           <DropdownComponent 
-            value={values?.category}
-            onChange={handleChange}
+            value={values?.subCategory}
+            onChange={(field, value) => setFieldValue(field, value)}
             data= {categoryData}
-            placeholder={t("select_category")}
-            name="category"
-            error={errors?.category}
-            touched={touched?.category}
+            placeholder={t("select_sub_category")}
+            name="subCategory"
+            error={errors?.subCategory}
+            touched={touched?.subCategory}
             className="col-span-2 w-full rounded border-[1px] border-[#ddd] custom-dropdown focus:outline-none"
             optionLabel="name"
           />
@@ -305,14 +250,14 @@ const ProductForm = () => {
         </div>
         <div className="col-span-2">
           <InputTextComponent
-            value={values?.weight}
+            value={values?.description}
             onChange={handleChange}
-            type="number"
-            placeholder={t("product_weight")}
-            name="weight"
+            type="text"
+            placeholder={t("description")}
+            name="description"
             isLabel={true}
-            error={errors?.weight}
-            touched={touched?.weight}
+            error={errors?.description}
+            touched={touched?.description}
             className="col-span-2 w-full rounded border-[1px] border-[#ddd] px-[1rem] py-[8px] text-[11px] focus:outline-none"
           />
         </div>
@@ -329,97 +274,24 @@ const ProductForm = () => {
             className="col-span-2 w-full rounded border-[1px] border-[#ddd] px-[1rem] py-[8px] text-[11px] focus:outline-none"
           />
         </div>
-        <div className="col-span-2">
-          <InputTextComponent
-            value={values?.description}
-            onChange={handleChange}
-            type="text"
-            placeholder={t("description")}
-            name="description"
-            isLabel={true}
-            error={errors?.description}
-            touched={touched?.description}
-            className="col-span-2 w-full rounded border-[1px] border-[#ddd] px-[1rem] py-[8px] text-[11px] focus:outline-none"
-          />
-        </div>
-        <div className="col-span-2">
-          <InputTextComponent
-            value={values?.stock}
-            onChange={handleChange}
-            type="number"
-            placeholder={t("available_qty")}
-            name="stock"
-            isLabel={true}
-            error={errors?.stock}
-            touched={touched?.stock}
-            className="col-span-2 w-full rounded border-[1px] border-[#ddd] px-[1rem] py-[8px] text-[11px] focus:outline-none"
-          />
-        </div>
-        <div className="col-span-2">
-          <InputTextComponent
-            value={values?.lowStockThresold}
-            onChange={handleChange}
-            type="number"
-            placeholder={t("minimum_stock_available")}
-            name="lowStockThresold"
-            isLabel={true}
-            error={errors?.lowStockThresold}
-            touched={touched?.lowStockThresold}
-            className="col-span-2 w-full rounded border-[1px] border-[#ddd] px-[1rem] py-[8px] text-[11px] focus:outline-none"
-          />
-        </div>
-        <div className="col-span-2">
-          <InputTextComponent
-            value={values?.salePrice}
-            onChange={handleChange}
-            type="number"
-            placeholder={t("sale_price")}
-            name="salePrice"
-            isLabel={true}
-            error={errors?.salePrice}
-            touched={touched?.salePrice}
-            className="col-span-2 w-full rounded border-[1px] border-[#ddd] px-[1rem] py-[8px] text-[11px] focus:outline-none"
-          />
-        </div>
-        <div className="col-span-2">
-          <InputTextComponent
-            value={values?.noOfSaleQuantity}
-            onChange={handleChange}
-            type="number"
-            placeholder={t("no_of_sale_quantity")}
-            name="noOfSaleQuantity"
-            isLabel={true}
-            error={errors?.noOfSaleQuantity}
-            touched={touched?.noOfSaleQuantity}
-            className="col-span-2 w-full rounded border-[1px] border-[#ddd] px-[1rem] py-[8px] text-[11px] focus:outline-none"
-          />
-        </div>
-        <div className="col-span-2">
-          <InputTextComponent
-            value={values?.saleStartDate}
-            onChange={handleChange}
-            type="date"
-            placeholder={t("sale_start_date")}
-            name="saleStartDate"
-            isLabel={true}
-            error={errors?.saleStartDate}
-            touched={touched?.saleStartDate}
-            className="col-span-2 w-full rounded border-[1px] border-[#ddd] px-[1rem] py-[8px] text-[11px] focus:outline-none"
-          />
-        </div>
-        <div className="col-span-2">
-          <InputTextComponent
-            value={values?.saleEndDate}
-            onChange={handleChange}
-            type="date"
-            placeholder={t("sale_end_date")}
-            name="saleEndDate"
-            isLabel={true}
-            error={errors?.saleEndDate}
-            touched={touched?.saleEndDate}
-            className="col-span-2 w-full rounded border-[1px] border-[#ddd] px-[1rem] py-[8px] text-[11px] focus:outline-none"
-          />
-        </div>
+         {
+            id && (
+              <>
+                <div className="col-span-2">
+                <DropdownComponent
+                    value={values?.status}
+                    onChange={(field, value) => setFieldValue(field, value)}
+                    data={statusList}
+                    name="status"
+                    placeholder={t("status")}
+                    className="custom-dropdown col-span-2 w-full rounded border-[1px] border-[#ddd] focus:outline-none"
+                    optionLabel="name"
+                  />
+                </div>
+                <div className="col-span-2"></div>
+              </>
+            )
+          }
         <div className="col-span-3"></div>
         <div className="mt-4 flex justify-end gap-4">
           <ButtonComponent
@@ -427,16 +299,12 @@ const ProductForm = () => {
             type="button"
             label={t("back")}
             className="rounded bg-BgTertiaryColor px-6 py-2 text-[12px] text-white"
-            icon="pi pi-arrow-right"
-            iconPos="right"
           />
           <ButtonComponent
             onClick={() => handleSubmit()}
             type="submit"
-            label={t("submit")}
+            label={id ? t("update") : t("submit")}
             className="rounded bg-BgTertiaryColor px-6 py-2 text-[12px] text-white"
-            icon="pi pi-arrow-right"
-            iconPos="right"
           />
         </div>
       </div>

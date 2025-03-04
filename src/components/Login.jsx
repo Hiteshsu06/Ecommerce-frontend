@@ -41,38 +41,14 @@ const Login = () => {
 
   const onHandleSubmit = async (value) => {
     setLoader(true);
-    let data = {...value, "remember": true}
+    let data = {
+      user: {
+      ...value}
+    }
     allApi(API_CONSTANTS.LOGIN, data, "post")
       .then((response) => {
-        if(response?.status === 201 && response?.data?.status === "success"){
-          localStorage.setItem("token", JSON.stringify(response?.data?.data[0]?.access_token));
-          verifyToken();
-        }else{
-          toast.current.show({
-            severity: "error",
-            summary: "Error",
-            detail: response?.data?.message,
-            life: 3000,
-          });
-          setLoader(false);
-        }
-      })
-      .catch(() => {
-        toast.current.show({
-          severity: "error",
-          summary: "Error",
-          detail: "Something went wrong",
-          life: 3000,
-        });
-        setLoader(false);
-      });
-  };
-
-  const verifyToken = ()=>{
-    allApiWithHeaderToken(API_CONSTANTS.VERIFY_TOKEN, "" , "get")
-      .then((response) => {
-        if (response.status === 200){
-          localStorage.setItem("userDetails", JSON.stringify(response?.data?.data));
+        if(response?.status === 200){
+          localStorage.setItem("token", JSON.stringify(response?.headers?.authorization));
           setToastType('success');
           toast.current.show({
             severity: "success",
@@ -80,28 +56,20 @@ const Login = () => {
             detail: "You have successfully login",
             life: 1000
           });
-        } 
-        else {
-          toast.current.show({
-            severity: "error",
-            summary: "Error",
-            detail: "Something went wrong",
-            life: 3000,
-          });
         }
       })
       .catch((err) => {
-        console.error("err", err);
         toast.current.show({
-            severity: "error",
-            summary: "Error",
-            detail: "Something went wrong",
-            life: 3000,
+          severity: "error",
+          summary: "Error",
+          detail: err?.response?.data?.errors,
+          life: 3000,
         });
-      }).finally(()=>{
+        setLoader(false);
+      }).finally(()=> {
         setLoader(false);
       });
-   }
+  };
 
   const formik = useFormik({
     initialValues: data,
@@ -133,7 +101,7 @@ const Login = () => {
             value={values?.email}
             onChange={handleChange}
             type="text"
-            placeholder={t("your_email")}
+            placeholder={t("email")}
             name="email"
             error={errors?.email}
             touched={touched?.email}
@@ -143,7 +111,7 @@ const Login = () => {
             value={values?.password}
             onChange={handleChange}
             type="password"
-            placeholder={t("your_password")}
+            placeholder={t("password")}
             name="password"
             error={errors?.password}
             touched={touched?.password}

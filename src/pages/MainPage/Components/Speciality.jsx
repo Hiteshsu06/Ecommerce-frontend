@@ -33,14 +33,13 @@ const Speciality = () => {
                     </div>
                 </div>
                 <div className="w-[55%] relative">
-                    <div className='w-full absolute top-[-25px]'>
+                    <div className='absolute top-[-25px] w-[62vw]'>
                     <Swiper
                         spaceBetween={20}
                         slidesPerView={2.5}
                         allowTouchMove={true}
                         loop={true}
-                        
-                    >
+                        >
                             {data.map((item) => (
                                 <SwiperSlide key={item.id}>
                                 <div className="flex flex-col cursor-pointer select-none ">

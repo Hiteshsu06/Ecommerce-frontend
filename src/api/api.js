@@ -1,5 +1,5 @@
 import axios from 'axios';
-const apiBaseURL = 'https://ecommerce-backend-l5mh.onrender.com/api';
+const apiBaseURL = 'http://localhost:3000';
 
 export const allApi = (dataurl, data, method) => {
     const headers = {
@@ -23,7 +23,7 @@ export const allApiWithHeaderToken = (dataurl, data, method, contentType) => {
     let token = JSON.parse(localStorage.getItem('token'));
     const headers = {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
+        'Authorization': `${token}`
     }
     const axiosInstance = axios.create({
         baseURL: apiBaseURL,

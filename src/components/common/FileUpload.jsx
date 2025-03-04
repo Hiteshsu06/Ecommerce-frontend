@@ -5,8 +5,8 @@ const FileUpload = ({value="", name, isLabel, onChange}) => {
             {isLabel ? (
                 <label className="text-[12px] text-TextSecondaryColor ms-[4px] font-[600]">{isLabel}</label>
                 ) : null}
-            {value ? <div className="relative">
-                 <img src={value} alt="" style={{ borderRadius:"5px", maxWidth: "100%", height: "500PX", minWidth: "100%"}}/>
+            {value ? <div className="relative"  style={{ height: "300px", overflow: "hidden", borderRadius: "8px", border: "1px solid #ddd" }}>
+                 <img src={value} alt="" style={{ borderRadius:"5px", maxWidth: "100%", width: "100%", height: "100%", objectFit: "cover", objectPosition: "center center"}}/>
                  <div className="absolute right-[4px] top-0 scale-[1.3]">
                    <div className="relative">
                         <span className='ri-pencil-line'></span>

@@ -21,6 +21,7 @@ const structure = {
   description: "",
   image: "",
   image_url: "",
+  categoryType: {}
 };
 
 const statusList = [
@@ -34,6 +35,7 @@ const CategoryForm = () => {
   const navigate = useNavigate();
   const [data, setData] = useState(structure);
   const [loader, setLoader] = useState(false);
+  const [categoryList, setCategoryList] = useState([]); 
   const { id } = useParams();
 
   const validationSchema = yup.object().shape({
@@ -44,41 +46,48 @@ const CategoryForm = () => {
   const onHandleSubmit = async (value) => {
     if (id) {
       // Update
-      updateCategory(value);
+      updateSubCategory(value);
     } else {
       // Create
-      createCategory(value);
+      createSubCategory(value);
     }
   };
 
-  const createCategory = (value) => {
+  const createSubCategory = (value) => {
     let data = {
       name: value?.name,
       description: value?.description,
       status: 1,
-      image: value?.image
+      image: value?.image,
+      category_id: value?.categoryType?.id
     }
     setLoader(true);
-    allApiWithHeaderToken(API_CONSTANTS.COMMON_CATEGORIES_URL, data , "post", 'multipart/form-data')
+    allApiWithHeaderToken(API_CONSTANTS.COMMON_SUB_CATEGORIES_URL, data , "post", 'multipart/form-data')
       .then((response) => {
         if (response.status === 201) {
-          navigate(ROUTES_CONSTANTS.CATEGORIES);
-        }
+          navigate(ROUTES_CONSTANTS.SUB_CATEGORIES);
+        } else {
+            toast.current.show({
+              severity: "error",
+              summary: "Error",
+              detail: response?.data?.statusMessage,
+              life: 3000,
+            });
+          }
       })
       .catch((err) => {
         toast.current.show({
           severity: "error",
           summary: "Error",
-          detail: err?.response?.data?.errors,
+          detail: "Something Went Wrong",
           life: 3000,
         });
-        setLoader(false);
       }).finally(()=>{
         setLoader(false);
       });
   };
 
-  const updateCategory = (value) => {
+  const updateSubCategory = (value) => {
     setLoader(true);
     let body = {
       name: value?.name,
@@ -89,20 +98,27 @@ const CategoryForm = () => {
       body['image'] = value?.image
     }
 
-    allApiWithHeaderToken(`${API_CONSTANTS.COMMON_CATEGORIES_URL}/${id}`, body, "put", 'multipart/form-data')
+    allApiWithHeaderToken(`${API_CONSTANTS.COMMON_SUB_CATEGORIES_URL}/${id}`, body, "put", 'multipart/form-data')
       .then((response) => {
         if (response.status === 200) {
           navigate(ROUTES_CONSTANTS.CATEGORIES);
-        }
+        } else {
+            toast.current.show({
+              severity: "error",
+              summary: "Error",
+              detail: response?.data?.statusMessage,
+              life: 3000,
+            });
+          }
       })
       .catch((err) => {
+        console.error("err", err);
         toast.current.show({
           severity: "error",
           summary: "Error",
-          detail: err?.response?.data?.errors,
+          detail: "Something Went Wrong",
           life: 3000,
         });
-        setLoader(false);
       }).finally(()=>{
         setLoader(false);
       });
@@ -115,30 +131,62 @@ const CategoryForm = () => {
   useEffect(() => {
     if (id) {
       setLoader(true);
-      allApiWithHeaderToken(`${API_CONSTANTS.COMMON_CATEGORIES_URL}/${id}`, "", "get")
+      allApiWithHeaderToken(`${API_CONSTANTS.COMMON_SUB_CATEGORIES_URL}/${id}`, "", "get")
         .then((response) => {
           if (response.status === 200) {
             let data = {
               name: response?.data?.name,
               description: response?.data?.description,
               image_url: response?.data?.image_url,
-              status: String(response?.data?.status)
+              status: response?.data?.status
             }
             setData(data);
+          } else {
+            toast.current.show({
+              severity: "error",
+              summary: "Error",
+              detail: response?.data?.statusMessage,
+              life: 3000,
+            });
           }
         })
         .catch((err) => {
+          console.error("err", err);
           toast.current.show({
             severity: "error",
             summary: "Error",
-            detail: err?.response?.data?.errors,
+            detail: "Something Went Wrong",
             life: 3000,
           });
-          setLoader(false);
         }).finally(()=>{
           setLoader(false);
         });
     }
+
+    setLoader(true);
+    allApiWithHeaderToken(`${API_CONSTANTS.COMMON_SUB_CATEGORIES_URL}`, "" , "get")
+      .then((response) => {
+        if (response.status === 200) {
+          setCategoryList(response?.data);
+        } else {
+          toast.current.show({
+            severity: "error",
+            summary: "Error",
+            detail: response?.data?.statusMessage,
+            life: 3000,
+          });
+        }
+      })
+      .catch((err) => {
+        toast.current.show({
+          severity: "error",
+          summary: "Error",
+          detail: "Something Went Wrong",
+          life: 3000,
+        });
+      }).finally(()=>{
+        setLoader(false);
+      });
   }, []);
 
   const formik = useFormik({
@@ -156,14 +204,25 @@ const CategoryForm = () => {
       <Toast ref={toast} position="top-right" />
       <div className="mx-16 my-auto grid h-fit w-full grid-cols-4 gap-4 bg-BgSecondaryColor p-8 border rounded border-BorderColor">
         <div className="col-span-4">
-            {id ? t("update_category") : t("create_category")}
+            {id ? t("update_sub_category") : t("create_sub_category")}
+        </div>
+        <div className="col-span-2">
+          <Dropdown
+              value={values?.categoryType}
+              onChange={(field, value) => setFieldValue(field, value)}
+              data={categoryList}
+              name="categoryType"
+              placeholder={t("category")}
+              className="custom-dropdown col-span-2 w-full rounded border-[1px] border-[#ddd] focus:outline-none"
+              optionLabel="name"
+            />
         </div>
         <div className="col-span-2">
           <InputTextComponent
             value={values?.name}
             onChange={handleChange}
             type="text"
-            placeholder={t("category_name")}
+            placeholder={t("category_sub_name")}
             name="name"
             isLabel={true}
             error={errors?.name}
@@ -176,7 +235,7 @@ const CategoryForm = () => {
             value={values?.description}
             onChange={handleChange}
             type="text"
-            placeholder={t("category_description")}
+            placeholder={t("category_sub_description")}
             name="description"
             isLabel={true}
             error={errors?.description}
@@ -188,7 +247,7 @@ const CategoryForm = () => {
             <FileUpload 
               value={values?.image_url}
               name="image"
-              isLabel={t("category_image")} 
+              isLabel={t("category_sub_image")} 
               onChange={(e)=> {
                 setFieldValue('image', e?.currentTarget?.files[0]);
                 setFieldValue('image_url', URL.createObjectURL(e?.target?.files[0]));
@@ -202,8 +261,8 @@ const CategoryForm = () => {
                   value={values?.status}
                   onChange={(field, value) => setFieldValue(field, value)}
                   data={statusList}
-                  placeholder={t("status")}
                   name="status"
+                  placeholder="status"
                   className="custom-dropdown col-span-2 w-full rounded border-[1px] border-[#ddd] focus:outline-none"
                   optionLabel="name"
                 />
@@ -219,12 +278,16 @@ const CategoryForm = () => {
             type="button"
             label={t("back")}
             className="rounded bg-[#1f1f70] px-6 py-2 text-[12px] text-white"
+            icon="pi pi-arrow-right"
+            iconPos="right"
           />
           <ButtonComponent
             onClick={() => handleSubmit()}
             type="submit"
-            label={id ? t("update") : t("submit")}
+            label={t("submit")}
             className="rounded bg-[#1f1f70] px-6 py-2 text-[12px] text-white"
+            icon="pi pi-arrow-right"
+            iconPos="right"
           />
         </div>
       </div>

@@ -16,7 +16,7 @@ const NavbarSubmenu = ({data}) => {
     <div className='flex hover: cursor-pointer' onMouseEnter = {()=> {handleSubmenu(showSubmenu)}} onMouseLeave = {()=> {handleSubmenu(showSubmenu)}}>
         <div className='text-[#5a5a5a] font-[500]'>{showSubmenu?.name}</div>
         <div>{ showSubmenu?.items ? < i className="ms-1 ri-arrow-drop-down-line"></i> : null}</div>
-        <div className={`absolute mt-6 w-[270px] ${showSubmenu?.items && showSubmenu?.hover ? "border p-4 rounded shadow-lg" : ""}`}>
+        <div className={`absolute mt-6 w-[270px] ${showSubmenu?.items && showSubmenu?.hover ? "border p-4 rounded shadow-lg bg-white" : ""}`}>
             {showSubmenu?.hover && showSubmenu?.items?.map((element, index)=>{
                 return (
                 <div className='h-9 ps-3 hover:bg-gray-100  hover:text-black text-[#898585] flex items-center rounded justify-between' onMouseEnter = {()=> {handleInnerSubmenu(element, index)}} onMouseLeave = {()=> {handleInnerSubmenu(element, index)}}>

@@ -134,3 +134,21 @@
   .avatar-menu > ul > li > ul > li > .p-menuitem-content:hover{
     background-color: var(--quater-background-color) !important;
   }
+  .p-paginator-bottom > .p-dropdown.p-component.p-inputwrapper.p-inputwrapper-filled{
+    scale: 0.8 !important;
+  }
+  .p-button:focus {
+    box-shadow: none !important;
+  }
+
+  /* Autocomplete */
+  .autocomplete > input {
+    width: 100%;
+    border-radius: 4px;
+    border: 1px solid #ddd;
+    padding: 8px 1rem;
+    font-size: 11px; 
+  }
+  .autocomplete > input:focus {
+    outline: none;
+  }

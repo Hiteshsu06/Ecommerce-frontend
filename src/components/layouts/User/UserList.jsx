@@ -11,77 +11,46 @@ import Confirmbox from "@common/Confirmbox";
 import { allApiWithHeaderToken } from "@api/api";
 import { ROUTES_CONSTANTS } from "../../../constants/routesurl";
 import { API_CONSTANTS } from "../../../constants/apiurl";
+import InputTextComponent from "@common/InputTextComponent";
 import { Toast } from "primereact/toast";
-import DefaultImage from "../../../assets/no-image.jpeg";
 
-const CatergoryList = () => {
+const UserList = () => {
   const toast = useRef(null);
   const { t } = useTranslation("msg");
-  const navigate = useNavigate();
   const [isConfirm, setIsConfirm] = useState(false);
   const [deleteId, setDeleteId] = useState(null);
   const [loader, setLoader] = useState(false);
+  const [search, setSearch] = useState("");
 
   const item = {
-    heading: t("category"),
+    heading: t("user"),
     routes: [
       { label: t("dashboard"), route: ROUTES_CONSTANTS.DASHBOARD },
-      { label: t("category"), route: ROUTES_CONSTANTS.CATEGORIES },
+      { label: t("user"), route: ROUTES_CONSTANTS.USERS },
     ],
   };
 
   const [data, setData] = useState([]);
-
   const actionBodyTemplate = (rowData) => {
     return (
       <div className="flex">
         <ButtonComponent
-          icon="ri-pencil-line"
-          className="text-[1rem]"
-          onClick={() => editCategory(rowData)}
-        />
-        <ButtonComponent
           icon="ri-delete-bin-line"
           className="text-[1rem]"
-          onClick={() => confirmDeleteCategory(rowData)}
+          onClick={() => confirmDeleteUser(rowData)}
         />
       </div>
     );
   };
 
-  const nameBodyTemplate= (rowData) => {
-    return (
-      <div className="flex items-center gap-4">
-        <div className="w-[60px] overflow-hidden h-[60px]">
-          <img src={rowData?.image_url ? rowData?.image_url : DefaultImage} alt="" width={80} style={{height: "100%"}}/>
-        </div>
-        <span>{rowData?.name}</span>
-      </div>
-    );
-  };
-
-  const statusBodyTemplate= (rowData) => {
-    return (
-      <div className="flex items-center gap-4">
-        {rowData?.status === 1 ? <span className="text-[green]">Active</span> : <span className="text-[red]">Inactive</span>}
-      </div>
-    );
-  };
-
-
   const columns = [
-    { header: t("name"), body: nameBodyTemplate, headerStyle: { paddingLeft: '3%'} },
-    { field: "description", header: t("description")},
-    { header: t("status"), body: statusBodyTemplate },
+    { field: "name", header: t("name")},
+    { field: "phone_number", header: t("phone_number")},
+    { field: "email", header: t("email")},
     { header: t("action"), body: actionBodyTemplate, headerStyle: { paddingLeft: '3%'} },
   ];
 
-  const editCategory = (item) => {
-    console.log("item",item)
-    navigate(`/edit-category/${item?.id}`);
-  };
-
-  const confirmDeleteCategory = (item) => {
+  const confirmDeleteUser = (item) => {
     setIsConfirm(!isConfirm);
     setDeleteId(item?.id);
   };
@@ -93,11 +62,11 @@ const CatergoryList = () => {
 
   const confirmDialogbox = () => {
     setIsConfirm(!isConfirm);
-    allApiWithHeaderToken(`${API_CONSTANTS.COMMON_CATEGORIES_URL}/${deleteId}`, '', "delete")
+    allApiWithHeaderToken(`${API_CONSTANTS.COMMON_USERS_URL}/${deleteId}`, '', "delete")
       .then((response) => {
         if (response.status === 200) {
-          fetchCategoryList();
-        }
+          fetchUserList();
+        } 
       })
       .catch((err) => {
         toast.current.show({
@@ -109,16 +78,18 @@ const CatergoryList = () => {
       });
   };
 
-  const fetchCategoryList = () => {
+  const fetchUserList = () => {
     setLoader(true);
-    allApiWithHeaderToken(API_CONSTANTS.COMMON_CATEGORIES_URL, "" , "get")
+    let body = {
+      search: search
+    }
+    allApiWithHeaderToken(`${API_CONSTANTS.COMMON_USERS_URL}/filter`, body , "post")
       .then((response) => {
         if (response.status === 200) {
           setData(response?.data);
-        } 
+        }
       })
       .catch((err) => {
-        console.error("err", err);
         toast.current.show({
           severity: "error",
           summary: "Error",
@@ -132,12 +103,8 @@ const CatergoryList = () => {
   };
 
   useEffect(() => {
-    fetchCategoryList();
+    fetchUserList();
   }, []);
-
-  const createCategory = () => {
-    navigate(ROUTES_CONSTANTS.CREATE_CATEGORY);
-  };
 
   return (
     <div className="text-TextPrimaryColor">
@@ -149,12 +116,14 @@ const CatergoryList = () => {
       />
       <Breadcrum item={item} />
       <div className="mt-4 flex justify-end bg-BgSecondaryColor border rounded border-BorderColor p-2">
-        <ButtonComponent
-          onClick={() => createCategory()}
-          type="submit"
-          label={t("create_category")}
-          className="rounded bg-BgTertiaryColor px-6 py-2 text-[12px] text-white"
-        />
+        <InputTextComponent
+            value={search}
+            onChange={(e)=>{ setSearch(e.target.value); fetchUserList(); }}
+            type="text"
+            placeholder={t("search")}
+            name="search"
+            className="w-[240px] text-black rounded border-[1px] border-[#ddd] px-[1rem] py-[8px] text-[11px] focus:outline-none"
+          />
       </div>
       <div className="mt-4">
         <DataTable
@@ -169,4 +138,4 @@ const CatergoryList = () => {
   );
 };
 
-export default CatergoryList;
+export default UserList;
