@@ -48,10 +48,16 @@ const DiscountList = () => {
     );
   };
 
+  const checkValidDate=(endDate)=>{
+    if(new Date() < new Date(endDate)){
+      return true;
+    }
+  }
+
   const statusBodyTemplate= (rowData) => {
     return (
       <div className="flex items-center gap-4">
-        {rowData?.status === 1 ? <span className="text-[green]">Active</span> : <span className="text-[red]">Inactive</span>}
+        { checkValidDate(rowData?.end_date) ? <span className="text-[green]">Active</span> : <span className="text-[red]">Inactive</span>}
       </div>
     );
   };

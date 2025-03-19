@@ -102,8 +102,8 @@ const AvatarProfile = ({ size, shape, userDetails }) => {
   return (
     <div className="card justify-content-center flex text-TextPrimaryColor">
       <div className="me-4">
-        <div className="text-[0.8rem]">{userDetails?.firstName || 'Test Name'}</div>
-        <div className="text-[0.6rem]">{userDetails?.role}</div>
+        <div className="text-[0.8rem] capitalize">{userDetails?.name || '-'}</div>
+        <div className="text-[0.6rem] capitalize">{t("admin")}</div>
       </div>
       <Toast ref={toast} position="top-right" style={{scale: '0.7'}} onHide={toastHandler}/>
       <Avatar

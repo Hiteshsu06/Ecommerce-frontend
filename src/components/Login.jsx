@@ -49,6 +49,7 @@ const Login = () => {
       .then((response) => {
         if(response?.status === 200){
           localStorage.setItem("token", JSON.stringify(response?.headers?.authorization));
+          localStorage.setItem("userDetails", JSON.stringify(response?.data?.data));
           setToastType('success');
           toast.current.show({
             severity: "success",

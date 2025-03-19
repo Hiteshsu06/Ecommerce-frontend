@@ -20,7 +20,6 @@ const structure = {
   discountValue: "",
   validFrom: "",
   validUntil: "",
-  status: "",
   discountType: "",
   product: {}
 };
@@ -28,11 +27,6 @@ const structure = {
 const discountTypeList = [
   { name: "Percentage", value: "0"},
   { name: "Fixed", value: "1"}
-];
-
-const statusList = [
-  { name: "Inactive", value: "0"},
-  { name: "Active", value: "1"}
 ];
 
 const DiscountForm = () => {
@@ -71,7 +65,6 @@ const DiscountForm = () => {
       discount_value: value?.discountValue,
       start_date: value?.validFrom,
       end_date: value?.validUntil,
-      status: 1,
       product_id: value?.product?.id,
     }
     setLoader(true);
@@ -101,7 +94,6 @@ const DiscountForm = () => {
       discount_value: value?.discountValue,
       start_date: value?.validFrom,
       end_date: value?.validUntil,
-      status: value?.status,
       product_id: value?.product?.id,
     }
 
@@ -128,6 +120,12 @@ const DiscountForm = () => {
     navigate(ROUTES_CONSTANTS.DISCOUNT);
   };
 
+  const checkValidDate=(startDate, endDate, key)=>{
+    if(new Date(startDate) > new Date(endDate)){
+      setFieldValue(key, "");
+    }
+  };
+
   const fetchProductList = async () => {
     setLoader(true); 
     try {
@@ -148,7 +146,6 @@ const DiscountForm = () => {
             discountValue: discountResponse?.data?.discount_value,
             validFrom: refactorPrefilledDate(discountResponse?.data?.start_date),
             validUntil: refactorPrefilledDate(discountResponse?.data?.end_date),
-            status: String(discountResponse?.data?.status),
             product: selectedProduct
           }
           setData(data);  // Set the form data
@@ -216,28 +213,11 @@ const DiscountForm = () => {
               touched={touched?.discountType}
             />
         </div>
-        {
-          id && (
-            <>
-              <div className="col-span-2">
-              <DropdownComponent
-                  value={values?.status}
-                  onChange={(field, value) => setFieldValue(field, value)}
-                  data={statusList}
-                  name="status"
-                  placeholder={t("status")}
-                  className="custom-dropdown col-span-2 w-full rounded border-[1px] border-[#ddd] focus:outline-none"
-                  optionLabel="name"
-                />
-              </div>
-            </>
-          )
-        }
         <div className="col-span-2">
           <InputTextComponent
             value={values?.discountValue}
             onChange={handleChange}
-            type="number"
+            type="number"checkValidDate
             placeholder={t("discount_value")}
             name="discountValue"
             isLabel={true}
@@ -249,7 +229,12 @@ const DiscountForm = () => {
         <div className="col-span-2">
           <InputTextComponent
             value={values?.validFrom}
-            onChange={handleChange}
+            onChange={(e)=>{
+              handleChange(e);
+              if(values?.validUntil){
+                checkValidDate(e?.target?.value, values?.validUntil, "validUntil");
+              }
+            }}
             type="date"
             placeholder={t("valid_from")}
             name="validFrom"
@@ -262,7 +247,12 @@ const DiscountForm = () => {
         <div className="col-span-2">
           <InputTextComponent
             value={values?.validUntil}
-            onChange={handleChange}
+            onChange={(e)=>{
+              handleChange(e);
+              if(values?.validFrom){
+                checkValidDate(values?.validFrom, e?.target?.value, "validFrom");
+              }
+            }}
             type="date"
             placeholder={t("valid_until")}
             name="validUntil"

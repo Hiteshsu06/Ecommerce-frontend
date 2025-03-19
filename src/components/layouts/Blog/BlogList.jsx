@@ -10,12 +10,13 @@ import ButtonComponent from "@common/ButtonComponent";
 import Confirmbox from "@common/Confirmbox";
 import { allApiWithHeaderToken } from "@api/api";
 import { ROUTES_CONSTANTS } from "../../../constants/routesurl";
-import { API_CONSTANTS } from "../../../constants/apiurl";
 import { Toast } from "primereact/toast";
-import { refactorPrefilledDate } from '../../../helper/helper';
+import { API_CONSTANTS } from "../../../constants/apiurl";
+import DefaultImage from "../../../assets/no-image.jpeg";
 
-const OrderList = () => {
+const BlogList = () => {
   const toast = useRef(null);
+  const [data, setData] = useState([]);
   const { t } = useTranslation("msg");
   const navigate = useNavigate();
   const [isConfirm, setIsConfirm] = useState(false);
@@ -23,63 +24,60 @@ const OrderList = () => {
   const [loader, setLoader] = useState(false);
 
   const item = {
-    heading: t("order"),
+    heading: t("blog"),
     routes: [
       { label: t("dashboard"), route: ROUTES_CONSTANTS.DASHBOARD },
-      { label: t("order"), route: ROUTES_CONSTANTS.ORDERS },
+      { label: t("blog"), route: ROUTES_CONSTANTS.BLOGS },
     ],
   };
 
-  const [data, setData] = useState([]);
   const actionBodyTemplate = (rowData) => {
     return (
       <div className="flex">
         <ButtonComponent
           icon="ri-pencil-line"
           className="text-[1rem]"
-          onClick={() => editOrder(rowData)}
+          onClick={() => editBlog(rowData)}
         />
         <ButtonComponent
           icon="ri-delete-bin-line"
           className="text-[1rem]"
-          onClick={() => confirmDeleteOrder(rowData)}
+          onClick={() => confirmDeleteBlog(rowData)}
         />
       </div>
     );
   };
 
-  const orderStatusBodyTemplate= (rowData) => {
+  const nameBodyTemplate= (rowData) => {
     return (
       <div className="flex items-center gap-4">
-        {rowData?.order_status === "Delivered" ? <span className="text-[green]">{rowData?.order_status}</span> : <span className="text-[grey]">{rowData?.order_status}</span>}
+        <div className="w-[60px] overflow-hidden h-[60px]">
+          <img src={rowData?.image_url ? rowData?.image_url : DefaultImage} alt="" width={80} style={{height: "100%"}}/>
+        </div>
+        <span>{rowData?.heading}</span>
       </div>
     );
   };
 
-  const paymentStatusBodyTemplate= (rowData) => {
+  const statusBodyTemplate= (rowData) => {
     return (
       <div className="flex items-center gap-4">
-        {rowData?.payment_status === "Approved" ? <span className="text-[green]">{rowData?.payment_status}</span> : <span className="text-[grey]">{rowData?.payment_status}</span>}
+        {rowData?.status === 1 ? <span className="text-[green]">Active</span> : <span className="text-[red]">Inactive</span>}
       </div>
     );
   };
 
   const columns = [
-    { field: "id", header: t("order_number")},
-    { field: "total_price", header: t("total_price")},
-    { field: "shipping_address", header: t("shipping_address")},
-    { field: "billing_address", header: t("billing_address")},
-    { field: "created_at", header: t("created_at")},
-    { header: t("payment_status"), body: paymentStatusBodyTemplate},
-    { header: t("order_status"), body: orderStatusBodyTemplate },
+    { header: t("name"), body: nameBodyTemplate, headerStyle: { paddingLeft: '3%'} },
+    { field: "description", header: t("description") },
     { header: t("action"), body: actionBodyTemplate, headerStyle: { paddingLeft: '3%'} },
   ];
 
-  const editOrder = (item) => {
-    navigate(`/edit-order/${item?.id}`);
+  const editBlog = (item) => {
+    navigate(`/edit-blog/${item?.id}`);
   };
 
-  const confirmDeleteOrder = (item) => {
+  const confirmDeleteBlog = (item) => {
     setIsConfirm(!isConfirm);
     setDeleteId(item?.id);
   };
@@ -90,37 +88,12 @@ const OrderList = () => {
   };
 
   const confirmDialogbox = () => {
-    setIsConfirm(!isConfirm);
-    allApiWithHeaderToken(`${API_CONSTANTS.COMMON_ORDER_URL}/${deleteId}`, '', "delete")
-      .then((response) => {
-        if (response.status === 200) {
-          fetchOrderList();
-        } 
-      })
-      .catch((err) => {
-        toast.current.show({
-          severity: "error",
-          summary: "Error",
-          detail: err?.response?.data?.errors,
-          life: 3000,
-        });
-      });
-  };
-
-  const fetchOrderList = () => {
     setLoader(true);
-    allApiWithHeaderToken(API_CONSTANTS.COMMON_ORDER_URL, "" , "get")
+    setIsConfirm(!isConfirm);
+    allApiWithHeaderToken(`${API_CONSTANTS.COMMON_BLOGS_URL}/${deleteId}`,"", "delete")
       .then((response) => {
-        if (response.status === 200) {
-           let updatedArray = [];
-            response?.data.forEach((item)=>{
-              let obj = {
-                ...item, 
-                created_at: refactorPrefilledDate(item?.created_at)
-              }
-              updatedArray.push(obj)
-            })
-            setData(updatedArray);
+        if (response?.status === 200) {
+          fetchBlogList();
         } 
       })
       .catch((err) => {
@@ -130,18 +103,37 @@ const OrderList = () => {
           detail: err?.response?.data?.errors,
           life: 3000,
         });
-        setLoader(false);
       }).finally(()=>{
         setLoader(false);
       });
   };
 
   useEffect(() => {
-    fetchOrderList();
+    fetchBlogList();
   }, []);
 
-  const createOrder = () => {
-    navigate(ROUTES_CONSTANTS.CREATE_ORDER);
+  const fetchBlogList = () => {
+    setLoader(true);
+    allApiWithHeaderToken(API_CONSTANTS.COMMON_BLOGS_URL, "" , "get")
+      .then((response) => {
+        if (response?.status === 200) {
+          setData(response?.data);
+        } 
+      })
+      .catch((err) => {
+        toast.current.show({
+            severity: "error",
+            summary: "Error",
+            detail: err?.response?.data?.errors,
+            life: 3000,
+        });
+      }).finally(()=>{
+        setLoader(false);
+      });
+  };
+
+  const createBlog = () => {
+    navigate(ROUTES_CONSTANTS.CREATE_BLOG);
   };
 
   return (
@@ -153,22 +145,20 @@ const OrderList = () => {
         confirmDialogbox={confirmDialogbox}
       />
       <Breadcrum item={item} />
-      <div className="mt-4 flex justify-end bg-BgSecondaryColor border rounded border-BorderColor p-2">
+      <div className="mt-4 flex justify-end bg-BgSecondaryColor p-2 border rounded border-BorderColor">
         <ButtonComponent
-          onClick={() => createOrder()}
+          onClick={() => createBlog()}
           type="submit"
-          label={t("create_order")}
+          label={t("create_blog")}
           className="rounded bg-BgTertiaryColor px-6 py-2 text-[12px] text-white"
-          icon="pi pi-arrow-right"
-          iconPos="right"
         />
       </div>
       <div className="mt-4">
         <DataTable
           className="bg-BgPrimaryColor border rounded border-BorderColor"
           columns={columns}
-          data={data}
           loader={loader}
+          data={data}
           showGridlines={true}
         />
       </div>
@@ -176,4 +166,4 @@ const OrderList = () => {
   );
 };
 
-export default OrderList;
+export default BlogList;

@@ -27,7 +27,8 @@ const initialValues = {
   subCategory: {},
   image: "",
   price: "",
-  status: ""
+  status: "",
+  weight: ""
 }
 const ProductForm = () => {
   const toast = useRef(null);
@@ -47,7 +48,8 @@ const ProductForm = () => {
     subCategory: yup.object()
     .test('non-empty-object', t("sub_category_is_required"), (value) => {
       return value && Object.keys(value).length > 0;
-    })
+    }),
+    weight: yup.string().required(t("weight_is_required"))
   });
 
   const onHandleSubmit = (value) => {
@@ -94,7 +96,8 @@ const ProductForm = () => {
       status: 1,
       image: value?.image,
       sub_category_id: value?.subCategory?.id,
-      price: value?.price
+      price: value?.price,
+      weight: value?.weight
     }
     setLoader(true);
     allApiWithHeaderToken(API_CONSTANTS.COMMON_PRODUCTS_URL, data, "post", 'multipart/form-data').then((response) => {
@@ -116,7 +119,8 @@ const ProductForm = () => {
       name: value?.name,
       description: value?.description,
       status: Number(value?.status),
-      price: value?.price
+      price: value?.price,
+      weight: value?.weight
     }
     if(value?.image){
       body['image'] = value?.image
@@ -158,6 +162,7 @@ const ProductForm = () => {
                 image_url: response?.data?.image_url,
                 status: String(response?.data?.status),
                 price: response?.data?.price,
+                weight: response?.data?.weight,
                 subCategory: selectedSubCategory
               }
               setData(data);
@@ -271,6 +276,19 @@ const ProductForm = () => {
             isLabel={true}
             error={errors?.price}
             touched={touched?.price}
+            className="col-span-2 w-full rounded border-[1px] border-[#ddd] px-[1rem] py-[8px] text-[11px] focus:outline-none"
+          />
+        </div>
+        <div className="col-span-2">
+          <InputTextComponent
+            value={values?.weight}
+            onChange={handleChange}
+            type="text"
+            placeholder={t("weight")}
+            name="weight"
+            isLabel={true}
+            error={errors?.weight}
+            touched={touched?.weight}
             className="col-span-2 w-full rounded border-[1px] border-[#ddd] px-[1rem] py-[8px] text-[11px] focus:outline-none"
           />
         </div>

@@ -13,7 +13,9 @@ export const API_CONSTANTS = {
     COMMON_REPORT_URL: "api/v1/reports",
     COMMON_DISCOUNT_URL: "api/v1/discounts",
     COMMON_USERS_URL: "api/v1/users",
-    COMMON_ADRESESS_URL: "api/v1/addresses"
+    COMMON_ADRESESS_URL: "api/v1/addresses",
+    COMMON_ADMIN_DASHBOARD_URL: "api/v1/dashboard",
+    COMMON_BLOGS_URL: "api/v1/blogs",
 
     // General use
 }

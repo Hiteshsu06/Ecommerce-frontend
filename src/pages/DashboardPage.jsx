@@ -1,5 +1,5 @@
 // components
-import { Topbar, Sidebar, CategoryList, ProductList, DashboardStats, SubCategoryList, InventoryList, OrderList, CouponList, ReportList, DiscountList, UserList} from "../components/index";
+import { Topbar, Sidebar, CategoryList, ProductList, DashboardStats, SubCategoryList, InventoryList, OrderList, CouponList, ReportList, DiscountList, UserList, BlogList} from "../components/index";
 import Loading from "@common/Loading";
 
 // utils
@@ -35,6 +35,7 @@ const DashboardPage = () => {
               <Route path="/addresess" element={<CouponList />}/>
               <Route path="/users" element={<UserList />}/>
               <Route path="/reports" element={<ReportList />}/>
+              <Route path="/blogs" element={<BlogList />}/>
             </Routes>
           </Suspense>
         </div>

@@ -17,6 +17,7 @@ const InventoryForm = lazy(() => import("@components/Inventory/InventoryForm"));
 const OrderForm = lazy(() => import("@components/Order/OrderForm"));
 const CouponForm = lazy(() => import("@components/Coupon/CouponForm"));
 const DiscountForm = lazy(() => import("@components/Discount/DiscountForm"));
+const BlogForm = lazy(() => import("@components/Blog/BlogForm"));
 
 // pages
 const Login = lazy(() => import("@pages/LoginPage"));
@@ -57,6 +58,8 @@ function App() {
           <Route path="/edit-coupon/:id" element={<CouponForm />}/>
           <Route path="/create-discount" element={<DiscountForm />}/>
           <Route path="/edit-discount/:id" element={<DiscountForm />}/>
+          <Route path="create-blog" element={<BlogForm />}/>
+          <Route path="/edit-blog/:id" element={<BlogForm />}/>
           <Route path="/not-authorized" element={<NotAuthorizedPage />}/>
           <Route path="/help" element={<HelpdeskPage />}/>
         </Routes>

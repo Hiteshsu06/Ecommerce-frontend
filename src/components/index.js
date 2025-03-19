@@ -14,9 +14,9 @@ import OrderForm from './layouts/Order/OrderForm';
 import CouponList from './layouts/Coupon/CouponList';
 import CouponForm from './layouts/Coupon/CouponForm';
 import ReportList from './layouts/Report/ReportList';
-import ReportForm from './layouts/Report/ReportForm';
 import DiscountForm from './layouts/Discount/DiscountForm';
 import DiscountList from './layouts/Discount/DiscountList';
 import UserList from './layouts/User/UserList';
+import BlogList from './layouts/Blog/BlogList';
 
-export { Topbar, Sidebar, CategoryList, CategoryForm, SubCategoryList, SubCategoryForm, ProductList, ProductForm, InventoryList, InventoryForm, DashboardStats, OrderList, OrderForm, CouponList, CouponForm, ReportList, ReportForm, DiscountForm, DiscountList, UserList };
+export { Topbar, Sidebar, CategoryList, CategoryForm, SubCategoryList, SubCategoryForm, ProductList, ProductForm, InventoryList, InventoryForm, DashboardStats, OrderList, OrderForm, CouponList, CouponForm, ReportList, DiscountForm, DiscountList, UserList, BlogList };

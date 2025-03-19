@@ -13,6 +13,7 @@ export const ROUTES_CONSTANTS = {
     USERS: "/dashboard/users",
     ADDRESSES: "/dashboard/addresses",
     DISCOUNT: "/dashboard/discounts",
+    BLOGS: "/dashboard/blogs",
     CREATE_CATEGORY: "/create-category",
     CREATE_SUB_CATEGORY: "/create-sub-category",
     CREATE_PRODUCT: "/create-product",
@@ -23,5 +24,6 @@ export const ROUTES_CONSTANTS = {
     CREATE_USER: "/create-user",
     CREATE_DISCOUNT: "/create-discount",
     CREATE_ADDRESESS: "/create-addresess",
-    CREATE_USER: "/create-user"
+    CREATE_USER: "/create-user",
+    CREATE_BLOG: "/create-blog",
 }

@@ -89,6 +89,14 @@ const Sidebar = () => {
       command: () => {
         navigate(ROUTES_CONSTANTS.REPORTS);
       }
+    },
+    {
+      label: t("blogs"),
+      icon: "ri-blogger-line",
+      route: ROUTES_CONSTANTS.BLOGS,
+      command: () => {
+        navigate(ROUTES_CONSTANTS.BLOGS);
+      }
     }
   ];
 

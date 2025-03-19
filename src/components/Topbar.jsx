@@ -1,12 +1,18 @@
 import { useEffect, useState } from "react";
 import AvatarProfile from "@common/AvatarProfile";
 import { useTranslation } from "react-i18next";
+import { Sidebar } from 'primereact/sidebar';
+import NotificationComponent from "./Notification";
+import InputTextComponent from "@common/InputTextComponent";
 
-const Topbar = ({ toggleExpansionSwitch }) => {
+const Topbar = ({ toggleExpansionSwitch, searchField, searchChangeHandler }) => {
   const { t } = useTranslation("msg");
   const [expand, setExpand] = useState(true);
   const [theme, setTheme] = useState(false);
   const [userDetails, setUserDetails] = useState({});
+  const [searchvalue, setSearchValue] = useState("");
+  const [visibleRight, setVisibleRight] = useState(false);
+  const [unreadNotificationCount, setUnreadNotificationCount] = useState(0);
 
   const toggleTheme = () => {
     setTheme(!theme);
@@ -24,6 +30,14 @@ const Topbar = ({ toggleExpansionSwitch }) => {
       localStorage.setItem("theme", "dark");
     }
   };
+
+  const readNotification = ()=>{
+    setVisibleRight(true)
+  }
+
+  useEffect(()=>{
+    setSearchValue(searchField);
+  },[searchField])
 
   useEffect(() => {
     setUserDetails(JSON.parse(localStorage.getItem("userDetails")));    
@@ -54,9 +68,21 @@ const Topbar = ({ toggleExpansionSwitch }) => {
         ></i>
       </button>
       <div className="grid w-full grid-cols-12 gap-2">
-        <div className="col-span-8 flex items-center">
+        <div className="col-span-8 max-sm:hidden flex items-center">
+          <InputTextComponent
+            type="text"
+            placeholder={t("search")}
+            value={searchvalue}
+            onChange={(e)=>searchChangeHandler(e)}
+            name="searchvalue"
+            className="w-full rounded border-[1px] border-[#ddd] px-[1rem] py-[8px] text-[11px] focus:outline-none"
+          />
         </div>
         <div className="col-span-4 flex justify-end text-TextPrimaryColor">
+          <button onClick={readNotification} className="me-8 text-xl relative">
+            <i className="ri-notification-4-line"></i>
+            <span className="absolute text-[12px] text-[red] left-[20px] top-[-6px]">{unreadNotificationCount}</span>
+          </button>
           <button onClick={toggleTheme} className="me-8 text-xl">
             {theme ? (
               <i className="ri-sun-line"></i>
@@ -67,6 +93,9 @@ const Topbar = ({ toggleExpansionSwitch }) => {
           <AvatarProfile shape="circle" userDetails={userDetails} />
         </div>
       </div>
+      <Sidebar visible={visibleRight} position="right" onHide={() => setVisibleRight(false)}>
+          <NotificationComponent />
+      </Sidebar>
     </div>
   );
 };

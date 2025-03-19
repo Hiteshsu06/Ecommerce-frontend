@@ -3,3 +3,7 @@
 
 #Run Frontend
 1. Run CMD- npm run start
+
+#Prerequsite for End Shop User
+1. Create a user with admin credential.
+2. Create shop address manually in DB for shop. 

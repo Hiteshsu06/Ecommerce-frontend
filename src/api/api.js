@@ -19,7 +19,7 @@ export const allApi = (dataurl, data, method) => {
     }
 };
 
-export const allApiWithHeaderToken = (dataurl, data, method, contentType) => {
+export const allApiWithHeaderToken = (dataurl, data, method, contentType, responseType) => {
     let token = JSON.parse(localStorage.getItem('token'));
     const headers = {
         'Content-Type': 'application/json',
@@ -28,6 +28,7 @@ export const allApiWithHeaderToken = (dataurl, data, method, contentType) => {
     const axiosInstance = axios.create({
         baseURL: apiBaseURL,
         headers: headers,
+        responseType: responseType ? responseType : "json"
     });
     // Handle File content
     if(contentType){

@@ -124,6 +124,12 @@ const CouponForm = () => {
     navigate(ROUTES_CONSTANTS.COUPONS);
   };
 
+  const checkValidDate=(startDate, endDate, key)=>{
+    if(new Date(startDate) > new Date(endDate)){
+      setFieldValue(key, "");
+    }
+  };
+
  const fetchUserList = async () => {
      setLoader(true); 
      try {
@@ -241,7 +247,12 @@ const CouponForm = () => {
         <div className="col-span-2">
           <InputTextComponent
             value={values?.validFrom}
-            onChange={handleChange}
+            onChange={(e)=>{
+              handleChange(e);
+              if(values?.validUntil){
+                checkValidDate(e?.target?.value, values?.validUntil, "validUntil");
+              }
+            }}
             type="date"
             placeholder={t("valid_from")}
             name="validFrom"
@@ -254,7 +265,12 @@ const CouponForm = () => {
         <div className="col-span-2">
           <InputTextComponent
             value={values?.validUntil}
-            onChange={handleChange}
+            onChange={(e)=>{
+              handleChange(e);
+              if(values?.validFrom){
+                checkValidDate(values?.validFrom, e?.target?.value, "validFrom");
+              }
+            }}
             type="date"
             placeholder={t("valid_until")}
             name="validUntil"

@@ -33,7 +33,7 @@ const Speciality = () => {
                     </div>
                 </div>
                 <div className="w-[55%] relative">
-                    <div className='absolute top-[-25px] w-[62vw]'>
+                    <div className='absolute top-[-16px] w-[62vw]'>
                     <Swiper
                         spaceBetween={20}
                         slidesPerView={2.5}
@@ -50,7 +50,7 @@ const Speciality = () => {
                                         alt={item?.name}
                                         draggable="false"
                                     />
-                                    <h1 className='absolute bottom-5 text-center left-[50%] translate-x-[-50%] text-white text-xl font-sans font-semibold] '>{item?.name}</h1>
+                                    <h1 className='absolute bottom-5 text-center left-[50%] translate-x-[-50%] text-white text-[20px] font-[700]'>{item?.name}</h1>
                                 </div>
                             </div>
                         </SwiperSlide>
