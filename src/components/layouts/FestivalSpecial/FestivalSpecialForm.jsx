@@ -1,7 +1,8 @@
 // components
 import ButtonComponent from "@common/ButtonComponent";
-import InputTextComponent from "@common/InputTextComponent";
+import MultiselectComponent from "@common/MultiselectComponent";
 import { allApiWithHeaderToken } from "@api/api";
+import InputTextComponent from "@common/InputTextComponent";
 
 // external libraries
 import * as yup from "yup";
@@ -18,9 +19,9 @@ import Dropdown from "@common/DropdownComponent";
 
 const structure = {
   name: "",
-  description: "",
-  image: "",
-  image_url: "",
+  products: "",
+  status: "",
+  image: ""
 };
 
 const statusList = [
@@ -28,12 +29,14 @@ const statusList = [
   { name: "Inactive", value: "0"}
 ];
 
-const CategoryForm = () => {
+const FestivalSpecialForm = () => {
   const toast = useRef(null);
   const { t } = useTranslation("msg");
   const navigate = useNavigate();
   const [data, setData] = useState(structure);
   const [loader, setLoader] = useState(false);
+  const [productList, setProductList] = useState([]);
+  const [selectedProduct, setSelectedProduct] = useState(null);
   const { id } = useParams();
 
   const validationSchema = yup.object().shape({
@@ -44,14 +47,14 @@ const CategoryForm = () => {
   const onHandleSubmit = async (value) => {
     if (id) {
       // Update
-      updateCategory(value);
+      updateFestProducts(value);
     } else {
       // Create
-      createCategory(value);
+      createFestProducts(value);
     }
   };
 
-  const createCategory = (value) => {
+  const createFestProducts = (value) => {
     let data = {
       name: value?.name,
       description: value?.description,
@@ -78,7 +81,7 @@ const CategoryForm = () => {
       });
   };
 
-  const updateCategory = (value) => {
+  const updateFestProducts = (value) => {
     setLoader(true);
     let body = {
       name: value?.name,
@@ -109,37 +112,22 @@ const CategoryForm = () => {
   };
 
   const handleBack = () => {
-    navigate(ROUTES_CONSTANTS.CATEGORIES);
+    navigate(ROUTES_CONSTANTS.FEST);
   };
 
+  const fetchProductList = async () => {
+    setLoader(true); 
+    const productResponse = await allApiWithHeaderToken(API_CONSTANTS.COMMON_PRODUCTS_URL, "", "get");
+    if (productResponse.status === 200) { 
+      console.log("productResponse?.data",productResponse?.data) 
+      setProductList(productResponse?.data);
+      setLoader(false); 
+    } 
+  }
+
   useEffect(() => {
-    if (id) {
-      setLoader(true);
-      allApiWithHeaderToken(`${API_CONSTANTS.COMMON_CATEGORIES_URL}/${id}`, "", "get")
-        .then((response) => {
-          if (response.status === 200) {
-            let data = {
-              name: response?.data?.name,
-              description: response?.data?.description,
-              image_url: response?.data?.image_url,
-              status: String(response?.data?.status)
-            }
-            setData(data);
-          }
-        })
-        .catch((err) => {
-          toast.current.show({
-            severity: "error",
-            summary: "Error",
-            detail: err?.response?.data?.errors,
-            life: 3000,
-          });
-          setLoader(false);
-        }).finally(()=>{
-          setLoader(false);
-        });
-    }
-  }, []);
+    fetchProductList();
+}, []);
 
   const formik = useFormik({
     initialValues: data,
@@ -150,20 +138,33 @@ const CategoryForm = () => {
   });
 
   const { values, errors, handleSubmit, handleChange, setFieldValue, touched } = formik;
+
   return (
     <div className="flex h-screen bg-BgPrimaryColor">
       {loader && <Loading/>}
       <Toast ref={toast} position="top-right" />
       <div className="mx-16 my-auto grid h-fit w-full grid-cols-4 gap-4 bg-BgSecondaryColor p-8 border rounded border-BorderColor">
         <div className="col-span-4">
-            {id ? t("update_category") : t("create_category")}
+            {id ? t("update_fest_product") : t("create_fest_product")}
+        </div>
+        <div className="col-span-4">
+            <FileUpload 
+                value={values?.image_url}
+                name="image"
+                isLabel={t("fest_special_image")} 
+                onChange={(e)=> {
+                  setFieldValue('image', e?.currentTarget?.files[0]);
+                  setFieldValue('image_url', URL.createObjectURL(e?.target?.files[0]));
+                }}
+              />    
+             <label htmlFor="file" className="error text-red-500">{errors?.file}</label>
         </div>
         <div className="col-span-2">
           <InputTextComponent
             value={values?.name}
             onChange={handleChange}
             type="text"
-            placeholder={t("category_name")}
+            placeholder={t("name")}
             name="name"
             isLabel={true}
             error={errors?.name}
@@ -172,27 +173,18 @@ const CategoryForm = () => {
           />
         </div>
         <div className="col-span-2">
-          <InputTextComponent
-            value={values?.description}
-            onChange={handleChange}
-            type="text"
-            placeholder={t("category_description")}
-            name="description"
-            isLabel={true}
-            error={errors?.description}
-            touched={touched?.description}
-            className="col-span-2 w-full rounded border-[1px] border-[#ddd] px-[1rem] py-[8px] text-[11px] focus:outline-none"
+          <MultiselectComponent
+            value={selectedProduct}
+            options={productList} 
+            optionLabel="products"
+            name="products"
+            onChange={(field, value) => setFieldValue(field, value)}
+            placeholder={t("fest_products")}
+            display="chip"
+            error={errors?.products}
+            touched={touched?.products}
+            className="w-full rounded border-[1px] border-[#ddd] px-[1rem] py-[8px] text-[11px] focus:outline-none"
           />
-        </div>
-        <div className="col-span-4 md:col-span-2">
-            <FileUpload 
-              value={values?.image_url}
-              name="image"
-              isLabel={t("category_image")} 
-              onChange={(e)=> {
-                setFieldValue('image', e?.currentTarget?.files[0]);
-                setFieldValue('image_url', URL.createObjectURL(e?.target?.files[0]));
-              }}/>
         </div>
         {
           id && (
@@ -232,4 +224,4 @@ const CategoryForm = () => {
   );
 };
 
-export default CategoryForm;
+export default FestivalSpecialForm;

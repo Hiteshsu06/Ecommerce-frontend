@@ -397,7 +397,7 @@ const OrderForm = () => {
                 onClick={() => setVisible(true)} 
                 type="submit"
                 icon="ri-add-large-fill"
-                className="rounded bg-BgTertiaryColor px-6 py-2 text-[12px] text-white"
+                className="rounded bg-TextPrimaryColor px-6 py-2 text-[12px] text-white"
               />
             </div>
           </div>
@@ -632,7 +632,7 @@ const OrderForm = () => {
                           onClick={() => { clearCoupon() }}
                           type="submit"
                           icon="ri-delete-bin-5-line"
-                          className="rounded bg-BgTertiaryColor px-6 py-2 text-[12px] text-white"
+                          className="rounded bg-TextPrimaryColor px-6 py-2 text-[12px] text-white"
                         />
                       </>
                       :
@@ -640,7 +640,7 @@ const OrderForm = () => {
                         onClick={() => checkCoupon()}
                         type="submit"
                         icon="ri-loop-right-fill"
-                        className="rounded bg-BgTertiaryColor px-6 py-2 text-[12px] text-white"
+                        className="rounded bg-TextPrimaryColor px-6 py-2 text-[12px] text-white"
                       />
                   }
                 </div>
@@ -723,7 +723,7 @@ const OrderForm = () => {
                             removeProduct(index);
                           }}
                           icon="ri-subtract-line"
-                          className="rounded bg-BgTertiaryColor px-6 py-2 text-[12px] text-white"
+                          className="rounded bg-TextPrimaryColor px-6 py-2 text-[12px] text-white"
                         />
                       )}
 
@@ -731,7 +731,7 @@ const OrderForm = () => {
                         <ButtonComponent
                           onClick={addProduct}
                           icon="ri-add-line"
-                          className="rounded bg-BgTertiaryColor px-6 py-2 text-[12px] text-white"
+                          className="rounded bg-TextPrimaryColor px-6 py-2 text-[12px] text-white"
                         />
                       )}
                     </div>
@@ -781,13 +781,13 @@ const OrderForm = () => {
               onClick={() => handleBack()}
               type="button"
               label={t("back")}
-              className="rounded bg-BgTertiaryColor px-6 py-2 text-[12px] text-white"
+              className="rounded bg-TextPrimaryColor px-6 py-2 text-[12px] text-white"
             />
             <ButtonComponent
               onClick={() => handleSubmit()}
               type="submit"
               label={id ? t("update") : t("submit")}
-              className="rounded bg-BgTertiaryColor px-6 py-2 text-[12px] text-white"
+              className="rounded bg-TextPrimaryColor px-6 py-2 text-[12px] text-white"
             />
           </div>
         </div>

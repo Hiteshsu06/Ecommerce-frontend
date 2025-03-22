@@ -4,13 +4,13 @@
 
 @layer base {
     :root {
-        --color-BgPrimaryColor: white;
+        --color-BgPrimaryColor: #c5c0e92e;
         --color-BgSecondaryColor: white;
-        --color-BgTertiaryColor: #1f1f70;
+        --color-BgTertiaryColor: white;
 
         --color-BorderColor: #d2d2ff;
 
-        --color-TextPrimaryColor: white;
+        --color-TextPrimaryColor: #3a3560;
         --color-TextSecondaryColor: black;
     }
     :root[class="dark"] {

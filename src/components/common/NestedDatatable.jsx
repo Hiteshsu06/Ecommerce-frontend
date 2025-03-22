@@ -2,38 +2,17 @@ import { TreeTable } from 'primereact/treetable';
 import { Column } from "primereact/column";
 import { useState } from 'react';
 
-const NestedDatatable = ({ columns, data = [], nestedColumns, className, showGridlines }) => {
+const NestedDatatable = ({ columns, data = [], className, showGridlines }) => {
   const [expandedRows, setExpandedRows] = useState(null);
 
   const allowExpansion = (rowData) => {
     return rowData?.children?.length > 0;
   };
-
-  function transformData(input) {
-    return input.map((item, index) => ({
-      key: `${index}`,
-      data: {
-        id: item?.id,
-        name: item?.name,
-        description: item?.description,
-        createdAt: item?.createdAt,
-        updatedAt: item?.updatedAt,
-      },
-      children: (item.children || []).map((child, childIndex) => ({
-        key: `${index}-${childIndex}`,
-        data: {
-          name: child.name,
-          description: child.description
-        },
-        children: [],
-      })),
-    }));
-  }
   
   return (
     <div>
       <TreeTable 
-          value={transformData(data)} 
+          value={data} 
           expandedRows={expandedRows} 
           onRowToggle={(e) => setExpandedRows(e.data)}
           dataKey="id"  

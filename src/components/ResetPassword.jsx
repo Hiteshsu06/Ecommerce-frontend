@@ -90,7 +90,7 @@ const ResetPassword = () => {
   return (
     <div className="h-screen items-center flex justify-center max-sm:px-4">
       {loader && <Loading/>}
-      <div className="w-1/3 max-lg:w-1/2 max-sm:w-full border px-5 py-5 max-lg:px-10 max-md:px-5">
+      <div className="w-1/3 shadow-cards max-lg:w-1/2 max-sm:w-full border px-5 py-5 max-lg:px-10 max-md:px-5">
         <Toast ref={toast} position="top-right" style={{scale: '0.7'}} onHide={toastHandler}/>
         <div className="text-center text-[1.5rem] font-[600] tracking-wide max-lg:text-[1.4em] max-sm:text-[1rem]">
           {t("reset_password")}
@@ -126,13 +126,13 @@ const ResetPassword = () => {
             onClick={() => handleSubmit()}
             type="submit"
             label={t("request_reset_link")}
-            className="w-full rounded bg-BgTertiaryColor px-6 py-2 text-[12px] text-white"
+            className="w-full rounded bg-TextPrimaryColor px-6 py-2 text-[12px] text-white"
             icon="pi pi-arrow-right"
             iconPos="right"
           />
         </div>
         <div className="mt-2 text-center text-[0.8rem]">
-          <span className="ps-2 font-[500] text-BgTertiaryColor underline">
+          <span className="ps-2 font-[500] text-TextPrimaryColor underline">
             <Link to="/">{t("back_to_login")}</Link>
           </span>
         </div>

@@ -165,7 +165,7 @@ const UserFormModal = ({ header, visible, width, onHide, draggable }) => {
                                 onClick={() => handleSubmit()}
                                 type="submit"
                                 label={t("submit")}
-                                className="rounded bg-BgTertiaryColor px-6 py-2 text-[12px] text-white"
+                                className="rounded bg-TextPrimaryColor px-6 py-2 text-[12px] text-white"
                             />
                         </div>
                     </div>

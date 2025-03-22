@@ -215,13 +215,13 @@ const BlogForm = () => {
             onClick={() => handleBack()}
             type="button"
             label={t("back")}
-            className="rounded bg-BgTertiaryColor px-6 py-2 text-[12px] text-white"
+            className="rounded bg-TextPrimaryColor px-6 py-2 text-[12px] text-white"
           />
           <ButtonComponent
             onClick={() => handleSubmit()}
             type="submit"
             label={id ? t("update") : t("submit")}
-            className="rounded bg-BgTertiaryColor px-6 py-2 text-[12px] text-white"
+            className="rounded bg-TextPrimaryColor px-6 py-2 text-[12px] text-white"
           />
         </div>
       </div>

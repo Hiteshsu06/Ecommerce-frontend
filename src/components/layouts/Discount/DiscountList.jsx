@@ -157,7 +157,7 @@ const DiscountList = () => {
           onClick={() => createDiscount()}
           type="submit"
           label={t("create_discount")}
-          className="rounded bg-BgTertiaryColor px-6 py-2 text-[12px] text-white"
+          className="rounded bg-TextPrimaryColor px-6 py-2 text-[12px] text-white"
           icon="pi pi-arrow-right"
           iconPos="right"
         />

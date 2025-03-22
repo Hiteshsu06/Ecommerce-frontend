@@ -159,7 +159,7 @@ const ProductList = () => {
             onClick={() => setVisible(false)}
             type="button"
             label={t("back")}
-            className="rounded bg-BgTertiaryColor px-6 py-2 text-[12px] text-white"
+            className="rounded bg-TextPrimaryColor px-6 py-2 text-[12px] text-white"
           />
           <ButtonComponent
             onClick={() => {
@@ -167,7 +167,7 @@ const ProductList = () => {
             }}
             type="submit"
             label={t("submit")}
-            className="rounded bg-BgTertiaryColor px-6 py-2 text-[12px] text-white"
+            className="rounded bg-TextPrimaryColor px-6 py-2 text-[12px] text-white"
           />
       </div>
   );
@@ -258,19 +258,19 @@ const ProductList = () => {
           type="submit"
           onClick={downloadTemplate}
           label={t("download_template")}
-          className="rounded bg-BgTertiaryColor px-6 py-2 text-[12px] text-white me-2"
+          className="rounded bg-TextPrimaryColor px-6 py-2 text-[12px] text-white me-2"
         />
         <ButtonComponent
           onClick={importBulkStock}
           type="submit"
           label={t("import_products")}
-          className="rounded bg-BgTertiaryColor px-6 py-2 text-[12px] text-white me-2"
+          className="rounded bg-TextPrimaryColor px-6 py-2 text-[12px] text-white me-2"
         />
         <ButtonComponent
           onClick={createStock}
           type="submit"
           label={t("create_product")}
-          className="rounded bg-BgTertiaryColor px-6 py-2 text-[12px] text-white"
+          className="rounded bg-TextPrimaryColor px-6 py-2 text-[12px] text-white"
         />
       </div>
       <div className="mt-4">

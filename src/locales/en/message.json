@@ -210,5 +210,12 @@
    "created_at": "Created At",
    "add_xlsx_file_here": "Add xlsx file here",
    "bulk_product_upload": "Bulk Product Upload",
-   "download_template": "Download Template"
+   "download_template": "Download Template",
+   "fest_special": "Festival Spec.",
+   "ecommerce": "Ecommerce",
+   "festival_special": "Festival Special",
+   "create_fest_special": "Create Festival Special",
+   "update_fest_product": "Update Festival Product",
+   "create_fest_product": "Create Festival Product",
+   "fest_products": "Festival Products"
 }

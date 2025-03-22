@@ -18,5 +18,7 @@ import DiscountForm from './layouts/Discount/DiscountForm';
 import DiscountList from './layouts/Discount/DiscountList';
 import UserList from './layouts/User/UserList';
 import BlogList from './layouts/Blog/BlogList';
+import FestivalSpecialForm from './layouts/FestivalSpecial/FestivalSpecialForm';
+import FestivalSpecialList from './layouts/FestivalSpecial/FestivalSpecialList';
 
-export { Topbar, Sidebar, CategoryList, CategoryForm, SubCategoryList, SubCategoryForm, ProductList, ProductForm, InventoryList, InventoryForm, DashboardStats, OrderList, OrderForm, CouponList, CouponForm, ReportList, DiscountForm, DiscountList, UserList, BlogList };
+export { Topbar, Sidebar, CategoryList, CategoryForm, SubCategoryList, SubCategoryForm, ProductList, ProductForm, InventoryList, InventoryForm, DashboardStats, OrderList, OrderForm, CouponList, CouponForm, ReportList, DiscountForm, DiscountList, UserList, BlogList, FestivalSpecialList, FestivalSpecialForm };

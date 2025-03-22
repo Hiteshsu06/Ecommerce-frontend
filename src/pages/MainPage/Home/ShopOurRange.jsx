@@ -1,7 +1,8 @@
 import React from 'react';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import RangeCard from '../Components/RangeCard';
-import 'swiper/css/bundle'
+import 'swiper/css/bundle';
+
 const ShopOurRange = () => {
     const category = [
         {

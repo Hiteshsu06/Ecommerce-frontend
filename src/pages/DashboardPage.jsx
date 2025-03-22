@@ -1,5 +1,5 @@
 // components
-import { Topbar, Sidebar, CategoryList, ProductList, DashboardStats, SubCategoryList, InventoryList, OrderList, CouponList, ReportList, DiscountList, UserList, BlogList} from "../components/index";
+import { Topbar, Sidebar, CategoryList, ProductList, DashboardStats, SubCategoryList, InventoryList, OrderList, CouponList, ReportList, DiscountList, UserList, BlogList, FestivalSpecialList} from "../components/index";
 import Loading from "@common/Loading";
 
 // utils
@@ -10,14 +10,15 @@ import { useTranslation } from "react-i18next";
 const DashboardPage = () => {
   const [toggle, setToggle] = useState(true);
   const { t } = useTranslation("msg");
+  
   const toggleExpansionSwitch = (key) => {
     setToggle(key);
   };
  
   return (
     <div className="flex h-screen overflow-hidden bg-BgPrimaryColor">
-      <div className={`sidebar ${toggle ? "open" : "closed"} h-full`}>
-        <Sidebar />
+      <div className={`sidebar ${toggle ? "w-[300px]" : "w-[103px]"} h-full`}>
+        <Sidebar toggle={toggle}/>
       </div>
       <div className="w-full">
         <Topbar toggleExpansionSwitch={toggleExpansionSwitch} />
@@ -36,6 +37,7 @@ const DashboardPage = () => {
               <Route path="/users" element={<UserList />}/>
               <Route path="/reports" element={<ReportList />}/>
               <Route path="/blogs" element={<BlogList />}/>
+              <Route path="/fests" element={<FestivalSpecialList />}/>
             </Routes>
           </Suspense>
         </div>

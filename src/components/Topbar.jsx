@@ -56,7 +56,7 @@ const Topbar = ({ toggleExpansionSwitch, searchField, searchChangeHandler }) => 
   }, [theme]);
 
   return (
-    <div className="flex h-16 w-full items-center gap-4 bg-BgTertiaryColor px-5">
+    <div className="flex h-16 w-full items-center gap-4 bg-BgTertiaryColor px-5 shadow-custom z-10">
       <button
         className={`toggle-button col-span-1 ${expand ? "expanded" : ""}`}
         onClick={() => {

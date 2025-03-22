@@ -86,13 +86,18 @@ const Login = () => {
      }
    };
    
+  const handleKeyDown = (event) => {
+    if (event.key === 'Enter') {
+      handleSubmit(); // Trigger form submission on Enter
+    }
+  };
 
   const { values, errors, handleSubmit, handleChange, touched } = formik;
 
   return (
     <div className="h-screen flex items-center justify-center">
       {loader && <Loading/>}
-      <div className="w-1/4 border px-5 py-5 max-lg:px-10 max-md:px-5">
+      <div className="w-1/4 border shadow-cards px-5 py-5 max-lg:px-10 max-md:px-5" onKeyDown={handleKeyDown}>
         <Toast ref={toast} position="top-right" style={{scale: '0.7'}} onHide={toastHandler}/>
         <div className="text-center text-[1.5rem] font-[600] tracking-wide max-lg:text-[1.4em] max-sm:text-[1rem]">
           {t("login")}
@@ -122,7 +127,7 @@ const Login = () => {
         <div className="mt-2 flex items-center justify-between">
           <div className="flex gap-2">
           </div>
-          <div className="z-10 text-[0.8rem] text-BgTertiaryColor underline underline-offset-2 hover:cursor-pointer">
+          <div className="z-10 text-[0.8rem] text-TextPrimaryColor underline underline-offset-2 hover:cursor-pointer">
             <Link to="/forgot-password">{t("forgot_password")}</Link>
           </div>
         </div>
@@ -131,7 +136,7 @@ const Login = () => {
             onClick={() => handleSubmit()}
             type="submit"
             label={t("log_in")}
-            className="w-full rounded bg-BgTertiaryColor px-6 py-2 text-[12px] text-white"
+            className="w-full rounded bg-TextPrimaryColor px-6 py-2 text-[12px] text-white"
             icon="pi pi-arrow-right"
             iconPos="right"
           />
@@ -139,7 +144,7 @@ const Login = () => {
         <div className="mt-2 text-center text-[0.8rem]">
           {" "}
           {t("don't_have_an_account?")}
-          <span className="ps-2 font-[500] text-BgTertiaryColor underline">
+          <span className="ps-2 font-[500] text-TextPrimaryColor underline">
             <Link to="/signup">Signup</Link>
           </span>
         </div>

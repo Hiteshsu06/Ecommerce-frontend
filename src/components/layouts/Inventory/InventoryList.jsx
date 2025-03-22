@@ -128,7 +128,7 @@ const InventoryList = () => {
           onClick={() => createInventory()}
           type="submit"
           label={t("create_inventory")}
-          className="rounded bg-BgTertiaryColor px-6 py-2 text-[12px] text-white"
+          className="rounded bg-TextPrimaryColor px-6 py-2 text-[12px] text-white"
         />
       </div>
       <div className="mt-4">

@@ -36,7 +36,7 @@ const HelpdeskPage = () => {
             onClick={redirection}
             type="submit"
             label={t("back_to_home")}
-            className="w-full rounded bg-BgTertiaryColor px-6 py-2 text-[12px] text-white"
+            className="w-full rounded bg-TextPrimaryColor px-6 py-2 text-[12px] text-white"
             icon="pi pi-arrow-right"
             iconPos="right"
           />

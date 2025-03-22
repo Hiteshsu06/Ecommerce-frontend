@@ -18,6 +18,7 @@ const OrderForm = lazy(() => import("@components/Order/OrderForm"));
 const CouponForm = lazy(() => import("@components/Coupon/CouponForm"));
 const DiscountForm = lazy(() => import("@components/Discount/DiscountForm"));
 const BlogForm = lazy(() => import("@components/Blog/BlogForm"));
+const FestivalSpecialForm = lazy(() => import("@components/FestivalSpecial/FestivalSpecialForm"));
 
 // pages
 const Login = lazy(() => import("@pages/LoginPage"));
@@ -60,6 +61,8 @@ function App() {
           <Route path="/edit-discount/:id" element={<DiscountForm />}/>
           <Route path="create-blog" element={<BlogForm />}/>
           <Route path="/edit-blog/:id" element={<BlogForm />}/>
+          <Route path="/edit-fest-product/:id" element={<FestivalSpecialForm />}/>
+          <Route path="/create-fest-product" element={<FestivalSpecialForm />}/>
           <Route path="/not-authorized" element={<NotAuthorizedPage />}/>
           <Route path="/help" element={<HelpdeskPage />}/>
         </Routes>

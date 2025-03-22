@@ -104,7 +104,7 @@ const Signup = () => {
   return (
     <div className="h-screen items-center flex justify-center">
       {loader && <Loading/>}
-      <div className="w-1/4 border px-5 max-lg:px-10 max-md:px-5">
+      <div className="w-1/4 border px-5 max-lg:px-10 max-md:px-5 shadow-cards">
         <Toast ref={toast} position="top-right" />
         <div className="my-2 text-left text-[1.5rem] font-[600] tracking-wide max-xl:text-center max-lg:text-[1.4em] max-sm:text-[1rem]">
           {t("signup")}
@@ -186,12 +186,12 @@ const Signup = () => {
             onClick={() => handleSubmit()}
             type="submit"
             label={t("sign_up")}
-            className="w-full rounded bg-BgTertiaryColor px-6 py-2 text-[12px] text-white"
+            className="w-full rounded bg-TextPrimaryColor px-6 py-2 text-[12px] text-white"
           />
         </div>
         <div className="mb-4 mt-2 text-center text-[0.8rem]">
           {t("already_have_an_account?")}
-          <span className="ps-2 font-[500] text-BgTertiaryColor underline">
+          <span className="ps-2 font-[500] text-TextPrimaryColor underline">
             <Link to="/login">{t("sign_in")}</Link>
           </span>
         </div>
