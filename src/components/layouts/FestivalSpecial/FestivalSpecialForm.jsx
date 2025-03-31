@@ -19,7 +19,7 @@ import Dropdown from "@common/DropdownComponent";
 
 const structure = {
   name: "",
-  products: "",
+  products: [],
   status: "",
   image: ""
 };
@@ -36,7 +36,6 @@ const FestivalSpecialForm = () => {
   const [data, setData] = useState(structure);
   const [loader, setLoader] = useState(false);
   const [productList, setProductList] = useState([]);
-  const [selectedProduct, setSelectedProduct] = useState(null);
   const { id } = useParams();
 
   const validationSchema = yup.object().shape({
@@ -119,7 +118,6 @@ const FestivalSpecialForm = () => {
     setLoader(true); 
     const productResponse = await allApiWithHeaderToken(API_CONSTANTS.COMMON_PRODUCTS_URL, "", "get");
     if (productResponse.status === 200) { 
-      console.log("productResponse?.data",productResponse?.data) 
       setProductList(productResponse?.data);
       setLoader(false); 
     } 
@@ -140,7 +138,7 @@ const FestivalSpecialForm = () => {
   const { values, errors, handleSubmit, handleChange, setFieldValue, touched } = formik;
 
   return (
-    <div className="flex h-screen bg-BgPrimaryColor">
+    <div className="flex h-screen bg-BgPrimaryColor overflow-y-scroll">
       {loader && <Loading/>}
       <Toast ref={toast} position="top-right" />
       <div className="mx-16 my-auto grid h-fit w-full grid-cols-4 gap-4 bg-BgSecondaryColor p-8 border rounded border-BorderColor">
@@ -174,16 +172,18 @@ const FestivalSpecialForm = () => {
         </div>
         <div className="col-span-2">
           <MultiselectComponent
-            value={selectedProduct}
+            value={values?.products}
             options={productList} 
-            optionLabel="products"
+            optionLabel="name"
             name="products"
-            onChange={(field, value) => setFieldValue(field, value)}
+            onChange={(e) => {
+              setFieldValue("products", e.value);
+            }}
             placeholder={t("fest_products")}
             display="chip"
             error={errors?.products}
             touched={touched?.products}
-            className="w-full rounded border-[1px] border-[#ddd] px-[1rem] py-[8px] text-[11px] focus:outline-none"
+            className="col-span-2 w-full rounded border-[1px] border-[#ddd] custom-dropdown focus:outline-none"
           />
         </div>
         {

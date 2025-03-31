@@ -60,6 +60,24 @@
   font-size: 11px !important;
 }
 
+.custom-dropdown > .p-multiselect-label-container {
+  font-size: 11px !important;
+}
+
+.custom-dropdown > .p-multiselect-label-container > .p-multiselect-label{
+  padding-top: 8px !important;
+  padding-bottom: 8px !important;
+}
+
+.p-multiselect-item{
+  font-size: 12px;
+}
+
+.p-multiselect.p-multiselect-chip .p-multiselect-token {
+  padding: 0px;
+  background: white;
+}
+
 .sidebar.open {
     transform: translateX(0);
 }
@@ -144,6 +162,88 @@
   }
   .p-button:focus {
     box-shadow: none !important;
+  }
+
+  /* Sidebar */
+  .p-sidebar-header{
+    font-size: 20px;
+    font-weight: 600;
+  }
+
+  /* Dialog */
+  .p-dialog-content{
+    background-color: #e9e9e9;
+    padding: 10px;
+  }
+  .p-dialog-footer{
+    padding-top: 1rem;
+    padding-bottom: 1rem;
+  }
+
+  /* Accordian */
+  .custom-checkout-accordian-header > .p-accordion-tab > .p-accordion-header > .p-accordion-header-link > svg{
+    display: none;
+  }
+  .custom-checkout-accordian-header > .p-accordion-tab > .p-accordion-header{
+    background-color: white;
+    border-radius: 10px;
+  }
+  .custom-checkout-accordian-header > .p-accordion-tab > .p-accordion-header:hover{
+    background-color: white !important;
+  }
+
+  /* Radio Button */
+  .p-radiobutton .p-radiobutton-box{
+    background: var(--button-secondary-background-color) !important;
+  }
+
+  .p-radiobutton{
+    scale: 0.8;
+  }
+
+  .p-dialog-content{
+    overflow-y: hidden;
+  }
+
+  /* Table container */
+  .table-container {
+    width: 100%;
+    height: 490px; /* Set a fixed height for the scrollable body */
+    overflow: hidden; /* Hide the overflow on the container to make it scrollable on tbody */
+  }
+
+  /* Ensure the table is taking the full width */
+  .table-container > div > div > table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  /* Sticky header */
+  .table-container > div > div > table > thead > tr > th {
+    position: sticky;
+    top: 0; /* Stick the header to the top */
+    background-color: #fff; /* Avoid transparency */
+    z-index: 2; /* Make sure the header stays on top */
+  }
+
+  /* Table body cells styling */
+  .table-container > div > div > table > tbody > td {
+    padding: 8px;
+    border: 1px solid #ddd;
+  }
+
+  /* Scrollable tbody */
+  .table-container > div > div > table > tbody {
+    display: block; /* Allow tbody to scroll */
+    max-height: 370px; /* Height to show a limited number of rows */
+    overflow-y: auto; /* Enable vertical scrolling */
+  }
+
+  /* Correct the width for tbody cells */
+  .table-container > div > div > table > thead, tbody tr {
+    display: table;
+    width: 100%;
+    table-layout: fixed; /* Fix the layout so cells align */
   }
 
   /* Autocomplete */

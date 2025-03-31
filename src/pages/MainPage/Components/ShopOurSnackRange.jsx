@@ -1,60 +1,42 @@
-const ShopOurSnackRange = () => {
+import { useNavigate } from "react-router-dom";
+import { ROUTES_CONSTANTS } from "../../../constants/routesurl";
+
+const ShopOurSnackRange = ({title, data}) => {
+    const navigate = useNavigate();
+    const snackDescription=(item)=>{
+        navigate(
+            ROUTES_CONSTANTS.VIEW_BLOG_DESCRIPTION, 
+            { 
+            state: { 
+                image_url: item?.image_url, 
+                heading: item?.heading, 
+                description: item?.description,
+                createdAt: item?.created_at
+            } })
+    };
+
     return (
         <section className="relative h-[660px]">
             <div className="absolute w-full h-[345px] z-0 inset-0 bg-[#ede9dd]">
             </div>
             <div className="relative flex flex-col justify-center items-center">
-                <h1 className="text-3xl font-sans font-semibold text-center mt-10">Shop Our Snacks Range</h1>
+                <h1 className="text-[#1D2E43] font-[playfair] text-[36px] font-bold text-center mt-10">{title}</h1>
                 <div className="grid xl:grid-cols-5 gap-5 px-10 py-10 justify-center items-center z-10">
-                    <a href="/" className="grid-cols-1 rounded-xl flex flex-col items-center justify-center">
-                        <div>
-                            <img src="https://www.anandsweets.in/cdn/shop/files/South_Indian_Special-1.png?v=1713501854&width=360" alt="Snacks" />
-                        </div>
-                        <div>
-                            <p className="font-bold text-xl my-4">South Indian Special</p>
-                        </div>
-                    </a>
-                    <a href="/" className="grid-cols-1 rounded-xl flex flex-col items-center justify-center">
-                        <div>
-                            <img src="https://www.anandsweets.in/cdn/shop/files/Indian_Bakery_2_76ee5112-e656-4414-947d-8a55b88313cd.png?v=1723613638&width=360" alt="Snacks" />
-                        </div>
-                        <div>
-                            <p className="font-bold text-xl my-4">Indian Bakery</p>
-                        </div>
-                    </a>
-
-                    <a href="/" className="grid-cols-1 rounded-xl flex flex-col items-center justify-center">
-                        <div>
-                            <img src="https://www.anandsweets.in/cdn/shop/files/Tea_Time_Snacks_2.png?v=1713501938&width=360" alt="Snacks" />
-                        </div>
-                        <div>
-                            <p className="font-bold text-xl my-4">Tea Time Snacks</p>
-                        </div>
-                    </a>
-
-                    <a href="/" className="grid-cols-1 rounded-xl flex flex-col items-center justify-center">
-                        <div>
-                            <img src="https://www.anandsweets.in/cdn/shop/files/Indian_BISCOTTIS_2.png?v=1713501922&width=360" alt="Snacks" />
-                        </div>
-                        <div>
-                            <p className="font-bold text-xl my-4">Indian Biscottis</p>
-                        </div>
-                    </a>
-
-                    <a href="/" className="grid-cols-1 rounded-xl flex flex-col items-center justify-center">
-                        <div>
-                            <img src="https://www.anandsweets.in/cdn/shop/files/North_Indian_Special_2.png?v=1713501887&width=360" alt="Snacks" />
-                        </div>
-                        <div>
-                            <p className="font-bold text-xl my-4">North Indian Specials</p>
-                        </div>
-                    </a>
+                    {data?.map((item)=>{
+                        return(
+                            <a key={item?.id} onClick={() => snackDescription(item)} className="grid-cols-1 rounded-xl flex flex-col items-center justify-center hover:cursor-pointer">
+                                <div>
+                                    <img src={item?.image_url} alt="Snacks" />
+                                </div>
+                                <div>
+                                    <p className="font-bold text-xl my-4">{item?.name}</p>
+                                </div>
+                            </a>
+                        )
+                    })}
                 </div>
             </div>
-
-
         </section>
-
     )
 
 }

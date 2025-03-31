@@ -8,27 +8,22 @@ import { useNavigate, useParams } from "react-router-dom";
 // components
 import ButtonComponent from "@common/ButtonComponent";
 import InputTextComponent from "@common/InputTextComponent";
-import Dropdown from "@common/DropdownComponent";
+import { RadioButton } from "primereact/radiobutton";
 import FileUpload from "@common/FileUpload";
 import { allApiWithHeaderToken } from "@api/api";
 import Loading from '@common/Loading';
 import { Toast } from "primereact/toast";
+import { ROUTES_CONSTANTS } from "../constants/routesurl";
+import { API_CONSTANTS } from "../constants/apiurl";
 
 const structure = {
-  firstName: "",
-  lastName: "",
+  name: "",
   email: "",
   gender: "",
   address: "",
-  profileImage: "",
-  profileImageUrl: ""
+  image: "",
+  role_id: 1
 };
-
-const genderList = [
-  { name: "Male", value: "M" },
-  { name: "Female", value: "F" },
-  { name: "Other", value: "O" },
-];
 
 const ProfilePage = () => {
   const { t } = useTranslation("msg");
@@ -40,52 +35,36 @@ const ProfilePage = () => {
   const [toastType, setToastType] = useState('');
 
   const validationSchema = yup.object().shape({
+    name: yup.string().required(t("name_is_required")),
     email: yup.string().required(t("email_is_required")),
   });
-
-  useEffect(() => {
-    let email = JSON.parse(localStorage.getItem("user"))?.email;
-    setData({ ...data, email: email });
-  }, []);
 
   const onHandleSubmit = async (value) => {
     setLoader(true);
     let body = {
-      first_name: value?.firstName,
-      last_name: value?.lastName,
-      full_address: value?.address
+        email: value?.email,
+        name: value?.name,
+        role_id: value?.role_id,
+        gender: value?.gender,
+        phone_number: value?.phoneNumber,
     };
-    body['gender'] = value?.gender ? value?.gender : "";
-    if(value?.profileImage){
-      body['profile_image'] = value?.profileImage;
+    if(value?.image){
+      body['image'] = value?.image
     }
-    allApiWithHeaderToken(`users/update_user/${id}`, body, "put", 'multipart/form-data')
+    
+    allApiWithHeaderToken(`${API_CONSTANTS.COMMON_USERS_URL}/${id}`, body, "put", 'multipart/form-data' )
       .then((response) => {
-        successToaster(response);
-        let data = {
-          id: response?.data?.data?.id,
-          fullName: "",
-          email: response?.data?.data?.email,
-          role: response?.data?.data?.role,
-          gender: response?.data?.data?.gender
+        if (response.status === 200) {
+          navigate(ROUTES_CONSTANTS.USERS);
         }
-        let firstName = response?.data?.data?.first_name ? response?.data?.data?.first_name : "";
-        let lastName = response?.data?.data?.last_name ? response?.data?.data?.last_name : "";
-        if(firstName && lastName){
-          data.fullName = firstName + " " + lastName
-        }
-        localStorage.setItem("user", JSON.stringify(data));
       })
       .catch((err) => {
-        if(Array.isArray(err?.response?.data?.errors)){
-          err?.response?.data?.errors?.forEach((item)=>{
-            errorToaster(item);
-          })
-        }else{
-          errorToaster(err?.response?.data);
-        }
-      })
-      .finally(()=>{
+        toast.current.show({
+            severity: "error",
+            summary: "Error",
+            detail: err?.response?.data?.errors,
+            life: 3000,
+        });
         setLoader(false);
       });
   };
@@ -101,29 +80,43 @@ const ProfilePage = () => {
   }
 
   useEffect(() => {
-   if(id){
-     setLoader(true);
-     allApiWithHeaderToken(`/users/${id}`, "", "get")
-     .then((response) => {
-        let data = {
-          firstName: response?.data?.first_name,
-          lastName: response?.data?.last_name,
-          email: response?.data?.email,
-          address: response?.data?.full_address,
-          profileImageUrl: response?.data?.profile_image_url
+    setLoader(true);
+    try{
+        if(id){
+          allApiWithHeaderToken(`${API_CONSTANTS.COMMON_USERS_URL}/${id}`, "", "get")
+          .then((response) => {
+            if (response.status === 200) {
+                let data = {
+                    name: response?.data?.name,
+                    gender: response?.data?.gender,
+                    image_url: response?.data?.image_url,
+                    phoneNumber: response?.data?.phone_number,
+                    email: response?.data?.email,
+                    role_id: response?.data?.role_id
+                }
+                setData(data);
+            } 
+          })
+          .catch((err) => {
+            toast.current.show({
+                severity: "error",
+                summary: "Error",
+                detail: err?.response?.data?.errors,
+                life: 3000,
+            });
+          });
         }
-        const genderData = genderList?.find((item)=> item?.value === response?.data?.gender);
-        data['gender'] = genderData?.value;
-        setData(data);
-     })
-     .catch((err) => {
-       console.log("err", err);
-     })
-     .finally(()=>{
-       setLoader(false);
-     });
-   }
-  }, [id]);
+    } catch (err){
+      toast.current.show({
+        severity: "error",
+        summary: "Error",
+        detail: "Something Went Wrong",
+        life: 3000,
+      });
+    }finally {
+      setLoader(false);
+    }
+  }, []);
 
   const formik = useFormik({
     initialValues: data,
@@ -133,32 +126,11 @@ const ProfilePage = () => {
     validateOnBlur: true,
   });
 
-  const successToaster=(response)=>{
-    setToastType('success');
-    return toast.current.show({
-      severity: "success",
-      summary: t("success"),
-      detail: response?.data?.message,
-      life: 500
-    });
-  };
-
-  const errorToaster=(err)=>{
-    setToastType('error');
-    return toast.current.show({
-      severity: "error",
-      summary: t("error"),
-      detail: err,
-      life: 1000
-    });
-  };
-
   const toastHandler=()=>{
     if (toastType === 'success') {
         backHandler();
      }
   };
-
 
   const { values, errors, handleSubmit, handleChange, touched, setFieldValue } = formik;
 
@@ -175,42 +147,39 @@ const ProfilePage = () => {
                   <div>
                     <FileUpload
                       isLabel={t("profile_image")}
-                      value={values?.profileImageUrl}
-                      name="profile_image"
-                      onChange={(e) => {
-                        setFieldValue("profileImage", e?.currentTarget?.files[0]);
-                        setFieldValue(
-                          "profileImageUrl",
-                          URL.createObjectURL(e?.target?.files[0]),
-                        );
-                      }}
+                      value={values?.image_url}
+                      name="image"
+                      onChange={(e)=> {
+                        setFieldValue('image', e?.currentTarget?.files[0]);
+                        setFieldValue('image_url', URL.createObjectURL(e?.target?.files[0]));
+                        }}
                       isProfile={true}
                     />
                   </div>
               </div>
               <div className="col-span-4 md:col-span-2">
                 <InputTextComponent
-                  value={values?.firstName}
+                  value={values?.name}
                   onChange={handleChange}
                   type="text"
-                  placeholder={t("first_name")}
-                  name="firstName"
+                  placeholder={t("name")}
+                  name="name"
                   isLabel={true}
-                  error={errors?.firstName}
-                  touched={touched?.firstName}
+                  error={errors?.name}
+                  touched={touched?.name}
                   className="w-full rounded border-[1px] border-[#ddd] px-[1rem] py-[8px] text-[11px] focus:outline-none"
                 />
               </div>
               <div className="col-span-4 md:col-span-2">
                 <InputTextComponent
-                  value={values?.lastName}
+                  value={values?.phoneNumber}
                   onChange={handleChange}
                   type="text"
-                  placeholder={t("last_name")}
-                  name="lastName"
+                  placeholder={t("phone_number")}
+                  name="phoneNumber"
                   isLabel={true}
-                  error={errors?.lastName}
-                  touched={touched?.lastName}
+                  error={errors?.phoneNumber}
+                  touched={touched?.phoneNumber}
                   className="w-full rounded border-[1px] border-[#ddd] px-[1rem] py-[8px] text-[11px] focus:outline-none"
                 />
               </div>
@@ -228,32 +197,42 @@ const ProfilePage = () => {
                   className="w-full rounded border-[1px] border-[#ddd] px-[1rem] py-[8px] text-[11px] focus:outline-none"
                 />
               </div>
-              <div className="col-span-4 md:col-span-2">
-                <InputTextComponent
-                  value={values?.address}
-                  onChange={handleChange}
-                  type="text"
-                  placeholder={t("full_address")}
-                  name="address"
-                  isLabel={true}
-                  error={errors?.address}
-                  touched={touched?.address}
-                  className="w-full rounded border-[1px] border-[#ddd] px-[1rem] py-[8px] text-[11px] focus:outline-none"
-                />
-              </div>
-              <div className="col-span-4 md:col-span-2">
-                <Dropdown
-                  value={values?.gender}
-                  onChange={handleChange}
-                  data={genderList}
-                  label={t("gender")}
-                  placeholder={t("select_gender")}
-                  name="gender"
-                  error={errors?.gender}
-                  touched={touched?.gender}
-                  className="custom-dropdown col-span-2 w-full rounded border-[1px] border-[#ddd] focus:outline-none"
-                  optionLabel="name"
-                />
+               <div className="col-span-4 md:col-span-2">
+                  <label className="text-[12px] text-TextSecondaryColor ms-[4px] font-[600]">{t("gender")}</label>
+                  <div className="flex flex-wrap gap-3 mt-2">
+                      <div className="flex align-items-center">
+                          <RadioButton 
+                              name="gender" 
+                              value="Male" 
+                              onChange={(e) => setFieldValue('gender', e.value)} 
+                              checked={values.gender === 'Male'} 
+                          />
+                          <label className="ml-2 font-[600] text-[12px]">Male</label>
+                      </div>
+                      <div className="flex align-items-center">
+                          <RadioButton 
+                              name="gender" 
+                              value="Female" 
+                              onChange={(e) => setFieldValue('gender', e.value)} 
+                              checked={values.gender === 'Female'} 
+                          />
+                          <label className="ml-2 font-[600] text-[12px]">Female</label>
+                      </div>
+                      <div className="flex align-items-center">
+                          <RadioButton 
+                              name="gender" 
+                              value="Other" 
+                              onChange={(e) => setFieldValue('gender', e.value)} 
+                              checked={values.gender === 'Other'} 
+                          />
+                          <label className="ml-2 font-[600] text-[12px]">Other</label>
+                      </div>
+                  </div>
+                  {errors?.gender && touched?.gender ? (
+                      <p className="text-[0.7rem] text-red-600">{errors?.gender}</p>
+                      ) : (
+                      ""
+                  )}
               </div>
               <div className="col-span-4 md:col-span-2"></div>
               <div className="col-span-3"></div>

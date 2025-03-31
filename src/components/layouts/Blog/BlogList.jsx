@@ -14,7 +14,7 @@ import { Toast } from "primereact/toast";
 import { API_CONSTANTS } from "../../../constants/apiurl";
 import DefaultImage from "../../../assets/no-image.jpeg";
 
-const BlogList = () => {
+const BlogList = ({search}) => {
   const toast = useRef(null);
   const [data, setData] = useState([]);
   const { t } = useTranslation("msg");
@@ -22,6 +22,9 @@ const BlogList = () => {
   const [isConfirm, setIsConfirm] = useState(false);
   const [deleteId, setDeleteId] = useState(null);
   const [loader, setLoader] = useState(false);
+  const [skip, setSkip] = useState(0);
+  const [limit, setLimit] = useState(5);
+  const [total, setTotal] = useState(0);
 
   const item = {
     heading: t("blog"),
@@ -50,31 +53,22 @@ const BlogList = () => {
 
   const nameBodyTemplate= (rowData) => {
     return (
-      <div className="flex items-center gap-4">
-        <div className="w-[60px] overflow-hidden h-[60px]">
+      <div className="flex items-center gap-4 w-[30%]">
+        <div className="overflow-hidden h-[60px]">
           <img src={rowData?.image_url ? rowData?.image_url : DefaultImage} alt="" width={80} style={{height: "100%"}}/>
         </div>
-        <span>{rowData?.heading}</span>
-      </div>
-    );
-  };
-
-  const statusBodyTemplate= (rowData) => {
-    return (
-      <div className="flex items-center gap-4">
-        {rowData?.status === 1 ? <span className="text-[green]">Active</span> : <span className="text-[red]">Inactive</span>}
       </div>
     );
   };
 
   const columns = [
-    { header: t("name"), body: nameBodyTemplate, headerStyle: { paddingLeft: '3%'} },
-    { field: "description", header: t("description") },
+    { header: t("blog_image"), body: nameBodyTemplate, style: { width: '20%' }, headerStyle: { width: '20%'}},
+    { field: "heading", header: t("blog_heading") },
     { header: t("action"), body: actionBodyTemplate, headerStyle: { paddingLeft: '3%'} },
   ];
 
   const editBlog = (item) => {
-    navigate(`/edit-blog/${item?.id}`);
+    navigate(`${ROUTES_CONSTANTS.EDIT_BLOG}/${item?.id}`);
   };
 
   const confirmDeleteBlog = (item) => {
@@ -110,14 +104,20 @@ const BlogList = () => {
 
   useEffect(() => {
     fetchBlogList();
-  }, []);
+  }, [search]);
 
-  const fetchBlogList = () => {
+  const fetchBlogList = (sk=skip, li=limit) => {
     setLoader(true);
-    allApiWithHeaderToken(API_CONSTANTS.COMMON_BLOGS_URL, "" , "get")
+    let body = {
+      search: search,
+      skip: sk,
+      limit: li
+    }
+    allApiWithHeaderToken(`${API_CONSTANTS.COMMON_BLOGS_URL}/filter`, body , "post")
       .then((response) => {
         if (response?.status === 200) {
-          setData(response?.data);
+          setData(response?.data?.data);
+          setTotal(response?.data?.total);
         } 
       })
       .catch((err) => {
@@ -130,6 +130,12 @@ const BlogList = () => {
       }).finally(()=>{
         setLoader(false);
       });
+  };
+  
+  const paginationChangeHandler = (skip, limit) => {
+    setSkip(skip);
+    setLimit(limit);
+    fetchBlogList(skip, limit);
   };
 
   const createBlog = () => {
@@ -157,8 +163,12 @@ const BlogList = () => {
         <DataTable
           className="bg-BgPrimaryColor border rounded border-BorderColor"
           columns={columns}
-          loader={loader}
           data={data}
+          skip={skip}
+          rows={limit}
+          total={total}
+          paginationChangeHandler={paginationChangeHandler}
+          loader={loader}
           showGridlines={true}
         />
       </div>

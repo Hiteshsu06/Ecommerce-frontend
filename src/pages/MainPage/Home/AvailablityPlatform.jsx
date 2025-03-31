@@ -33,8 +33,8 @@ const AvailablityPlatform = () => {
     ]
     return (
         <div className="flex flex-col justify-center items-center p-10">
-            <h1 className="text-[32px] font-semibold font-['M-Heading-Font']">We Are Also Available On</h1>
-            <p className="text-[16px] font-medium pt-2">Same day delivery in bangalore</p>
+            <h1 className="font-semibold font-[playfair] text-[2.5rem] text-[#1D2E43]">We Are Also Available On</h1>
+            <p className="text-[16px] font-medium pt-2 font-[playfair] text-[#464646]">Same day delivery in bangalore</p>
             <div className="flex md:grid md:grid-cols-2 lg:grid lg:grid-cols-6 p-5">
                 {
                     platform.map((item, index) => {

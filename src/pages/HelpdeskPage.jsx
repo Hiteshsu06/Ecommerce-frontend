@@ -10,15 +10,7 @@ const HelpdeskPage = () => {
   const { t } = useTranslation("msg");
 
   const redirection = () => {
-    let role = JSON.parse(localStorage.getItem("user"))?.role;
-    let navigationUrl = "/";
-    if (['super_admin', 'admin'].includes(role)) {
-      navigationUrl = '/dashboard/sector-master';
-    }
-    if (['super_admin', 'viewer'].includes(role)) {
-      navigationUrl = '/dashboard';
-    }
-    navigate(navigationUrl);
+    navigate('/dashboard');
   };
 
   return (

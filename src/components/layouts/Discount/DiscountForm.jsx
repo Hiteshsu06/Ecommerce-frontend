@@ -129,7 +129,9 @@ const DiscountForm = () => {
   const fetchProductList = async () => {
     setLoader(true); 
     try {
-      const productResponse = await allApiWithHeaderToken(API_CONSTANTS.COMMON_PRODUCTS_URL, "", "get");
+      
+      let url = id ? API_CONSTANTS.COMMON_PRODUCTS_URL : `${API_CONSTANTS.COMMON_DISCOUNT_URL}/discount_product_list`;
+      const productResponse = await allApiWithHeaderToken(url, "", "get");
       if (productResponse.status === 200) {  
         setProductList(productResponse?.data);
       } 
@@ -180,7 +182,7 @@ const DiscountForm = () => {
   const { values, errors, handleSubmit, handleChange, setFieldValue, touched } = formik;
 
   return (
-    <div className="flex h-screen bg-BgPrimaryColor">
+    <div className="flex h-screen bg-BgPrimaryColor overflow-y-scroll">
       {loader && <Loading/>}
       <Toast ref={toast} position="top-right" />
       <div className="mx-16 my-auto grid h-fit w-full grid-cols-4 gap-4 bg-BgSecondaryColor p-8 border rounded border-BorderColor">

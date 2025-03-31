@@ -57,12 +57,10 @@ const Signup = () => {
     setLoader(true);
     let body = structuredClone(
       {
-        user: {
-            name: value.name,
-            email: value.email,
-            password: value.password,
-            phone_number: value.phoneNumber
-          }
+        name: value.name,
+        email: value.email,
+        password: value.password,
+        phone_number: value.phoneNumber
       });
       allApi(API_CONSTANTS.SINGNUP, body, "post")
       .then((response) => {

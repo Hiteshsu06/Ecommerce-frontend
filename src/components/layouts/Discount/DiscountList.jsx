@@ -14,13 +14,16 @@ import { API_CONSTANTS } from "../../../constants/apiurl";
 import { Toast } from "primereact/toast";
 import { refactorPrefilledDate } from '../../../helper/helper';
 
-const DiscountList = () => {
+const DiscountList = ({search}) => {
   const toast = useRef(null);
   const { t } = useTranslation("msg");
   const navigate = useNavigate();
   const [isConfirm, setIsConfirm] = useState(false);
   const [deleteId, setDeleteId] = useState(null);
   const [loader, setLoader] = useState(false);
+  const [skip, setSkip] = useState(0);
+  const [limit, setLimit] = useState(5);
+  const [total, setTotal] = useState(0);
 
   const item = {
     heading: t("discount"),
@@ -73,7 +76,7 @@ const DiscountList = () => {
   ];
 
   const editDiscount = (item) => {
-    navigate(`/edit-discount/${item?.id}`);
+    navigate(`${ROUTES_CONSTANTS.EDIT_DISCOUNT}/${item?.id}`);
   };
 
   const confirmDeleteDiscount = (item) => {
@@ -91,7 +94,7 @@ const DiscountList = () => {
     allApiWithHeaderToken(`${API_CONSTANTS.COMMON_DISCOUNT_URL}/${deleteId}`, '', "delete")
       .then((response) => {
         if (response.status === 200) {
-          fetchCategoryList();
+          fetchDiscountList();
         } 
       })
       .catch((err) => {
@@ -104,13 +107,18 @@ const DiscountList = () => {
       });
   };
 
-  const fetchCategoryList = () => {
+  const fetchDiscountList = (sk=skip, li=limit) => {
     setLoader(true);
-    allApiWithHeaderToken(API_CONSTANTS.COMMON_DISCOUNT_URL, "" , "get")
+    let body = {
+      search: search,
+      skip: sk,
+      limit: li
+    }
+    allApiWithHeaderToken(`${API_CONSTANTS.COMMON_DISCOUNT_URL}/filter`, body , "post")
       .then((response) => {
         if (response.status === 200) {
           let updatedArray = [];
-          response?.data.forEach((item)=>{
+          response?.data.data?.forEach((item)=>{
             let obj = {
               ...item, 
               end_date: refactorPrefilledDate(item?.end_date), 
@@ -120,6 +128,7 @@ const DiscountList = () => {
             updatedArray.push(obj)
           })
           setData(updatedArray);
+          setTotal(response?.data?.total);
         } 
       })
       .catch((err) => {
@@ -136,8 +145,14 @@ const DiscountList = () => {
   };
 
   useEffect(() => {
-    fetchCategoryList();
-  }, []);
+    fetchDiscountList(0,5);
+  }, [search]);
+
+  const paginationChangeHandler = (skip, limit) => {
+    setSkip(skip);
+    setLimit(limit);
+    fetchDiscountList(skip, limit);
+  };
 
   const createDiscount = () => {
     navigate(ROUTES_CONSTANTS.CREATE_DISCOUNT);
@@ -167,6 +182,10 @@ const DiscountList = () => {
           className="bg-BgPrimaryColor border rounded border-BorderColor"
           columns={columns}
           data={data}
+          skip={skip}
+          rows={limit}
+          total={total}
+          paginationChangeHandler={paginationChangeHandler}
           loader={loader}
           showGridlines={true}
         />

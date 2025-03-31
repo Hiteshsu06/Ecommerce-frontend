@@ -18,4 +18,11 @@ export const API_CONSTANTS = {
     COMMON_BLOGS_URL: "api/v1/blogs",
 
     // General use
+    BLOGS_URL: "api/v1/user_dashboard/latest_blogs",
+    SNACK_RANGE_URL : "api/v1/user_dashboard/snacks_category",
+    SPECIALITY_CATEGORY_URL : "api/v1/user_dashboard/speciality_category",
+    GIFTING_CATEGORY_URL : "api/v1/user_dashboard/gifting_category",
+    ALL_CATEGORY_URL : "api/v1/user_dashboard/all_categories",
+    ALL_PRODUCTS_URL : "api/v1/user_dashboard/all_active_products",
+    MENU_LIST_URL: "api/v1/user_dashboard/nav_menu_list"
 }

@@ -14,13 +14,16 @@ import { API_CONSTANTS } from "../../../constants/apiurl";
 import { Toast } from "primereact/toast";
 import { refactorPrefilledDate } from '../../../helper/helper';
 
-const CouponList = () => {
+const CouponList = ({search}) => {
   const toast = useRef(null);
   const { t } = useTranslation("msg");
   const navigate = useNavigate();
   const [isConfirm, setIsConfirm] = useState(false);
   const [deleteId, setDeleteId] = useState(null);
   const [loader, setLoader] = useState(false);
+  const [skip, setSkip] = useState(0);
+  const [limit, setLimit] = useState(5);
+  const [total, setTotal] = useState(0);
 
   const item = {
     heading: t("coupon"),
@@ -58,7 +61,7 @@ const CouponList = () => {
   ];
 
   const editCoupon = (item) => {
-    navigate(`/edit-coupon/${item?.id}`);
+    navigate(`${ROUTES_CONSTANTS.EDIT_COUPON}/${item?.id}`);
   };
 
   const confirmDeleteCoupon = (item) => {
@@ -76,7 +79,7 @@ const CouponList = () => {
     allApiWithHeaderToken(`${API_CONSTANTS.COMMON_COUPON_URL}/${deleteId}`, '', "delete")
       .then((response) => {
         if (response.status === 200) {
-          fetchCategoryList();
+          fetchCouponList();
         } 
       })
       .catch((err) => {
@@ -89,13 +92,18 @@ const CouponList = () => {
       });
   };
 
-  const fetchCategoryList = () => {
+  const fetchCouponList = (sk=skip, li=limit) => {
     setLoader(true);
-    allApiWithHeaderToken(API_CONSTANTS.COMMON_COUPON_URL, "" , "get")
+    let body = {
+      search: search,
+      skip: sk,
+      limit: li
+    }
+    allApiWithHeaderToken(`${API_CONSTANTS.COMMON_COUPON_URL}/filter`, body , "post")
       .then((response) => {
         if (response.status === 200) {
           let updatedArray = [];
-          response?.data.forEach((item)=>{
+          response?.data.data?.forEach((item)=>{
             let obj = {
               ...item, 
               valid_until: refactorPrefilledDate(item?.valid_until), 
@@ -105,6 +113,7 @@ const CouponList = () => {
             updatedArray.push(obj)
           })
           setData(updatedArray);
+          setTotal(response?.data?.total);
         }
       })
       .catch((err) => {
@@ -121,8 +130,14 @@ const CouponList = () => {
   };
 
   useEffect(() => {
-    fetchCategoryList();
-  }, []);
+    fetchCouponList(0,5);
+  }, [search]);
+
+  const paginationChangeHandler = (skip, limit) => {
+    setSkip(skip);
+    setLimit(limit);
+    fetchCouponList(skip, limit);
+  };
 
   const createCoupon = () => {
     navigate(ROUTES_CONSTANTS.CREATE_COUPON);
@@ -152,6 +167,10 @@ const CouponList = () => {
           className="bg-BgPrimaryColor border rounded border-BorderColor"
           columns={columns}
           data={data}
+          skip={skip}
+          rows={limit}
+          total={total}
+          paginationChangeHandler={paginationChangeHandler}
           loader={loader}
           showGridlines={true}
         />

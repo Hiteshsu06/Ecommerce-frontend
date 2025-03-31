@@ -14,13 +14,16 @@ import { API_CONSTANTS } from "../../../constants/apiurl";
 import { Toast } from "primereact/toast";
 import DefaultImage from "../../../assets/no-image.jpeg";
 
-const SubCategoryList = () => {
+const SubCategoryList = ({search}) => {
   const toast = useRef(null);
   const { t } = useTranslation("msg");
   const navigate = useNavigate();
   const [isConfirm, setIsConfirm] = useState(false);
   const [deleteId, setDeleteId] = useState(null);
   const [loader, setLoader] = useState(false);
+  const [skip, setSkip] = useState(0);
+  const [limit, setLimit] = useState(5);
+  const [total, setTotal] = useState(0);
 
   const item = {
     heading: t("sub_category"),
@@ -76,7 +79,7 @@ const SubCategoryList = () => {
   ];
 
   const editSubCategory = (item) => {
-    navigate(`/edit-sub-category/${item?.id}`);
+    navigate(`${ROUTES_CONSTANTS.EDIT_SUB_CATEGORY}/${item?.id}`);
   };
 
   const confirmDeleteSubCategory = (item) => {
@@ -94,7 +97,7 @@ const SubCategoryList = () => {
     allApiWithHeaderToken(`${API_CONSTANTS.COMMON_SUB_CATEGORIES_URL}/${deleteId}`, '', "delete")
       .then((response) => {
         if (response.status === 200) {
-          fetchCategoryList();
+          fetchSubCategoryList();
         } 
       })
       .catch((err) => {
@@ -107,12 +110,18 @@ const SubCategoryList = () => {
       });
   };
 
-  const fetchCategoryList = () => {
+  const fetchSubCategoryList = (sk=skip, li=limit) => {
     setLoader(true);
-    allApiWithHeaderToken(API_CONSTANTS.COMMON_SUB_CATEGORIES_URL, "" , "get")
+    let body = {
+      search: search,
+      skip: sk,
+      limit: li
+    }
+    allApiWithHeaderToken(`${API_CONSTANTS.COMMON_SUB_CATEGORIES_URL}/filter`, body , "post")
       .then((response) => {
         if (response.status === 200) {
-          setData(response?.data);
+          setData(response?.data?.data);
+          setTotal(response?.data?.total);
         } 
       })
       .catch((err) => {
@@ -129,8 +138,14 @@ const SubCategoryList = () => {
   };
 
   useEffect(() => {
-    fetchCategoryList();
-  }, []);
+    fetchSubCategoryList(0,5);
+  }, [search]);
+
+  const paginationChangeHandler = (skip, limit) => {
+    setSkip(skip);
+    setLimit(limit);
+    fetchSubCategoryList(skip, limit);
+  };
 
   const createCategory = () => {
     navigate(ROUTES_CONSTANTS.CREATE_SUB_CATEGORY);
@@ -158,6 +173,10 @@ const SubCategoryList = () => {
           className="bg-BgPrimaryColor border rounded border-BorderColor"
           columns={columns}
           data={data}
+          skip={skip}
+          rows={limit}
+          total={total}
+          paginationChangeHandler={paginationChangeHandler}
           loader={loader}
           showGridlines={true}
         />

@@ -22,12 +22,15 @@ const dummyData = [
 {id: "7", year: "2025", month: "January", report: "January_Month_Revenue_Report.csv"}
 ];
 
-const ReportList = () => {
+const ReportList = ({search}) => {
   const toast = useRef(null);
   const { t } = useTranslation("msg");
   const navigate = useNavigate();
   const [data, setData] = useState(dummyData);
   const [loader, setLoader] = useState(false);
+  const [skip, setSkip] = useState(0);
+  const [limit, setLimit] = useState(5);
+  const [total, setTotal] = useState(0);
 
   const item = {
     heading: t("report"),
@@ -80,14 +83,20 @@ const ReportList = () => {
   };
 
   useEffect(() => {
-    fetchReportList();
-  }, []);
+    fetchReportList(0,5);
+  }, [search]);
+
+  const paginationChangeHandler = (skip, limit) => {
+    setSkip(skip);
+    setLimit(limit);
+    fetchReportList(skip, limit);
+  };
 
   return (
     <div className="text-TextPrimaryColor">
       <Toast ref={toast} position="top-right" />
       <Breadcrum item={item} />
-      <div className="mt-4 flex justify-start bg-BgSecondaryColor border rounded border-BorderColor p-2">
+      <div className="mt-4 flex justify-start bg-BgSecondaryColor border rounded border-BorderColor p-2 py-3">
         <span className="text-[13px] text-TextSecondaryColor ms-[4px] font-[600]">
           {t("month_wise_revenue_report")}  
         </span> 
@@ -97,6 +106,10 @@ const ReportList = () => {
           className="bg-BgPrimaryColor border rounded border-BorderColor"
           columns={columns}
           data={data}
+          skip={skip}
+          rows={limit}
+          total={total}
+          paginationChangeHandler={paginationChangeHandler}
           loader={loader}
           showGridlines={true}
         />

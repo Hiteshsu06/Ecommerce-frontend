@@ -185,7 +185,7 @@ const CouponForm = () => {
   const { values, errors, handleSubmit, handleChange, setFieldValue, touched } = formik;
 
   return (
-    <div className="flex h-screen bg-BgPrimaryColor">
+    <div className="flex h-screen bg-BgPrimaryColor overflow-y-scroll">
       {loader && <Loading/>}
       <Toast ref={toast} position="top-right" />
       <div className="mx-16 my-auto grid h-fit w-full grid-cols-4 gap-4 bg-BgSecondaryColor p-8 border rounded border-BorderColor">

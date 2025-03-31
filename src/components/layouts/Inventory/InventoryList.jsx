@@ -13,13 +13,16 @@ import { ROUTES_CONSTANTS } from "../../../constants/routesurl";
 import { API_CONSTANTS } from "../../../constants/apiurl";
 import { Toast } from "primereact/toast";
 
-const InventoryList = () => {
+const InventoryList = ({search}) => {
   const toast = useRef(null);
   const { t } = useTranslation("msg");
   const navigate = useNavigate();
   const [isConfirm, setIsConfirm] = useState(false);
   const [deleteId, setDeleteId] = useState(null);
   const [loader, setLoader] = useState(false);
+  const [skip, setSkip] = useState(0);
+  const [limit, setLimit] = useState(5);
+  const [total, setTotal] = useState(0);
 
   const item = {
     heading: t("inventory"),
@@ -54,7 +57,7 @@ const InventoryList = () => {
   ];
 
   const editInventory = (item) => {
-    navigate(`/edit-inventory/${item?.id}`);
+    navigate(`${ROUTES_CONSTANTS.EDIT_INVENTORY}/${item?.id}`);
   };
 
   const confirmDeleteInventory = (item) => {
@@ -72,7 +75,7 @@ const InventoryList = () => {
     allApiWithHeaderToken(`${API_CONSTANTS.COMMON_INVENTORY_URL}/${deleteId}`, '', "delete")
       .then((response) => {
         if (response.status === 200) {
-          fetchCategoryList();
+          fetchInventoryList();
         } 
       })
       .catch((err) => {
@@ -85,12 +88,18 @@ const InventoryList = () => {
       });
   };
 
-  const fetchCategoryList = () => {
+  const fetchInventoryList = (sk=skip, li=limit) => {
     setLoader(true);
-    allApiWithHeaderToken(API_CONSTANTS.COMMON_INVENTORY_URL, "" , "get")
+    let body = {
+      search: search,
+      skip: sk,
+      limit: li
+    }
+    allApiWithHeaderToken(`${API_CONSTANTS.COMMON_INVENTORY_URL}/filter`, body , "post")
       .then((response) => {
         if (response.status === 200) {
-          setData(response?.data);
+          setData(response?.data?.data);
+          setTotal(response?.data?.total);
         } 
       })
       .catch((err) => {
@@ -106,9 +115,15 @@ const InventoryList = () => {
       });
   };
 
+  const paginationChangeHandler = (skip, limit) => {
+    setSkip(skip);
+    setLimit(limit);
+    fetchInventoryList(skip, limit);
+  };
+
   useEffect(() => {
-    fetchCategoryList();
-  }, []);
+    fetchInventoryList(0,5);
+  }, [search]);
 
   const createInventory = () => {
     navigate(ROUTES_CONSTANTS.CREATE_INVENTORY);
@@ -136,6 +151,10 @@ const InventoryList = () => {
           className="bg-BgPrimaryColor border rounded border-BorderColor"
           columns={columns}
           data={data}
+          skip={skip}
+          rows={limit}
+          total={total}
+          paginationChangeHandler={paginationChangeHandler}
           loader={loader}
           showGridlines={true}
         />

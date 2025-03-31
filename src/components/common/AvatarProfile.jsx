@@ -10,17 +10,25 @@ import { Toast } from "primereact/toast";
 const AvatarProfile = ({ size, shape, userDetails }) => {
   const menu = useRef(null);
   const toast = useRef(null);
+  let data = JSON.parse(localStorage.getItem("userDetails"));
   const { t } = useTranslation("msg");
   const [toastType, setToastType] = useState(''); 
   const navigate = useNavigate();
+
   const items = [
     {
       label: t("my_profile"),
-      icon: "ri-id-card-line"
+      icon: "ri-id-card-line",
+      command: () => {
+        navigate(`/profile/${data?.id}`)
+      }
     },
     {
       label: t("help"),
       icon: "ri-questionnaire-line",
+      command: () => {
+        navigate('/help')
+      }
     },
     {
       label: t("languages"),
@@ -107,7 +115,7 @@ const AvatarProfile = ({ size, shape, userDetails }) => {
       </div>
       <Toast ref={toast} position="top-right" style={{scale: '0.7'}} onHide={toastHandler}/>
       <Avatar
-        image="https://primefaces.org/cdn/primereact/images/avatar/amyelsner.png"
+        image={data?.image_url ? data?.image_url : "https://primefaces.org/cdn/primereact/images/avatar/amyelsner.png"}
         className="mr-2"
         size={size}
         shape={shape}

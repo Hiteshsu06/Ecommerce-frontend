@@ -15,6 +15,7 @@ import { ROUTES_CONSTANTS } from "../../../constants/routesurl";
 import { allApiWithHeaderToken } from "../../../api/api";
 import InputTextAreaComponent from "../../common/InputTextAreaComponent";
 import Loading from '@common/Loading';
+import { Editor } from "primereact/editor";
 
 const initialValues = {
   heading: "",
@@ -163,7 +164,7 @@ const BlogForm = () => {
   const { values, errors, setFieldValue,handleSubmit, handleChange, touched } = formik;
 
   return (
-    <div className="flex h-full bg-BgPrimaryColor py-5">
+    <div className="flex h-screen bg-BgPrimaryColor py-5 overflow-y-scroll">
       {loader && <Loading/>}
       <Toast ref={toast} position="top-right" style={{scale: '0.7'}} onHide={toastHandler}/>
       <div className="mx-16 my-auto grid h-fit w-full grid-cols-4 gap-4 bg-BgSecondaryColor p-8 border rounded border-BorderColor">
@@ -196,18 +197,20 @@ const BlogForm = () => {
           />
         </div>
         <div className="col-span-4">
-          <InputTextAreaComponent
-            value={values?.description}
-            onChange={handleChange}
-            type="text"
-            rows={5} 
-            placeholder={t("blog_description")}
+          <label className="text-[12px] text-TextSecondaryColor ms-[4px] font-[600]">{t("description")}</label>
+          <Editor 
             name="description"
-            isLabel={true}
-            error={errors?.description}
-            touched={touched?.description}
-            className="col-span-2 w-full rounded border-[1px] border-[#ddd] px-[1rem] py-[8px] text-[11px] focus:outline-none"
+            value={values?.description} 
+            onTextChange={(e)=>{
+              setFieldValue('description', e.htmlValue);
+            }} 
+            style={{ height: '320px' }} 
           />
+          {errors?.description && touched?.description ? (
+              <p className="text-[0.7rem] text-red-600">{errors?.gender}</p>
+              ) : (
+              ""
+          )}
         </div>
         <div className="col-span-3"></div>
         <div className="mt-4 flex justify-end gap-4">

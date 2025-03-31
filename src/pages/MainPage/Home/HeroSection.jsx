@@ -1,3 +1,14 @@
+import { Swiper, SwiperSlide } from 'swiper/react';
+
+// Import Swiper styles
+import 'swiper/css';
+import 'swiper/css/effect-fade';
+import 'swiper/css/navigation';
+import 'swiper/css/pagination';
+
+// import required modules
+import { EffectFade, Pagination } from 'swiper/modules';
+
 const HeroSection = () => {
 
     const Hero = {
@@ -7,42 +18,41 @@ const HeroSection = () => {
         navigateUrl: "/dashboard",
         navigateText: "Shop Now",
         subsection: {
-            title: "Excellence In Every Morsel",
+            title: "Excellence in Every Bite of Our Sweets, Snacks, and Treats",
             description: "With over three decades of expertise in the art of crafting heritage sweets, Anand Sweets has been a symbol of quality and tradition, dedicated to one singular goal - a commitment to bringing the authentic taste of Royal India to your homes."
         }
     }
 
     return (
         <>
-            <a className="hero-section flex box-border justify-center items-center max-sm:flex-col">
-                <div className="hero-section-image w-[60%] h-[560px] max-sm:w-full max-sm:h-[300px] max-md:w[50%]">
-                    <img src={Hero.imageUrl} alt="hero" className="w-full h-full object-cover" />
-                </div>
-
-                <div className="hero-section-text w-[40%] flex justify-center flex-col p-[5rem] max-sm:w-full max-sm:p-[2rem]">
-                    <div className="hero-section-text-heading pb-6">
-                        <h1 className="text-5xl font-sans font-semibold">
-                            <span>{Hero.name}</span>
-                        </h1>
-                    </div>
-
-                    <div className="hero-section-text-para pb-6">
-                        <p>
-                            <span> {Hero.description}</span>
-                        </p>
-                    </div>
-
-                    <div className="hero-section-text-button rounded-sm"></div>
-                        <button className="hero-section-text-button text-lg w-fit py-2 px-4 rounded-md bg-[#c5a238] text-white uppercase" >
-                            <span>{Hero.navigateText}</span>
-                        </button>
-                </div>
-            </a>
+            <Swiper
+                spaceBetween={30}
+                effect={'fade'}
+                loop={true}
+                pagination={{
+                clickable: true,
+                }}
+                modules={[EffectFade, Pagination]}
+                className="mySwiper w-full h-[80vh]"
+                >
+                <SwiperSlide>
+                <img src="https://swiperjs.com/demos/images/nature-1.jpg" className='block w-full'/>
+                </SwiperSlide>
+                <SwiperSlide>
+                <img src="https://swiperjs.com/demos/images/nature-2.jpg" className='block w-full'/>
+                </SwiperSlide>
+                <SwiperSlide>
+                <img src="https://swiperjs.com/demos/images/nature-3.jpg" className='block w-full'/>
+                </SwiperSlide>
+                <SwiperSlide>
+                <img src="https://swiperjs.com/demos/images/nature-4.jpg" className='block w-full'/>
+                </SwiperSlide>
+            </Swiper>
             <div className="hero-sub-section w-full flex flex-col justify-center items-center h-[250px]">
-                <div className="hero-sub-section-heading w-[50%] pb-6">
-                    <h1 className="text-3xl font-sans font-semibold text-center">{Hero.subsection.title}</h1>
+                <div className="hero-sub-section-heading w-[80%] pb-6">
+                    <h1 className="text-[2.5rem] text-[#1D2E43] font-semibold text-center font-[playfair]">{Hero.subsection.title}</h1>
                 </div>
-                <div className="hero-sub-section-text w-[50%]">
+                <div className="hero-sub-section-text w-[60%]">
                     <p className="text-center">{Hero.subsection.description}</p>
                 </div>
             </div>

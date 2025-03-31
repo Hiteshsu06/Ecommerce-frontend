@@ -21,6 +21,21 @@ const statusList = [
   { name: "Inactive", value: "0"}
 ];
 
+const weightList = [
+  { name: "500 Gram", value: "500 Gram"},
+  { name: "1 Kg", value: "1 Kg"},
+  { name: "1.5 Kg", value: "1.5 Kg"},
+  { name: "2 Kg", value: "2 Kg"},
+  { name: "3 Kg", value: "3 Kg"},
+  { name: "4 Kg", value: "4 Kg"},
+  { name: "5 Kg", value: "5 Kg"},
+  { name: "6 Kg", value: "6 Kg"},
+  { name: "7 Kg", value: "7 Kg"},
+  { name: "8 Kg", value: "8 Kg"},
+  { name: "9 Kg", value: "9 Kg"},
+  { name: "10 Kg", value: "10 Kg"}
+];
+
 const initialValues = {
   name: "",
   description: "",
@@ -143,7 +158,7 @@ const ProductForm = () => {
       });
   };
 
-  const fetchSubCategoryList = async () => {
+  const fetchProductList = async () => {
     setLoader(true);
     try{
        const categoryResponse = await allApiWithHeaderToken(`${API_CONSTANTS.COMMON_SUB_CATEGORIES_URL}/active_sub_categories_list`, "", "get");
@@ -190,7 +205,7 @@ const ProductForm = () => {
   }; 
 
   useEffect(()=>{
-    fetchSubCategoryList();
+    fetchProductList();
  },[id]);
 
   const handleBack = () => {
@@ -205,10 +220,10 @@ const ProductForm = () => {
     validateOnBlur: true,
   });
 
-  const { values, errors, setFieldValue,handleSubmit, handleChange, touched } = formik;
+  const { values, errors, setFieldValue, handleSubmit, handleChange, touched } = formik;
 
   return (
-    <div className="flex h-full bg-BgPrimaryColor py-5">
+    <div className="flex h-screen bg-BgPrimaryColor py-5 overflow-y-scroll">
       {loader && <Loading/>}
       <Toast ref={toast} position="top-right" style={{scale: '0.7'}} onHide={toastHandler}/>
       <div className="mx-16 my-auto grid h-fit w-full grid-cols-4 gap-4 bg-BgSecondaryColor p-8 border rounded border-BorderColor">
@@ -280,16 +295,16 @@ const ProductForm = () => {
           />
         </div>
         <div className="col-span-2">
-          <InputTextComponent
+          <DropdownComponent
             value={values?.weight}
-            onChange={handleChange}
-            type="text"
-            placeholder={t("weight")}
+            onChange={(field, value) => setFieldValue(field, value)}
+            data={weightList}
             name="weight"
-            isLabel={true}
+            placeholder={t("weight")}
+            className="custom-dropdown col-span-2 w-full rounded border-[1px] border-[#ddd] focus:outline-none"
+            optionLabel="name"
             error={errors?.weight}
             touched={touched?.weight}
-            className="col-span-2 w-full rounded border-[1px] border-[#ddd] px-[1rem] py-[8px] text-[11px] focus:outline-none"
           />
         </div>
          {

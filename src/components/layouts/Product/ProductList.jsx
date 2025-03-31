@@ -15,8 +15,9 @@ import { API_CONSTANTS } from "../../../constants/apiurl";
 import DefaultImage from "../../../assets/no-image.jpeg";
 import { Dialog } from 'primereact/dialog';
 import FileUpload from "@common/FileUpload";
+import Loading from '@common/Loading';
 
-const ProductList = () => {
+const ProductList = ({search}) => {
   const toast = useRef(null);
   const [data, setData] = useState([]);
   const { t } = useTranslation("msg");
@@ -27,6 +28,9 @@ const ProductList = () => {
   const [visible, setVisible] = useState(false);
   const [toastType, setToastType] = useState(''); 
   const [bulkUploadFile, setBulkUploadFile] = useState(null);
+  const [skip, setSkip] = useState(0);
+  const [limit, setLimit] = useState(5);
+  const [total, setTotal] = useState(0);
 
   const item = {
     heading: t("product"),
@@ -56,7 +60,7 @@ const ProductList = () => {
   const nameBodyTemplate= (rowData) => {
     return (
       <div className="flex items-center gap-4">
-        <div className="w-[60px] overflow-hidden h-[60px]">
+        <div className="min-w-[60px] overflow-hidden h-[60px]">
           <img src={rowData?.image_url ? rowData?.image_url : DefaultImage} alt="" width={80} style={{height: "100%"}}/>
         </div>
         <span>{rowData?.name}</span>
@@ -73,19 +77,19 @@ const ProductList = () => {
   };
 
   const columns = [
-    { header: t("name"), body: nameBodyTemplate, headerStyle: { paddingLeft: '3%'} },
+    { field: "name", header: t("name") },
+    { field: "weight", header: t("weight") },
     { field: "sub_category_name", header: t("sub_category") },
     { field: "price", header: t("price") },
     { field: "discounted_price", header: t("discount") },
     { field: "final_price", header: t("final_price") },
-    { field: "weight", header: t("weight") },
     { field: "description", header: t("description") },
     { header: t("status"), body: statusBodyTemplate },
     { header: t("action"), body: actionBodyTemplate, headerStyle: { paddingLeft: '3%'} },
   ];
 
   const editProduct = (item) => {
-    navigate(`/edit-product/${item?.id}`);
+    navigate(`${ROUTES_CONSTANTS.EDIT_PRODUCT}/${item?.id}`);
   };
 
   const confirmDeleteProduct = (item) => {
@@ -120,15 +124,27 @@ const ProductList = () => {
   };
 
   useEffect(() => {
-    fetchProductList();
-  }, []);
+    fetchProductList(0,5);
+  }, [search]);
 
-  const fetchProductList = () => {
+  const paginationChangeHandler = (skip, limit) => {
+    setSkip(skip);
+    setLimit(limit);
+    fetchProductList(skip, limit);
+  };
+
+  const fetchProductList = (sk=skip, li=limit) => {
     setLoader(true);
-    allApiWithHeaderToken(API_CONSTANTS.COMMON_PRODUCTS_URL, "" , "get")
+    let body = {
+      search: search,
+      skip: sk,
+      limit: li
+    }
+    allApiWithHeaderToken(`${API_CONSTANTS.COMMON_PRODUCTS_URL}/filter`, body , "post")
       .then((response) => {
         if (response?.status === 200) {
-          setData(response?.data);
+          setData(response?.data?.data);
+          setTotal(response?.data?.total);
         } 
       })
       .catch((err) => {
@@ -247,6 +263,7 @@ const ProductList = () => {
   return (
     <div className="text-TextPrimaryColor">
       <Toast ref={toast} position="top-right" />
+      {loader && <Loading/>}
       <Confirmbox
         isConfirm={isConfirm}
         closeDialogbox={closeDialogbox}
@@ -275,17 +292,23 @@ const ProductList = () => {
       </div>
       <div className="mt-4">
         <DataTable
-          className="bg-BgPrimaryColor border rounded border-BorderColor"
-          columns={columns}
-          loader={loader}
-          data={data}
-          showGridlines={true}
+           className="bg-BgPrimaryColor border rounded border-BorderColor"
+           columns={columns}
+           data={data}
+           skip={skip}
+           rows={limit}
+           total={total}
+           paginationChangeHandler={paginationChangeHandler}
+           loader={loader}
+           showGridlines={true}
         />
       </div>
-      <Dialog visible={visible} modal header={headerElement} footer={footerContent} style={{ width: '50rem' }} onHide={() => {if (!visible) return; setVisible(false); }}>
+      <Dialog draggable={false} visible={visible} modal header={headerElement} footer={footerContent} style={{ width: '50rem' }} onHide={() => {if (!visible) return; setVisible(false); }}>
           <FileUpload 
               name="image"
               isLabel={t("add_xlsx_file_here")} 
+              value={bulkUploadFile}
+              isDoc={true}
               onChange={(e)=> {
                 setBulkUploadFile(e.target.files[0])
               }}

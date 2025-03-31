@@ -12,9 +12,8 @@ import { allApiWithHeaderToken } from "@api/api";
 import { ROUTES_CONSTANTS } from "../../../constants/routesurl";
 import { API_CONSTANTS } from "../../../constants/apiurl";
 import { Toast } from "primereact/toast";
-import DefaultImage from "../../../assets/no-image.jpeg";
 
-const FestivalSpecialList = () => {
+const FestivalSpecialList = ({search}) => {
   const toast = useRef(null);
   const { t } = useTranslation("msg");
   const navigate = useNavigate();
@@ -138,7 +137,12 @@ const FestivalSpecialList = () => {
 
   const fetchFestProductsList = () => {
     setLoader(true);
-    allApiWithHeaderToken(API_CONSTANTS.COMMON_CATEGORIES_URL, "" , "get")
+    let body = {
+      search: search,
+      skip: 0,
+      limit:10
+    }
+    allApiWithHeaderToken(`${API_CONSTANTS.COMMON_CATEGORIES_URL}/filter`, body , "post")
       .then((response) => {
         if (response.status === 200) {
           let nestedData = [
@@ -183,7 +187,6 @@ const FestivalSpecialList = () => {
         } 
       })
       .catch((err) => {
-        console.error("err", err);
         toast.current.show({
           severity: "error",
           summary: "Error",
@@ -198,7 +201,7 @@ const FestivalSpecialList = () => {
 
   useEffect(() => {
     fetchFestProductsList();
-  }, []);
+  }, [search]);
 
   const createFestProducts = () => {
     navigate(ROUTES_CONSTANTS.CREATE_FEST_PRODUCT);

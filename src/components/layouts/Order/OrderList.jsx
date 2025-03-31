@@ -14,13 +14,16 @@ import { API_CONSTANTS } from "../../../constants/apiurl";
 import { Toast } from "primereact/toast";
 import { refactorPrefilledDate } from '../../../helper/helper';
 
-const OrderList = () => {
+const OrderList = ({search}) => {
   const toast = useRef(null);
   const { t } = useTranslation("msg");
   const navigate = useNavigate();
   const [isConfirm, setIsConfirm] = useState(false);
   const [deleteId, setDeleteId] = useState(null);
   const [loader, setLoader] = useState(false);
+  const [skip, setSkip] = useState(0);
+  const [limit, setLimit] = useState(5);
+  const [total, setTotal] = useState(0);
 
   const item = {
     heading: t("order"),
@@ -76,7 +79,7 @@ const OrderList = () => {
   ];
 
   const editOrder = (item) => {
-    navigate(`/edit-order/${item?.id}`);
+    navigate(`${ROUTES_CONSTANTS.EDIT_ORDER}/${item?.id}`);
   };
 
   const confirmDeleteOrder = (item) => {
@@ -107,13 +110,18 @@ const OrderList = () => {
       });
   };
 
-  const fetchOrderList = () => {
+  const fetchOrderList = (sk=skip, li=limit) => {
     setLoader(true);
-    allApiWithHeaderToken(API_CONSTANTS.COMMON_ORDER_URL, "" , "get")
+    let body = {
+      search: search,
+      skip: sk,
+      limit: li
+    }
+    allApiWithHeaderToken(`${API_CONSTANTS.COMMON_ORDER_URL}/filter`, body , "post")
       .then((response) => {
         if (response.status === 200) {
            let updatedArray = [];
-            response?.data.forEach((item)=>{
+            response?.data.data?.forEach((item)=>{
               let obj = {
                 ...item, 
                 created_at: refactorPrefilledDate(item?.created_at)
@@ -121,6 +129,7 @@ const OrderList = () => {
               updatedArray.push(obj)
             })
             setData(updatedArray);
+            setTotal(response?.data?.total);
         } 
       })
       .catch((err) => {
@@ -136,9 +145,15 @@ const OrderList = () => {
       });
   };
 
+  const paginationChangeHandler = (skip, limit) => {
+    setSkip(skip);
+    setLimit(limit);
+    fetchOrderList(skip, limit);
+  };
+
   useEffect(() => {
-    fetchOrderList();
-  }, []);
+    fetchOrderList(0,5);
+  }, [search]);
 
   const createOrder = () => {
     navigate(ROUTES_CONSTANTS.CREATE_ORDER);
@@ -168,6 +183,10 @@ const OrderList = () => {
           className="bg-BgPrimaryColor border rounded border-BorderColor"
           columns={columns}
           data={data}
+          skip={skip}
+          rows={limit}
+          total={total}
+          paginationChangeHandler={paginationChangeHandler}
           loader={loader}
           showGridlines={true}
         />

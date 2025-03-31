@@ -14,13 +14,16 @@ import { API_CONSTANTS } from "../../../constants/apiurl";
 import { Toast } from "primereact/toast";
 import DefaultImage from "../../../assets/no-image.jpeg";
 
-const CatergoryList = () => {
+const CatergoryList = ({search}) => {
   const toast = useRef(null);
   const { t } = useTranslation("msg");
   const navigate = useNavigate();
   const [isConfirm, setIsConfirm] = useState(false);
   const [deleteId, setDeleteId] = useState(null);
   const [loader, setLoader] = useState(false);
+  const [skip, setSkip] = useState(0);
+  const [limit, setLimit] = useState(5);
+  const [total, setTotal] = useState(0);
 
   const item = {
     heading: t("category"),
@@ -77,8 +80,7 @@ const CatergoryList = () => {
   ];
 
   const editCategory = (item) => {
-    console.log("item",item)
-    navigate(`/edit-category/${item?.id}`);
+    navigate(`${ROUTES_CONSTANTS.EDIT_CATEGORY}/${item?.id}`);
   };
 
   const confirmDeleteCategory = (item) => {
@@ -109,16 +111,21 @@ const CatergoryList = () => {
       });
   };
 
-  const fetchCategoryList = () => {
+  const fetchCategoryList = (sk=skip, li=limit) => {
     setLoader(true);
-    allApiWithHeaderToken(API_CONSTANTS.COMMON_CATEGORIES_URL, "" , "get")
+    let body = {
+      search: search,
+      skip: sk,
+      limit: li
+    }
+    allApiWithHeaderToken(`${API_CONSTANTS.COMMON_CATEGORIES_URL}/filter`, body , "post")
       .then((response) => {
         if (response.status === 200) {
-          setData(response?.data);
+          setData(response?.data?.data);
+          setTotal(response?.data?.total);
         } 
       })
       .catch((err) => {
-        console.error("err", err);
         toast.current.show({
           severity: "error",
           summary: "Error",
@@ -132,8 +139,14 @@ const CatergoryList = () => {
   };
 
   useEffect(() => {
-    fetchCategoryList();
-  }, []);
+    fetchCategoryList(0,5);
+  }, [search]);
+
+  const paginationChangeHandler = (skip, limit) => {
+    setSkip(skip);
+    setLimit(limit);
+    fetchCategoryList(skip, limit);
+  };
 
   const createCategory = () => {
     navigate(ROUTES_CONSTANTS.CREATE_CATEGORY);
@@ -161,6 +174,10 @@ const CatergoryList = () => {
           className="bg-BgPrimaryColor border rounded border-BorderColor"
           columns={columns}
           data={data}
+          skip={skip}
+          rows={limit}
+          total={total}
+          paginationChangeHandler={paginationChangeHandler}
           loader={loader}
           showGridlines={true}
         />

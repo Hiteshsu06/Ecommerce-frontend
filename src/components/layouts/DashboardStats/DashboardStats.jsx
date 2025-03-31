@@ -235,7 +235,7 @@ const DashboardStats = () => {
   }, []);
 
   return (
-    <div>
+    <div className="overflow-y-scroll h-[88vh] mr-[-20px]">
       <Toast ref={toast} position="top-right" />
       <div className="flex gap-10 text-TextSecondaryColor">
         <div className="mt-4 flex w-[25%] bg-BgSecondaryColor border rounded border-BorderColor p-6">

@@ -14,13 +14,16 @@ import { API_CONSTANTS } from "../../../constants/apiurl";
 import InputTextComponent from "@common/InputTextComponent";
 import { Toast } from "primereact/toast";
 
-const UserList = () => {
+const UserList = ({search}) => {
   const toast = useRef(null);
   const { t } = useTranslation("msg");
   const [isConfirm, setIsConfirm] = useState(false);
   const [deleteId, setDeleteId] = useState(null);
   const [loader, setLoader] = useState(false);
-  const [search, setSearch] = useState("");
+  const navigate = useNavigate();
+  const [skip, setSkip] = useState(0);
+  const [limit, setLimit] = useState(5);
+  const [total, setTotal] = useState(0);
 
   const item = {
     heading: t("user"),
@@ -31,9 +34,19 @@ const UserList = () => {
   };
 
   const [data, setData] = useState([]);
+
+  const editUser = (item) => {
+    navigate(`${ROUTES_CONSTANTS.EDIT_USER}/${item?.id}`);
+  };
+
   const actionBodyTemplate = (rowData) => {
     return (
       <div className="flex">
+         <ButtonComponent
+          icon="ri-pencil-line"
+          className="text-[1rem]"
+          onClick={() => editUser(rowData)}
+        />
         <ButtonComponent
           icon="ri-delete-bin-line"
           className="text-[1rem]"
@@ -78,15 +91,18 @@ const UserList = () => {
       });
   };
 
-  const fetchUserList = () => {
+  const fetchUserList = (sk=skip, li=limit) => {
     setLoader(true);
     let body = {
-      search: search
+      search: search,
+      skip: sk,
+      limit: li
     }
     allApiWithHeaderToken(`${API_CONSTANTS.COMMON_USERS_URL}/filter`, body , "post")
       .then((response) => {
         if (response.status === 200) {
-          setData(response?.data);
+          setData(response?.data?.data);
+          setTotal(response?.data?.total);
         }
       })
       .catch((err) => {
@@ -102,9 +118,19 @@ const UserList = () => {
       });
   };
 
+  const createUser = ()=>{
+    navigate(ROUTES_CONSTANTS.CREATE_USER);
+  }
+
   useEffect(() => {
-    fetchUserList();
-  }, []);
+    fetchUserList(0,5);
+  }, [search]);
+
+  const paginationChangeHandler = (skip, limit) => {
+    setSkip(skip);
+    setLimit(limit);
+    fetchUserList(skip, limit);
+  };
 
   return (
     <div className="text-TextPrimaryColor">
@@ -116,20 +142,22 @@ const UserList = () => {
       />
       <Breadcrum item={item} />
       <div className="mt-4 flex justify-end bg-BgSecondaryColor border rounded border-BorderColor p-2">
-        <InputTextComponent
-            value={search}
-            onChange={(e)=>{ setSearch(e.target.value); fetchUserList(); }}
-            type="text"
-            placeholder={t("search")}
-            name="search"
-            className="w-[240px] text-black rounded border-[1px] border-[#ddd] px-[1rem] py-[8px] text-[11px] focus:outline-none"
-          />
+        <ButtonComponent
+          onClick={() => createUser()}
+          type="submit"
+          label={t("create_user")}
+          className="rounded bg-TextPrimaryColor px-6 py-2 text-[12px] text-white"
+        />
       </div>
       <div className="mt-4">
         <DataTable
           className="bg-BgPrimaryColor border rounded border-BorderColor"
           columns={columns}
           data={data}
+          skip={skip}
+          rows={limit}
+          total={total}
+          paginationChangeHandler={paginationChangeHandler}
           loader={loader}
           showGridlines={true}
         />

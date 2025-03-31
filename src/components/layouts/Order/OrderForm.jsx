@@ -126,13 +126,11 @@ const OrderForm = () => {
       }
     };
 
-    console.log("Result", data)
     setLoader(true);
     allApiWithHeaderToken(API_CONSTANTS.COMMON_ORDER_URL, data , "post")
       .then((response) => {
-        console.log("orders",response)
         if (response.status === 201) {
-          // navigate(ROUTES_CONSTANTS.ORDERS);
+          navigate(ROUTES_CONSTANTS.ORDERS);
         }
       })
       .catch((err) => {
@@ -200,7 +198,7 @@ const OrderForm = () => {
     try {
       const userResponse = await allApiWithHeaderToken(`${API_CONSTANTS.COMMON_USERS_URL}/filter`,"", "post");
       if (userResponse.status === 200) {
-        setUserList(userResponse?.data);
+        setUserList(userResponse?.data?.data);
       }
     } catch (err) {
       toast.current.show({
@@ -368,7 +366,7 @@ const OrderForm = () => {
 }, [formik.values.products]);
 
   return (
-    <div className="min-h-[80vh] bg-BgPrimaryColor py-4">
+    <div className="h-screen bg-BgPrimaryColor py-4 overflow-y-scroll">
     {loader && <Loading/>}
     <Toast ref={toast} position="top-right" style={{scale: '0.7'}} />
     <div className="mx-4 sm:mx-16 my-auto bg-BgSecondaryColor border rounded border-BorderColor">
@@ -495,7 +493,6 @@ const OrderForm = () => {
               type="text"
               placeholder={t("country")}
               name="country"
-              disabled={true}
               isLabel={true}
               error={errors?.country}
               touched={touched?.country}

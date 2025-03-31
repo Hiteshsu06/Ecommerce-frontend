@@ -4,7 +4,7 @@ import { useRef, useState } from "react";
 // components
 import ButtonComponent from "@common/ButtonComponent";
 import InputTextComponent from "@common/InputTextComponent";
-import { allApi, allApiWithHeaderToken } from "@api/api";
+import { allApi } from "@api/api";
 
 // external libraries
 import * as yup from "yup";

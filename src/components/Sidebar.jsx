@@ -25,8 +25,8 @@ const Sidebar = ({toggle}) => {
     },
     {
       label: t("categories"),
-      icon: "ri-dice-4-line",
-      filledIcon: "ri-dice-4-fill",
+      icon: "ri-folder-6-line",
+      filledIcon: "ri-folder-6-fill",
       route: ROUTES_CONSTANTS.CATEGORIES,
       command: () => {
         navigate(ROUTES_CONSTANTS.CATEGORIES);
@@ -34,8 +34,8 @@ const Sidebar = ({toggle}) => {
     },
     {
       label: t("sub_categories"),
-      icon: "ri-dice-6-line",
-      filledIcon: "ri-dice-6-fill",
+      icon: "ri-folders-line",
+      filledIcon: "ri-folders-fill",
       route: ROUTES_CONSTANTS.SUB_CATEGORIES,
       command: () => {
         navigate(ROUTES_CONSTANTS.SUB_CATEGORIES);
@@ -105,6 +105,15 @@ const Sidebar = ({toggle}) => {
       }
     },
     {
+      label: t("reviews"),
+      icon: "ri-draft-line",
+      filledIcon: "ri-draft-fill",
+      route: ROUTES_CONSTANTS.REVIEWS,
+      command: () => {
+        navigate(ROUTES_CONSTANTS.REVIEWS);
+      }
+    },
+    {
       label: t("blogs"),
       icon: "ri-blogger-line",
       filledIcon: "ri-blogger-fill",
@@ -162,7 +171,7 @@ const Sidebar = ({toggle}) => {
       {
           !toggle && <div className="flex width-full justify-center"><hr className="w-[90%]"/></div>
       }
-      <div className="px-4">
+      <div className="px-4 h-[88vh] overflow-y-scroll">
         <Menu
             model={items.map((item, index) => {
               return(

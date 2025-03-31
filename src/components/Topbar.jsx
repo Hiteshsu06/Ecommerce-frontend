@@ -4,9 +4,11 @@ import { useTranslation } from "react-i18next";
 import { Sidebar } from 'primereact/sidebar';
 import NotificationComponent from "./Notification";
 import InputTextComponent from "@common/InputTextComponent";
+import { useLocation } from 'react-router-dom';
 
 const Topbar = ({ toggleExpansionSwitch, searchField, searchChangeHandler }) => {
   const { t } = useTranslation("msg");
+  const location = useLocation();
   const [expand, setExpand] = useState(true);
   const [theme, setTheme] = useState(false);
   const [userDetails, setUserDetails] = useState({});
@@ -54,6 +56,10 @@ const Topbar = ({ toggleExpansionSwitch, searchField, searchChangeHandler }) => 
       localStorage.setItem("theme", "light");
     }
   }, [theme]);
+
+  useEffect(() => {
+    setSearchValue("");
+  }, [location]);
 
   return (
     <div className="flex h-16 w-full items-center gap-4 bg-BgTertiaryColor px-5 shadow-custom z-10">
