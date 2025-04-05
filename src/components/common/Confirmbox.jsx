@@ -1,10 +1,11 @@
+// Utils
 import { useRef, useEffect } from "react";
 import { useTranslation } from "react-i18next";
-
-import ButtonComponent from "@common/ButtonComponent";
-
 import { ConfirmDialog, confirmDialog } from "primereact/confirmdialog";
 import { Toast } from "primereact/toast";
+
+// Components
+import ButtonComponent from "@common/ButtonComponent";
 
 const Confirmbox = ({ isConfirm, closeDialogbox, confirmDialogbox }) => {
   const { t } = useTranslation("msg");

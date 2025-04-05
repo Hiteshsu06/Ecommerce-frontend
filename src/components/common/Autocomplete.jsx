@@ -1,5 +1,5 @@
 // hooks
-import React, { useState } from 'react';
+import { useState } from 'react';
 
 // utils
 import { AutoComplete } from 'primereact/autocomplete';
@@ -25,7 +25,6 @@ const AutocompleteComponent = ({value, name, label, placeholder, data, error, to
   }
 
   return (
-    <React.Fragment>
       <div className="custom-input-design w-full">
       {label ? (
       <label className="text-[12px] text-TextSecondaryColor ms-[4px] font-[600]">{label}</label>
@@ -47,7 +46,6 @@ const AutocompleteComponent = ({value, name, label, placeholder, data, error, to
         ""
       )}
       </div>
-    </React.Fragment>
   )
 }
 

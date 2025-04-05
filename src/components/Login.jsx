@@ -12,8 +12,8 @@ import { useFormik } from "formik";
 import { Toast } from "primereact/toast";
 import { Link, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { ROUTES_CONSTANTS } from "../constants/routesurl";
-import { API_CONSTANTS } from "../constants/apiurl";
+import { ROUTES_CONSTANTS } from "@constants/routesurl";
+import { API_CONSTANTS } from "@constants/apiurl";
 import Loading from '@common/Loading';
 
 const data = {

@@ -1,10 +1,9 @@
-import Login from '../components/Login';
+// Components
+import Login from '@adminpage-components/Login';
 
 const LoginPage = () => {
   return (
-    <>
     <Login/>
-    </>
   )
 }
 

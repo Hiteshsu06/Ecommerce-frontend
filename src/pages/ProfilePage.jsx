@@ -1,4 +1,4 @@
-// external libraries
+// utils
 import * as yup from "yup";
 import { useFormik } from "formik";
 import { useTranslation } from "react-i18next";
@@ -13,8 +13,8 @@ import FileUpload from "@common/FileUpload";
 import { allApiWithHeaderToken } from "@api/api";
 import Loading from '@common/Loading';
 import { Toast } from "primereact/toast";
-import { ROUTES_CONSTANTS } from "../constants/routesurl";
-import { API_CONSTANTS } from "../constants/apiurl";
+import { ROUTES_CONSTANTS } from "@constants/routesurl";
+import { API_CONSTANTS } from "@constants/apiurl";
 
 const structure = {
   name: "",

@@ -1,6 +1,3 @@
-// hooks
-import React from 'react';
-
 // utils
 import { Dropdown } from 'primereact/dropdown';
 

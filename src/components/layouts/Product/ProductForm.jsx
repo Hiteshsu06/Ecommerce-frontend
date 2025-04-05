@@ -2,6 +2,11 @@
 import ButtonComponent from "@common/ButtonComponent";
 import InputTextComponent from "@common/InputTextComponent";
 import FileUpload from "@common/FileUpload";
+import { API_CONSTANTS } from "@constants/apiurl";
+import { ROUTES_CONSTANTS } from "@constants/routesurl";
+import { allApiWithHeaderToken } from "@api/api";
+import DropdownComponent from "@common/DropdownComponent";
+import Loading from '@common/Loading';
 
 // external libraries
 import * as yup from "yup";
@@ -10,11 +15,6 @@ import { useNavigate, useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { Toast } from "primereact/toast";
 import { useEffect, useRef, useState } from "react";
-import { API_CONSTANTS } from "../../../constants/apiurl";
-import { ROUTES_CONSTANTS } from "../../../constants/routesurl";
-import { allApiWithHeaderToken } from "../../../api/api";
-import DropdownComponent from "../../common/DropdownComponent";
-import Loading from '@common/Loading';
 
 const statusList = [
   { name: "Active", value: "1"},
@@ -42,6 +42,7 @@ const initialValues = {
   subCategory: {},
   image: "",
   price: "",
+  shelfLife: "",
   status: "",
   weight: ""
 }
@@ -59,6 +60,7 @@ const ProductForm = () => {
   const validationSchema = yup.object().shape({
     name: yup.string().required(t("product_name_is_required")),
     price: yup.number().required(t("price_is_required")),
+    shelfLife: yup.number().required(t("price_is_required")),
     description: yup.string().required(t("description_is_required")),
     subCategory: yup.object()
     .test('non-empty-object', t("sub_category_is_required"), (value) => {
@@ -112,6 +114,7 @@ const ProductForm = () => {
       image: value?.image,
       sub_category_id: value?.subCategory?.id,
       price: value?.price,
+      shelf_life: value?.shelfLife,
       weight: value?.weight
     }
     setLoader(true);
@@ -135,6 +138,7 @@ const ProductForm = () => {
       description: value?.description,
       status: Number(value?.status),
       price: value?.price,
+      shelf_life: value?.shelfLife,
       weight: value?.weight
     }
     if(value?.image){
@@ -178,6 +182,7 @@ const ProductForm = () => {
                 status: String(response?.data?.status),
                 price: response?.data?.price,
                 weight: response?.data?.weight,
+                shelfLife: response?.data?.shelf_life,
                 subCategory: selectedSubCategory
               }
               setData(data);
@@ -305,6 +310,19 @@ const ProductForm = () => {
             optionLabel="name"
             error={errors?.weight}
             touched={touched?.weight}
+          />
+        </div>
+        <div className="col-span-2">
+           <InputTextComponent
+            value={values?.shelfLife}
+            onChange={handleChange}
+            type="number"
+            placeholder={t("shelf_life_in_days")}
+            name="shelfLife"
+            isLabel={true}
+            error={errors?.shelfLife}
+            touched={touched?.shelfLife}
+            className="col-span-2 w-full rounded border-[1px] border-[#ddd] px-[1rem] py-[8px] text-[11px] focus:outline-none"
           />
         </div>
          {

@@ -1,10 +1,13 @@
-import Customers from "@assets/customers.png";
-import { API_CONSTANTS } from "../../../constants/apiurl";
-import { allApiWithHeaderToken } from "@api/api";
+// Utils
 import { useEffect, useState, useRef } from "react";
-import { Toast } from "primereact/toast";
-import { ROUTES_CONSTANTS } from "../../../constants/routesurl";
 import Chart from "react-apexcharts";
+
+// Components
+import Customers from "@assets/customers.png";
+import { API_CONSTANTS } from "@constants/apiurl";
+import { allApiWithHeaderToken } from "@api/api";
+import { Toast } from "primereact/toast";
+import { ROUTES_CONSTANTS } from "@constants/routesurl";
 
 const DashboardStats = () => {
   const toast = useRef(null);

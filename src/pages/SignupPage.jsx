@@ -1,10 +1,9 @@
-import Signup from '../components/Signup';
+// Components
+import Signup from "@adminpage-components/Signup";
 
 const SignupPage = () => {
   return (
-    <div>
       <Signup/>
-    </div>
   )
 }
 

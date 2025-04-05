@@ -8,18 +8,18 @@ import Breadcrum from "@common/Breadcrum";
 import DataTable from "@common/DataTable";
 import ButtonComponent from "@common/ButtonComponent";
 import { allApiWithHeaderToken } from "@api/api";
-import { ROUTES_CONSTANTS } from "../../../constants/routesurl";
-import { API_CONSTANTS } from "../../../constants/apiurl";
+import { ROUTES_CONSTANTS } from "@constants/routesurl";
+import { API_CONSTANTS } from "@constants/apiurl";
 import { Toast } from "primereact/toast";
 
 const dummyData = [
-{id: "1", year: "2024", month: "July", report: "July_Month_Revenue_Report.csv"},
-{id: "2", year: "2024", month: "August", report: "August_Month_Revenue_Report.csv"},
-{id: "3", year: "2024", month: "September", report: "September_Month_Revenue_Report.csv"},
-{id: "4", year: "2024", month: "October", report: "October_Month_Revenue_Report.csv"},
-{id: "5", year: "2024", month: "November", report: "November_Month_Revenue_Report.csv"},
-{id: "6", year: "2024", month: "December", report: "December_Month_Revenue_Report.csv"},
-{id: "7", year: "2025", month: "January", report: "January_Month_Revenue_Report.csv"}
+  {id: "1", year: "2024", month: "July", report: "July_Month_Revenue_Report.csv"},
+  {id: "2", year: "2024", month: "August", report: "August_Month_Revenue_Report.csv"},
+  {id: "3", year: "2024", month: "September", report: "September_Month_Revenue_Report.csv"},
+  {id: "4", year: "2024", month: "October", report: "October_Month_Revenue_Report.csv"},
+  {id: "5", year: "2024", month: "November", report: "November_Month_Revenue_Report.csv"},
+  {id: "6", year: "2024", month: "December", report: "December_Month_Revenue_Report.csv"},
+  {id: "7", year: "2025", month: "January", report: "January_Month_Revenue_Report.csv"}
 ];
 
 const ReportList = ({search}) => {

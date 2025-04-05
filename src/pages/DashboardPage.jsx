@@ -1,20 +1,21 @@
-import { Topbar, Sidebar, CategoryList, ProductList, DashboardStats, SubCategoryList, InventoryList, OrderList, CouponList, ReportList, DiscountList, UserList, BlogList, FestivalSpecialList } from "../components/index";
-import Loading from "@common/Loading";
+// Utils
 import { Suspense, useState, lazy } from "react";
 import { Routes, Route, useLocation } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 
 // Components
-const CategoryForm = lazy(() => import("@components/Category/CategoryForm"));
-const SubCategoryForm = lazy(() => import("@components/SubCategory/SubCategoryForm"));
-const ProductForm = lazy(() => import("@components/Product/ProductForm"));
-const InventoryForm = lazy(() => import("@components/Inventory/InventoryForm"));
-const OrderForm = lazy(() => import("@components/Order/OrderForm"));
-const CouponForm = lazy(() => import("@components/Coupon/CouponForm"));
-const DiscountForm = lazy(() => import("@components/Discount/DiscountForm"));
-const BlogForm = lazy(() => import("@components/Blog/BlogForm"));
-const FestivalSpecialForm = lazy(() => import("@components/FestivalSpecial/FestivalSpecialForm"));
-const UserForm = lazy(() => import("@components/User/UserForm"));
+import { Topbar, Sidebar, CategoryList, ProductList, DashboardStats, SubCategoryList, InventoryList, OrderList, CouponList, ReportList, DiscountList, UserList, BlogList, FestivalSpecialList } from "@adminpage-components/index";
+import Loading from "@common/Loading";
+const CategoryForm = lazy(() => import("@adminpage-layouts/Category/CategoryForm"));
+const SubCategoryForm = lazy(() => import("@adminpage-layouts/SubCategory/SubCategoryForm"));
+const ProductForm = lazy(() => import("@adminpage-layouts/Product/ProductForm"));
+const InventoryForm = lazy(() => import("@adminpage-layouts/Inventory/InventoryForm"));
+const OrderForm = lazy(() => import("@adminpage-layouts/Order/OrderForm"));
+const CouponForm = lazy(() => import("@adminpage-layouts/Coupon/CouponForm"));
+const DiscountForm = lazy(() => import("@adminpage-layouts/Discount/DiscountForm"));
+const BlogForm = lazy(() => import("@adminpage-layouts/Blog/BlogForm"));
+const FestivalSpecialForm = lazy(() => import("@adminpage-layouts/FestivalSpecial/FestivalSpecialForm"));
+const UserForm = lazy(() => import("@adminpage-layouts/User/UserForm"));
 
 const DashboardPage = () => {
   const [toggle, setToggle] = useState(true);

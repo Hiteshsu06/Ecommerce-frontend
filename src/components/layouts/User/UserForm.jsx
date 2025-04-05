@@ -6,17 +6,17 @@ import ButtonComponent from "@common/ButtonComponent";
 import InputTextComponent from "@common/InputTextComponent";
 import { allApiWithHeaderToken } from "@api/api";
 import Loading from '@common/Loading';
-import { RadioButton } from "primereact/radiobutton";
 import FileUpload from "@common/FileUpload";
+import { ROUTES_CONSTANTS } from "@constants/routesurl";
+import { API_CONSTANTS } from "@constants/apiurl";
 
 // external libraries
 import * as yup from "yup";
 import { useFormik } from "formik";
+import { RadioButton } from "primereact/radiobutton";
 import { Toast } from "primereact/toast";
 import { useNavigate, useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { ROUTES_CONSTANTS } from "../../../constants/routesurl";
-import { API_CONSTANTS } from "../../../constants/apiurl";
 
 const initialValues = {
     name: "",

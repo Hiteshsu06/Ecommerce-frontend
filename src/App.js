@@ -9,20 +9,26 @@ import { Routes, Route } from 'react-router-dom';
 import 'remixicon/fonts/remixicon.css';
 import "primereact/resources/themes/lara-light-cyan/theme.css";
 
-// pages
+// Admin pages
 const Login = lazy(() => import("@pages/LoginPage"));
 const Signup = lazy(() => import("@pages/SignupPage"));
 const DashboardPage = lazy(() => import("@pages/DashboardPage"));
-const MainPage = lazy(()=> import("@pages/MainPage/MainPage"));
 const ForgotPassword = lazy(() => import("@pages/ForgotPasswordPage"));
 const ResetPassword = lazy(() => import("@pages/ResetPasswordPage"));
 const NotAuthorizedPage = lazy(() => import("@pages/NotAuthorizedPage"));
 const HelpdeskPage = lazy(() => import("@pages/HelpdeskPage"));
-const ViewCart = lazy(() => import("@pages/MainPage/Home/ViewCartPage"));
-const CollectionDescription = lazy(() => import("@pages/MainPage/Home/CollectionDescription"));
-const LatestBlogDescription = lazy(() => import("@pages/MainPage/Home/LatestBlogDescription"));
-const ProductDescription = lazy(() => import("@pages/MainPage/Home/ProductDescription"));
 const ProfilePage = lazy(() => import("@pages/ProfilePage"));
+
+// User pages
+const MainPage = lazy(()=> import("@pages/MainPage"));
+const ViewCart = lazy(() => import("@pages/ViewCartPage"));
+const CollectionDescription = lazy(() => import("@pages/CollectionDescription"));
+const LatestBlogDescription = lazy(() => import("@pages/LatestBlogDescription"));
+const ProductDescription = lazy(() => import("@pages/ProductDescription"));
+const Payment = lazy(() => import("@pages/ProductDescription"));
+const PaymentConfirmed = lazy(() => import("@pages/ProductDescription"));
+const PaymentRejected = lazy(() => import("@pages/ProductDescription"));
+const SignInRegister = lazy(() => import("@pages/ProductDescription"));
 
 function App() {
   const theme = localStorage.getItem('theme');
@@ -37,8 +43,12 @@ function App() {
           <Route path="/" element={<MainPage />}/>
           <Route path="/view-cart" element={<ViewCart />}/>
           <Route path="/view-blog" element={<LatestBlogDescription />}/>
-          <Route path="/collections/:name" element={<CollectionDescription />}/>
-          <Route path="/products/*" element={<ProductDescription />}/>
+          <Route path="/collection/:name" element={<CollectionDescription />}/>
+          <Route path="/product/:name" element={<ProductDescription />}/>
+          <Route path="/payment" element={<Payment />}/>
+          <Route path="/payment-confirmed" element={<PaymentConfirmed />}/>
+          <Route path="/payment-rejected" element={<PaymentRejected />}/>
+          <Route path="/sign-in-register" element={<SignInRegister />}/>
           
           {/* Routes for admin screen */}
           <Route path="/dashboard/*" element={<DashboardPage />}/>

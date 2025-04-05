@@ -1,11 +1,9 @@
-import React from 'react';
 import { useTranslation } from "react-i18next";
 
 const FileUpload = ({value="", name, isLabel, onChange, isDoc, isProfile}) => {
   const { t } = useTranslation("msg");
 
   return (
-    <React.Fragment>
       <div className="flex flex-col w-full">
           {isLabel && !isProfile ? (
               <label className="text-[12px] text-TextSecondaryColor ms-[4px] font-[600]">{isLabel}</label>
@@ -67,7 +65,6 @@ const FileUpload = ({value="", name, isLabel, onChange, isDoc, isProfile}) => {
             </>
           }
       </div>
-    </React.Fragment>
   )
 }
 

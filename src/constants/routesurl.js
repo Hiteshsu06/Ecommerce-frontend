@@ -3,7 +3,8 @@ export const ROUTES_CONSTANTS = {
     HOME: "/",
     VIEW_CART: "/view-cart",
     VIEW_BLOG_DESCRIPTION: "/view-blog",
-    VIEW_COLLECTION_DESCRIPTION: "/collections",
+    VIEW_COLLECTION_DESCRIPTION: "/collection",
+    VIEW_PRODUCT_DESCRIPTION: "/product",
     
     // Admin based routes
     LOGIN: "/login",

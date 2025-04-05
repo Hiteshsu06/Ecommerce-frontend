@@ -1,11 +1,14 @@
-import React, { useRef, useState } from "react";
+// Utils
+import { useRef, useState } from "react";
 import { TieredMenu } from "primereact/tieredmenu";
 import { Avatar } from "primereact/avatar";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
-import { API_CONSTANTS } from "../../constants/apiurl";
-import { allApiWithHeaderToken } from "../../api/api";
 import { Toast } from "primereact/toast";
+
+// Components
+import { API_CONSTANTS } from "@constants/apiurl";
+import { allApiWithHeaderToken } from "@api/api";
 
 const AvatarProfile = ({ size, shape, userDetails }) => {
   const menu = useRef(null);

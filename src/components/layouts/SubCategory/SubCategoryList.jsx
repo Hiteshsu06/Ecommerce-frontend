@@ -1,7 +1,8 @@
-// hooks
+// utils
 import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
+import { Toast } from "primereact/toast";
 
 // components
 import Breadcrum from "@common/Breadcrum";
@@ -9,10 +10,9 @@ import DataTable from "@common/DataTable";
 import ButtonComponent from "@common/ButtonComponent";
 import Confirmbox from "@common/Confirmbox";
 import { allApiWithHeaderToken } from "@api/api";
-import { ROUTES_CONSTANTS } from "../../../constants/routesurl";
-import { API_CONSTANTS } from "../../../constants/apiurl";
-import { Toast } from "primereact/toast";
-import DefaultImage from "../../../assets/no-image.jpeg";
+import { ROUTES_CONSTANTS } from "@constants/routesurl";
+import { API_CONSTANTS } from "@constants/apiurl";
+import DefaultImage from "@assets/no-image.jpeg";
 
 const SubCategoryList = ({search}) => {
   const toast = useRef(null);

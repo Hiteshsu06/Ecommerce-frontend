@@ -2,6 +2,10 @@
 import ButtonComponent from "@common/ButtonComponent";
 import InputTextComponent from "@common/InputTextComponent";
 import FileUpload from "@common/FileUpload";
+import { API_CONSTANTS } from "@constants/apiurl";
+import { ROUTES_CONSTANTS } from "@constants/routesurl";
+import { allApiWithHeaderToken } from "@api/api";
+import Loading from '@common/Loading';
 
 // external libraries
 import * as yup from "yup";
@@ -10,11 +14,6 @@ import { useNavigate, useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { Toast } from "primereact/toast";
 import { useEffect, useRef, useState } from "react";
-import { API_CONSTANTS } from "../../../constants/apiurl";
-import { ROUTES_CONSTANTS } from "../../../constants/routesurl";
-import { allApiWithHeaderToken } from "../../../api/api";
-import InputTextAreaComponent from "../../common/InputTextAreaComponent";
-import Loading from '@common/Loading';
 import { Editor } from "primereact/editor";
 
 const initialValues = {

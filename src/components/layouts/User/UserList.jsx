@@ -9,9 +9,8 @@ import DataTable from "@common/DataTable";
 import ButtonComponent from "@common/ButtonComponent";
 import Confirmbox from "@common/Confirmbox";
 import { allApiWithHeaderToken } from "@api/api";
-import { ROUTES_CONSTANTS } from "../../../constants/routesurl";
-import { API_CONSTANTS } from "../../../constants/apiurl";
-import InputTextComponent from "@common/InputTextComponent";
+import { ROUTES_CONSTANTS } from "@constants/routesurl";
+import { API_CONSTANTS } from "@constants/apiurl";
 import { Toast } from "primereact/toast";
 
 const UserList = ({search}) => {

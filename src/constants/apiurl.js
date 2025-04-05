@@ -1,5 +1,5 @@
 export const API_CONSTANTS = {
-    SINGNUP: "users",
+    SIGNUP: "users",
     LOGIN: "users/sign_in",
     LOGOUT: "users/sign_out",
 
@@ -24,5 +24,7 @@ export const API_CONSTANTS = {
     GIFTING_CATEGORY_URL : "api/v1/user_dashboard/gifting_category",
     ALL_CATEGORY_URL : "api/v1/user_dashboard/all_categories",
     ALL_PRODUCTS_URL : "api/v1/user_dashboard/all_active_products",
-    MENU_LIST_URL: "api/v1/user_dashboard/nav_menu_list"
+    MENU_LIST_URL: "api/v1/user_dashboard/nav_menu_list",
+    GET_PRODUCT_BY_SUBCATEGORY_ID_URL: "api/v1/user_dashboard/get_products_by_subcategory",
+    ALL_SUB_CATEGORY_URL : "api/v1/user_dashboard/all_sub_categories",
 }

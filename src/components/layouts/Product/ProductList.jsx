@@ -1,7 +1,9 @@
-// hooks
+// utils
 import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
+import { Toast } from "primereact/toast";
+import { Dialog } from 'primereact/dialog';
 
 // components
 import Breadcrum from "@common/Breadcrum";
@@ -9,11 +11,9 @@ import DataTable from "@common/DataTable";
 import ButtonComponent from "@common/ButtonComponent";
 import Confirmbox from "@common/Confirmbox";
 import { allApiWithHeaderToken } from "@api/api";
-import { ROUTES_CONSTANTS } from "../../../constants/routesurl";
-import { Toast } from "primereact/toast";
-import { API_CONSTANTS } from "../../../constants/apiurl";
-import DefaultImage from "../../../assets/no-image.jpeg";
-import { Dialog } from 'primereact/dialog';
+import { ROUTES_CONSTANTS } from "@constants/routesurl";
+import { API_CONSTANTS } from "@constants/apiurl";
+import DefaultImage from "@assets/no-image.jpeg";
 import FileUpload from "@common/FileUpload";
 import Loading from '@common/Loading';
 

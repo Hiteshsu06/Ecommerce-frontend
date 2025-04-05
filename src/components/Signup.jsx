@@ -13,8 +13,6 @@ import { useFormik } from "formik";
 import { Toast } from "primereact/toast";
 import { Link, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { API_CONSTANTS } from "../constants/apiurl";
-import { ROUTES_CONSTANTS } from "../constants/routesurl";
 
 const data = {
   name: "",
@@ -62,7 +60,7 @@ const Signup = () => {
         password: value.password,
         phone_number: value.phoneNumber
       });
-      allApi(API_CONSTANTS.SINGNUP, body, "post")
+      allApi(API_CONSTANTS.SIGNUP, body, "post")
       .then((response) => {
         if(response?.status === 200){
           toast.current.show({
