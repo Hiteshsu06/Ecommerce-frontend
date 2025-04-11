@@ -1,17 +1,16 @@
-// hooks
-import { useRef, useState } from "react";
-
-// components
-import ButtonComponent from "@common/ButtonComponent";
-import InputTextComponent from "@common/InputTextComponent";
-import { allApi } from "@api/api";
-
-// external libraries
+// utils
+import { useEffect, useRef, useState } from "react";
+import { useLocation } from 'react-router-dom';
 import * as yup from "yup";
 import { useFormik } from "formik";
 import { Toast } from "primereact/toast";
 import { Link, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
+
+// components
+import ButtonComponent from "@common/ButtonComponent";
+import InputTextComponent from "@common/InputTextComponent";
+import { allApi } from "@api/api";
 import { ROUTES_CONSTANTS } from "@constants/routesurl";
 import { API_CONSTANTS } from "@constants/apiurl";
 import Loading from '@common/Loading';
@@ -24,6 +23,8 @@ const data = {
 const Login = () => {
   const toast = useRef(null);
   const { t } = useTranslation("msg");
+  const location = useLocation();
+  const { isLogout } = location?.state || {};
   const [toastType, setToastType] = useState(''); 
   const [loader, setLoader] = useState(false);
   const navigate = useNavigate();
@@ -50,13 +51,11 @@ const Login = () => {
         if(response?.status === 200){
           localStorage.setItem("token", JSON.stringify(response?.headers?.authorization));
           localStorage.setItem("userDetails", JSON.stringify(response?.data?.data));
-          setToastType('success');
-          toast.current.show({
-            severity: "success",
-            summary: t("success"),
-            detail: "You have successfully login",
-            life: 1000
-          });
+          navigate(ROUTES_CONSTANTS.DASHBOARD, { 
+            state: { 
+                    isLogin: "success"
+                } 
+            });
         }
       })
       .catch((err) => {
@@ -72,6 +71,19 @@ const Login = () => {
       });
   };
 
+  useEffect(()=>{
+    if(isLogout){
+      toast.current.show({
+       severity: "success",
+       summary: t("success"),
+       detail: "You have successfully logout",
+       life: 2000
+      });
+    };
+    
+    navigate(location.pathname, { replace: true }); 
+  },[])
+
   const formik = useFormik({
     initialValues: data,
     onSubmit: onHandleSubmit,
@@ -79,12 +91,6 @@ const Login = () => {
     enableReinitialize: true,
     validateOnBlur: true,
   });
-
-  const toastHandler=()=>{
-    if (toastType === 'success') {
-       navigate(ROUTES_CONSTANTS.DASHBOARD);
-     }
-   };
    
   const handleKeyDown = (event) => {
     if (event.key === 'Enter') {
@@ -98,7 +104,10 @@ const Login = () => {
     <div className="h-screen flex items-center justify-center">
       {loader && <Loading/>}
       <div className="w-1/4 border shadow-cards px-5 py-5 max-lg:px-10 max-md:px-5" onKeyDown={handleKeyDown}>
-        <Toast ref={toast} position="top-right" style={{scale: '0.7'}} onHide={toastHandler}/>
+        <Toast ref={toast} position="top-right" style={{scale: '0.7'}}/>
+        <div className="mb-2 text-center">
+          <i className="ri-shopping-cart-2-line text-[40px] text-TextPrimaryColor"></i>
+        </div>
         <div className="text-center text-[1.5rem] font-[600] tracking-wide max-lg:text-[1.4em] max-sm:text-[1rem]">
           {t("login")}
         </div>

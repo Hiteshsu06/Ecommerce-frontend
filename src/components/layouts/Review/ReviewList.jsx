@@ -1,4 +1,4 @@
-// utils
+// hooks
 import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
@@ -12,8 +12,9 @@ import Confirmbox from "@common/Confirmbox";
 import { allApiWithHeaderToken } from "@api/api";
 import { ROUTES_CONSTANTS } from "@constants/routesurl";
 import { API_CONSTANTS } from "@constants/apiurl";
+import { refactorPrefilledDate } from '@helper';
 
-const InventoryList = ({search}) => {
+const ReviewList = ({search}) => {
   const toast = useRef(null);
   const { t } = useTranslation("msg");
   const navigate = useNavigate();
@@ -25,42 +26,69 @@ const InventoryList = ({search}) => {
   const [total, setTotal] = useState(0);
 
   const item = {
-    heading: t("inventory"),
+    heading: t("review"),
     routes: [
       { label: t("dashboard"), route: ROUTES_CONSTANTS.DASHBOARD },
-      { label: t("inventory"), route: ROUTES_CONSTANTS.INVENTORY },
+      { label: t("review"), route: ROUTES_CONSTANTS.REVIEWS },
     ],
   };
 
   const [data, setData] = useState([]);
+
   const actionBodyTemplate = (rowData) => {
     return (
       <div className="flex">
         <ButtonComponent
-          icon="ri-pencil-line"
-          className="text-[1rem]"
-          onClick={() => editInventory(rowData)}
-        />
-        <ButtonComponent
           icon="ri-delete-bin-line"
           className="text-[1rem]"
-          onClick={() => confirmDeleteInventory(rowData)}
+          onClick={() => confirmDeleteReview(rowData)}
         />
       </div>
     );
   };
 
+  const verifiedBodyTemplate= (rowData) => {
+    return (
+      <div className="flex items-center">
+      {rowData?.is_verified === 1 ? <span className="text-[green]">Verified</span> : <span className="text-[#5e5ed8]">Not Verified</span>}
+    </div>
+    );
+  };
+
+  const ratingBodyTemplate= (rowData) => {
+    return (
+      <div className="flex items-center gap-1">
+        {[...Array(5)].map((item, index)=>{
+          if(rowData?.rating <= index){
+            return(<i className="ri-star-line" key={index}></i>)
+          }
+          else{
+            return(<i className="ri-star-fill" key={index}></i>)
+          }
+        })}
+      </div>
+    );
+  };
+
+  const createdAtBodyTemplate= (rowData) => {
+    return (
+      <div className="flex items-center">
+        <span>{refactorPrefilledDate(rowData?.created_at)}</span>
+      </div>
+    );
+  };
+
   const columns = [
-    { field: "product_name", header: t("product_name")},
-    { field: "stock_quantity", header: t("stock_quantity")},
+    { field: "name", header: t("user_name")},
+    { field: "product_data.name", header: t("product_name")},
+    { field: "review_text", header: t("review_text")},
+    { field: "created_at", body: createdAtBodyTemplate, header: t("created_at")},
+    { field: "is_verfied", body: verifiedBodyTemplate, header: t("verfied")},
+    { field: "rating", body: ratingBodyTemplate, header: t("rating")},
     { header: t("action"), body: actionBodyTemplate, headerStyle: { paddingLeft: '3%'} },
   ];
 
-  const editInventory = (item) => {
-    navigate(`${ROUTES_CONSTANTS.EDIT_INVENTORY}/${item?.id}`);
-  };
-
-  const confirmDeleteInventory = (item) => {
+  const confirmDeleteReview = (item) => {
     setIsConfirm(!isConfirm);
     setDeleteId(item?.id);
   };
@@ -73,11 +101,11 @@ const InventoryList = ({search}) => {
   const confirmDialogbox = () => {
     setLoader(true);
     setIsConfirm(!isConfirm);
-    allApiWithHeaderToken(`${API_CONSTANTS.COMMON_INVENTORY_URL}/${deleteId}`, '', "delete")
+    allApiWithHeaderToken(`${API_CONSTANTS.COMMON_PRODUCT_REVIEW_URL}/${deleteId}`, '', "delete")
       .then((response) => {
         if (response.status === 200) {
-          fetchInventoryList();
-        } 
+          fetchReviewList();
+        }
       })
       .catch((err) => {
         toast.current.show({
@@ -90,14 +118,14 @@ const InventoryList = ({search}) => {
       });
   };
 
-  const fetchInventoryList = (sk=skip, li=limit) => {
+  const fetchReviewList = (sk=skip, li=limit) => {
     setLoader(true);
     let body = {
       search: search,
       skip: sk,
       limit: li
     }
-    allApiWithHeaderToken(`${API_CONSTANTS.COMMON_INVENTORY_URL}/filter`, body , "post")
+    allApiWithHeaderToken(`${API_CONSTANTS.COMMON_PRODUCT_REVIEW_URL}/filter`, body , "post")
       .then((response) => {
         if (response.status === 200) {
           setData(response?.data?.data);
@@ -117,18 +145,14 @@ const InventoryList = ({search}) => {
       });
   };
 
+  useEffect(() => {
+    fetchReviewList(0,5);
+  }, [search]);
+
   const paginationChangeHandler = (skip, limit) => {
     setSkip(skip);
     setLimit(limit);
-    fetchInventoryList(skip, limit);
-  };
-
-  useEffect(() => {
-    fetchInventoryList(0,5);
-  }, [search]);
-
-  const createInventory = () => {
-    navigate(ROUTES_CONSTANTS.CREATE_INVENTORY);
+    fetchReviewList(skip, limit);
   };
 
   return (
@@ -140,13 +164,10 @@ const InventoryList = ({search}) => {
         confirmDialogbox={confirmDialogbox}
       />
       <Breadcrum item={item} />
-      <div className="mt-4 flex justify-end bg-BgSecondaryColor border rounded border-BorderColor p-2">
-        <ButtonComponent
-          onClick={() => createInventory()}
-          type="submit"
-          label={t("create_inventory")}
-          className="rounded bg-TextPrimaryColor px-6 py-2 text-[12px] text-white"
-        />
+      <div className="mt-4 flex justify-start bg-BgSecondaryColor border rounded border-BorderColor p-2 py-3">
+        <span className="text-[13px] text-TextSecondaryColor ms-[4px] font-[600]">
+          {t("user_review_on_products")}  
+        </span> 
       </div>
       <div className="mt-4">
         <DataTable
@@ -165,4 +186,4 @@ const InventoryList = ({search}) => {
   );
 };
 
-export default InventoryList;
+export default ReviewList;

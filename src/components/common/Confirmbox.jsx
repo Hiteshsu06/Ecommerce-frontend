@@ -13,9 +13,9 @@ const Confirmbox = ({ isConfirm, closeDialogbox, confirmDialogbox }) => {
 
   const accept = () => {
     toast.current.show({
-      severity: "info",
-      summary: t("confirmed"),
-      detail: t("you_have_accepted"),
+      severity: "success",
+      summary: t("delete_record"),
+      detail: t("record_has_been_deleted_successfully"),
       life: 3000,
     });
   };

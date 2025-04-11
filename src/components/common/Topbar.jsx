@@ -9,6 +9,23 @@ import AvatarProfile from "@common/AvatarProfile";
 import NotificationComponent from "@common/Notification";
 import InputTextComponent from "@common/InputTextComponent";
 
+// Custom Hook for Debouncing
+const useDebounce = (value, delay) => {
+  const [debouncedValue, setDebouncedValue] = useState(value);
+
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedValue(value);
+    }, delay);
+
+    return () => {
+      clearTimeout(handler);
+    };
+  }, [value, delay]);
+
+  return debouncedValue;
+};
+
 const Topbar = ({ toggleExpansionSwitch, searchField, searchChangeHandler }) => {
   const { t } = useTranslation("msg");
   const location = useLocation();
@@ -18,6 +35,7 @@ const Topbar = ({ toggleExpansionSwitch, searchField, searchChangeHandler }) => 
   const [searchvalue, setSearchValue] = useState("");
   const [visibleRight, setVisibleRight] = useState(false);
   const [unreadNotificationCount, setUnreadNotificationCount] = useState(0);
+  const debouncedSearchValue = useDebounce(searchvalue, 800);
 
   const toggleTheme = () => {
     setTheme(!theme);
@@ -36,13 +54,17 @@ const Topbar = ({ toggleExpansionSwitch, searchField, searchChangeHandler }) => 
     }
   };
 
+  useEffect(() => {
+    searchChangeHandler(debouncedSearchValue);
+  }, [debouncedSearchValue, searchChangeHandler]);
+
   const readNotification = ()=>{
     setVisibleRight(true)
-  }
+  };
 
   useEffect(()=>{
     setSearchValue(searchField);
-  },[searchField])
+  },[searchField]);
 
   useEffect(() => {
     setUserDetails(JSON.parse(localStorage.getItem("userDetails")));    
@@ -82,7 +104,7 @@ const Topbar = ({ toggleExpansionSwitch, searchField, searchChangeHandler }) => 
             type="text"
             placeholder={t("search")}
             value={searchvalue}
-            onChange={(e)=>searchChangeHandler(e)}
+            onChange={(e)=> setSearchValue(e.target.value)}
             name="searchvalue"
             className="w-full rounded border-[1px] border-[#ddd] px-[1rem] py-[8px] text-[11px] focus:outline-none"
           />

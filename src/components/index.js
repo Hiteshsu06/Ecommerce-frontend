@@ -13,12 +13,12 @@ import OrderList from '@adminpage-layouts/Order/OrderList';
 import OrderForm from '@adminpage-layouts/Order/OrderForm';
 import CouponList from '@adminpage-layouts/Coupon/CouponList';
 import CouponForm from '@adminpage-layouts/Coupon/CouponForm';
-import ReportList from '@adminpage-layouts/Report/ReportList';
 import DiscountForm from '@adminpage-layouts/Discount/DiscountForm';
 import DiscountList from '@adminpage-layouts/Discount/DiscountList';
 import UserList from '@adminpage-layouts/User/UserList';
 import BlogList from '@adminpage-layouts/Blog/BlogList';
 import FestivalSpecialForm from '@adminpage-layouts/FestivalSpecial/FestivalSpecialForm';
 import FestivalSpecialList from '@adminpage-layouts/FestivalSpecial/FestivalSpecialList';
+import ReviewList from '@adminpage-layouts/Review/ReviewList';
 
-export { Topbar, Sidebar, CategoryList, CategoryForm, SubCategoryList, SubCategoryForm, ProductList, ProductForm, InventoryList, InventoryForm, DashboardStats, OrderList, OrderForm, CouponList, CouponForm, ReportList, DiscountForm, DiscountList, UserList, BlogList, FestivalSpecialList, FestivalSpecialForm };
+export { Topbar, Sidebar, CategoryList, CategoryForm, SubCategoryList, SubCategoryForm, ProductList, ProductForm, InventoryList, InventoryForm, DashboardStats, OrderList, OrderForm, CouponList, CouponForm, DiscountForm, DiscountList, UserList, BlogList, FestivalSpecialList, FestivalSpecialForm, ReviewList };

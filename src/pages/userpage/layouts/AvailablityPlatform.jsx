@@ -39,7 +39,7 @@ const AvailablityPlatform = () => {
                 {
                     platform.map((item, index) => {
                         return (
-                            <a href={item.url} key={index} className="platform">
+                            <a href={item.url} key={item?.id} className="platform">
                                 <img src={item.logo} alt={item.name} className="aspect-[3.0]" />
                             </a>
                         )

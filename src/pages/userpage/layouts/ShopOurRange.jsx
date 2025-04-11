@@ -19,7 +19,7 @@ const ShopOurRange = ({data}) => {
                 loop={true}
                 >
                 {data.map((item) => (
-                    <SwiperSlide key={item.id}>
+                    <SwiperSlide key={item?.id}>
                         <RangeCard data={item} />
                     </SwiperSlide>
                 ))}

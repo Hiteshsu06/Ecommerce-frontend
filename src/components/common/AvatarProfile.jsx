@@ -76,12 +76,10 @@ const AvatarProfile = ({ size, shape, userDetails }) => {
     allApiWithHeaderToken(API_CONSTANTS.LOGOUT, "" , "delete")
       .then((response) => {
         if (response.status === 200){
-          setToastType('success');
-          toast.current.show({
-            severity: "success",
-            summary: t("success"),
-            detail: "You have successfully logout",
-            life: 500
+          navigate("/login", { 
+          state: { 
+                  isLogout: "success"
+              } 
           });
         } 
         else {
@@ -103,12 +101,6 @@ const AvatarProfile = ({ size, shape, userDetails }) => {
         });
       });
   }
-  
-  const toastHandler=()=>{
-    if (toastType === 'success') {
-      navigate("/login");
-     }
-   };
 
   return (
     <div className="card justify-content-center flex text-TextPrimaryColor">
@@ -116,7 +108,7 @@ const AvatarProfile = ({ size, shape, userDetails }) => {
         <div className="text-[0.8rem] capitalize">{userDetails?.name || '-'}</div>
         <div className="text-[0.6rem] capitalize">{t("admin")}</div>
       </div>
-      <Toast ref={toast} position="top-right" style={{scale: '0.7'}} onHide={toastHandler}/>
+      <Toast ref={toast} position="top-right" style={{scale: '0.7'}}/>
       <Avatar
         image={data?.image_url ? data?.image_url : "https://primefaces.org/cdn/primereact/images/avatar/amyelsner.png"}
         className="mr-2"

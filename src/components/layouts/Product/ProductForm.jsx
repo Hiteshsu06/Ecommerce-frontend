@@ -45,14 +45,15 @@ const initialValues = {
   shelfLife: "",
   status: "",
   weight: ""
-}
+};
+
 const ProductForm = () => {
   const toast = useRef(null);
   const { t } = useTranslation("msg");
   const navigate = useNavigate();
   const [loader, setLoader] = useState(false);
 
-  const [data,setData] = useState(initialValues);
+  const [data, setData] = useState(initialValues);
   const [toastType, setToastType] = useState(''); 
   const [categoryData, setCategoryData] = useState([]);
   const { id } = useParams();

@@ -85,7 +85,7 @@ const CheckoutComponent = () => {
                 header={
                     <div className="flex align-items-center justify-between gap-2 w-full">
                         <div className='flex items-center'>
-                          <i class="ri-shopping-cart-line text-[18px] me-2"></i>
+                          <i className="ri-shopping-cart-line text-[18px] me-2"></i>
                           <span className="font-[500] white-space-nowrap">{t("order_summary")}</span>
                         </div>
                         <div className='flex items-center'>
@@ -103,7 +103,7 @@ const CheckoutComponent = () => {
                 <div className="bg-white">
                     {cart?.map((item) => (
                       <CartItem
-                        key={item.id}
+                        key={item?.id}
                         item={item}
                         onQuantityChange={updateQuantity}
                         onRemove={removeItem}

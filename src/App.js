@@ -25,10 +25,11 @@ const ViewCart = lazy(() => import("@pages/ViewCartPage"));
 const CollectionDescription = lazy(() => import("@pages/CollectionDescription"));
 const LatestBlogDescription = lazy(() => import("@pages/LatestBlogDescription"));
 const ProductDescription = lazy(() => import("@pages/ProductDescription"));
-const Payment = lazy(() => import("@pages/ProductDescription"));
-const PaymentConfirmed = lazy(() => import("@pages/ProductDescription"));
-const PaymentRejected = lazy(() => import("@pages/ProductDescription"));
-const SignInRegister = lazy(() => import("@pages/ProductDescription"));
+const Payment = lazy(() => import("@pages/Payment"));
+const PaymentConfirmed = lazy(() => import("@pages/PaymentConfirmed"));
+const PaymentRejected = lazy(() => import("@pages/PaymentRejected"));
+const SignIn = lazy(() => import("@pages/SignIn"));
+const Register = lazy(() => import("@pages/Register"));
 
 function App() {
   const theme = localStorage.getItem('theme');
@@ -48,7 +49,8 @@ function App() {
           <Route path="/payment" element={<Payment />}/>
           <Route path="/payment-confirmed" element={<PaymentConfirmed />}/>
           <Route path="/payment-rejected" element={<PaymentRejected />}/>
-          <Route path="/sign-in-register" element={<SignInRegister />}/>
+          <Route path="/sign-in" element={<SignIn />}/>
+          <Route path="/register" element={<Register />}/>
           
           {/* Routes for admin screen */}
           <Route path="/dashboard/*" element={<DashboardPage />}/>

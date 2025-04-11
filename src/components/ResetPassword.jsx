@@ -65,7 +65,6 @@ const ResetPassword = () => {
       }
     })
     .catch((err) => {
-      console.log("err", err);
     }).finally(()=>{
       setLoader(false);
     });

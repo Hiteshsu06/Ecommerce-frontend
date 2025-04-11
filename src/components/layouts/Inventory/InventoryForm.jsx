@@ -152,7 +152,6 @@ const InventoryForm = () => {
 
   const { values, errors, handleSubmit, handleChange, setFieldValue, touched } = formik;
 
-  console.log("R",errors)
   return (
     <div className="flex h-screen bg-BgPrimaryColor overflow-y-scroll">
       {loader && <Loading/>}

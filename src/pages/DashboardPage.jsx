@@ -4,8 +4,9 @@ import { Routes, Route, useLocation } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 
 // Components
-import { Topbar, Sidebar, CategoryList, ProductList, DashboardStats, SubCategoryList, InventoryList, OrderList, CouponList, ReportList, DiscountList, UserList, BlogList, FestivalSpecialList } from "@adminpage-components/index";
+import { Topbar, ReviewList, Sidebar, CategoryList, ProductList, DashboardStats, SubCategoryList, InventoryList, OrderList, CouponList, DiscountList, UserList, BlogList, FestivalSpecialList } from "@adminpage-components/index";
 import Loading from "@common/Loading";
+
 const CategoryForm = lazy(() => import("@adminpage-layouts/Category/CategoryForm"));
 const SubCategoryForm = lazy(() => import("@adminpage-layouts/SubCategory/SubCategoryForm"));
 const ProductForm = lazy(() => import("@adminpage-layouts/Product/ProductForm"));
@@ -27,8 +28,8 @@ const DashboardPage = () => {
     setToggle(key);
   };
 
-  const searchChangeHandler=(e)=>{
-    setSearchField(e.target.value);
+  const searchChangeHandler=(data)=>{
+    setSearchField(data);
   }
 
   // Check if the current route is an edit or create route
@@ -38,7 +39,7 @@ const DashboardPage = () => {
     <div className="flex h-screen overflow-hidden bg-BgPrimaryColor">
       {/* Conditionally render sidebar */}
       {!isCreateOrEditPage && (
-        <div className={`sidebar ${toggle ? "w-[300px]" : "w-[103px]"} h-full`}>
+        <div className={`sidebar ${toggle ? "w-[300px]" : "w-[103px]"} h-full overflow-hidden`}>
           <Sidebar toggle={toggle} />
         </div>
       )}
@@ -60,9 +61,9 @@ const DashboardPage = () => {
               <Route path="/discounts" element={<DiscountList search={searchField}/>} />
               <Route path="/addresess" element={<CouponList search={searchField}/>} />
               <Route path="/users" element={<UserList search={searchField}/>} />
-              <Route path="/reports" element={<ReportList search={searchField}/>} />
               <Route path="/blogs" element={<BlogList search={searchField}/>} />
               <Route path="/fests" element={<FestivalSpecialList search={searchField}/>} />
+              <Route path="/reviews" element={<ReviewList search={searchField}/>} />
 
               {/* Create / Update forms */}
               <Route path="/create-category" element={<CategoryForm />} />

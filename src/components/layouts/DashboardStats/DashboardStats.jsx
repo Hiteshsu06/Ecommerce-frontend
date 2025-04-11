@@ -1,6 +1,8 @@
 // Utils
 import { useEffect, useState, useRef } from "react";
+import { useLocation, useNavigate } from 'react-router-dom';
 import Chart from "react-apexcharts";
+import { useTranslation } from "react-i18next";
 
 // Components
 import Customers from "@assets/customers.png";
@@ -11,7 +13,11 @@ import { ROUTES_CONSTANTS } from "@constants/routesurl";
 
 const DashboardStats = () => {
   const toast = useRef(null);
+  const location = useLocation();
+  const { isLogin } = location?.state || {};
+  const { t } = useTranslation("msg");
   const [loader, setLoader] = useState(false);
+  const navigate = useNavigate();
   const [counts, setCounts] = useState({
     productCounts: 0,
     categoryCounts: 0,
@@ -234,11 +240,25 @@ const DashboardStats = () => {
   };
 
   useEffect(() => {
+      if(isLogin){
+        toast.current.show({
+          severity: "success",
+          summary: t("success"),
+          detail: "You have successfully login",
+          life: 2000
+        });
+      };
+      navigate(location.pathname, { replace: true }); 
+
       fetchCounts();
   }, []);
 
   return (
-    <div className="overflow-y-scroll h-[88vh] mr-[-20px]">
+    <div className="overflow-y-scroll h-[88vh] custom-scroll" style={{
+        overflow: 'scroll',
+        scrollbarWidth: 'none',
+        msOverflowStyle: 'none'
+      }}>
       <Toast ref={toast} position="top-right" />
       <div className="flex gap-10 text-TextSecondaryColor">
         <div className="mt-4 flex w-[25%] bg-BgSecondaryColor border rounded border-BorderColor p-6">
@@ -304,7 +324,7 @@ const DashboardStats = () => {
             options={revenueByMonth.options}
             series={revenueByMonth.series}
             type="bar"
-            width="550"
+            width="500"
           />
         </div>
         <div className="flex justify-center p-6 bg-white border border-gray-200 rounded-lg shadow-sm"> 
@@ -312,7 +332,7 @@ const DashboardStats = () => {
             options={yearWiseRevenue.options} 
             series={yearWiseRevenue.series} 
             type="donut" 
-            width="500" 
+            width="400" 
           />
         </div>
       </div>
@@ -323,7 +343,7 @@ const DashboardStats = () => {
             options={winterReasonRevenue.options} 
             series={winterReasonRevenue.series} 
             type="donut" 
-            width="380" 
+            width="340" 
           />
         </div>
         <div className="flex justify-center p-6 bg-white border border-gray-200 rounded-lg shadow-sm">
@@ -331,7 +351,7 @@ const DashboardStats = () => {
             options={rainyReasonRevenue.options} 
             series={rainyReasonRevenue.series} 
             type="donut" 
-            width="380" 
+            width="340" 
           />
         </div>
         <div className="flex justify-center p-6 bg-white border border-gray-200 rounded-lg shadow-sm">
@@ -339,17 +359,17 @@ const DashboardStats = () => {
             options={summerReasonRevenue.options} 
             series={summerReasonRevenue.series} 
             type="donut" 
-            width="380" 
+            width="340" 
           />
         </div>
       </div>
-      <div className="grid grid-cols-2 gap-4 mt-16">
+      <div className="grid grid-cols-2 gap-4 mt-16 mb-4">
         <div className="flex justify-center p-6 bg-white border border-gray-200 rounded-lg shadow-sm">
           <Chart
               options={transactionByMonth.options}
               series={transactionByMonth.series}
               type="line"
-              width="550" 
+              width="500" 
           />
         </div>
         <div className="flex justify-center p-6 bg-white border border-gray-200 rounded-lg shadow-sm">
@@ -357,7 +377,7 @@ const DashboardStats = () => {
               options={comarisonOfRevenue.options}
               series={comarisonOfRevenue.series}
               type="area"
-              width="550" 
+              width="500" 
           />
         </div>
       </div>

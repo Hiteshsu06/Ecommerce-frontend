@@ -1,9 +1,19 @@
 import axios from 'axios';
 const apiBaseURL = 'http://localhost:3000';
 
-export const allApi = (dataurl, data, method) => {
+export const allApi = (dataurl, data, method, contentType) => {
     const headers = {
         'Content-Type': 'application/json',
+    }
+    if(contentType){
+        headers['Content-Type'] = 'multipart/form-data';
+        let requestData = new FormData();
+        Object.keys(data).forEach((key) => {
+            requestData.append(key, data[key]);
+        });
+        if ('post' === method) {
+            return axios.post(`${apiBaseURL}/${dataurl}`, requestData, { headers: headers });
+        }
     }
     if ('post' === method) {
         return axios.post(`${apiBaseURL}/${dataurl}`, JSON.stringify(data), { headers: headers });

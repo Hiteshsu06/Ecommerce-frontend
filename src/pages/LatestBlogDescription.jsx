@@ -1,6 +1,9 @@
 // Libararies
+import { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useTranslation } from "react-i18next";
+import { API_CONSTANTS } from "@constants/apiurl";
+import { allApi } from "@api/api";
 
 // Components
 import { refactorPrefilledDate } from '@helper';
@@ -11,38 +14,31 @@ const LatestBlogDescription = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { t } = useTranslation("msg");
+  const [menuList, setMenuList] = useState([]);
   const { image_url, heading, description, createdAt } = location.state || {};
-  const allCategories = [
-    {name: "Shop All", hover: false, items: [
-      {name: "Sweets", hover: false, items: [
-              {name: "All Sweets"},
-              {name: "Burfi"},
-              {name: "Mysore Pak"},
-              {name: "Laddu"},
-              {name: "Pak"},
-      ]},
-      {name: "Dry Fruits"},
-      {name: "Speciality"},
-      {name: "Snacks"},
-      {name: "Guilt Free"},
-      {name: "Grifting"}
-    ]},
-    {name: "Sweets"},
-    {name: "Namkeen", hover: false, items: [
-      {name: "All Namkeen"},
-      {name: "Northern Special"},
-      {name: "Southern Special"}
-    ]},
-    {name: "Dry Fruits"},
-    {name: "Gifting"},
-    {name: "About Us"},
-    {name: "Explore & Connect"}
-  ]
+ 
+  const fetchMenuList = () => {
+    return allApi(API_CONSTANTS.MENU_LIST_URL, "" , "get")
+    .then((response) => {
+      if (response.status === 200) {
+          let data = response?.data;
+          data.push({name: "About Us"});
+          setMenuList(data)
+      } 
+    })
+    .catch((err) => {
+    }).finally(()=>{
+    });
+  };
+
+  useEffect(()=>{
+    fetchMenuList();
+  },[])
 
   return (
     <div>
-      <Navbar categories={allCategories} fix={true}/>
-      <div className='px-24 relative'>
+      <Navbar data={menuList}/>
+      <div className='px-24 relative mt-[5rem]'>
         <img src={image_url} alt="blog-img" />
         <div className='bg-white absolute top-[85%] text-center left-[15%] px-12 w-[70%]'>
           <div className='uppercase mt-2'>{t("blogs")}</div>

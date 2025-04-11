@@ -99,15 +99,6 @@ const Sidebar = ({toggle}) => {
       }
     },
     {
-      label: t("reports"),
-      icon: "ri-layout-horizontal-line",
-      filledIcon: "ri-layout-horizontal-fill",
-      route: ROUTES_CONSTANTS.REPORTS,
-      command: () => {
-        navigate(ROUTES_CONSTANTS.REPORTS);
-      }
-    },
-    {
       label: t("reviews"),
       icon: "ri-draft-line",
       filledIcon: "ri-draft-fill",
@@ -174,7 +165,7 @@ const Sidebar = ({toggle}) => {
       {
           !toggle && <div className="flex width-full justify-center"><hr className="w-[90%]"/></div>
       }
-      <div className="px-4 h-[88vh] overflow-y-scroll">
+      <div className="px-4 h-[88vh] overflow-y-scroll overflow-x-hidden">
         <Menu
             model={items.map((item, index) => {
               return(

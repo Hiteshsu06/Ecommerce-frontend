@@ -73,6 +73,7 @@ const UserList = ({search}) => {
   };
 
   const confirmDialogbox = () => {
+    setLoader(true);
     setIsConfirm(!isConfirm);
     allApiWithHeaderToken(`${API_CONSTANTS.COMMON_USERS_URL}/${deleteId}`, '', "delete")
       .then((response) => {
@@ -87,6 +88,7 @@ const UserList = ({search}) => {
           detail: err?.response?.data?.errors,
           life: 3000,
         });
+        setLoader(false);
       });
   };
 

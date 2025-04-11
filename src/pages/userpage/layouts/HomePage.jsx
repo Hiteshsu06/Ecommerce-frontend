@@ -13,8 +13,11 @@ import AvailablityPlatform from '@userpage-layouts/AvailablityPlatform';
 import Benifits from '@userpage-layouts/Benifits';
 import DashboardProducts from '@userpage-layouts/DashboardProducts';
 import Collection from '@userpage-layouts/Collection';
+import Navbar from '@userpage/Navbar';
+import Footer from '@userpage/Footer';
 import { allApi } from "@api/api";
 import { API_CONSTANTS } from "@constants/apiurl";
+import Loading from '@common/Loading';
 
 const HomePage = () => {
   const [loader, setLoader] = useState(false);
@@ -22,7 +25,9 @@ const HomePage = () => {
   const [specialityData, setSpecialityData] = useState([]);
   const [giftingCollectionData, setGiftingCollectionData] = useState([]);
   const [allCategories, setAllCategories] = useState([]);
+  const [festSpecialList, setFestSpecialList] = useState([]);
   const [allProducts, setAllProducts] = useState([]);
+  const [menuList, setMenuList] = useState([]);
   
   useEffect(()=>{
     fetchData();
@@ -30,18 +35,26 @@ const HomePage = () => {
 
   const fetchData = async () => {
     setLoader(true);
+    const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+
     const promises = [
+      fetchMenuList(),
+      getFestSpecialData(),
       getAllCategoryData(),
       getGiftingCollectionData(),
       getSpecialityData(),
       getSnackData(),
-      getAllProducts()
+      getAllProducts(),
     ]
-    const settledResults = await Promise.allSettled(promises);
-    if(settledResults){
-      setLoader(false);
-    }
-  }
+
+    // Run API calls + delay in parallel
+    await Promise.allSettled([
+      Promise.allSettled(promises), // API calls
+      delay(1000) // 1-second delay
+    ]);
+
+    setLoader(false)
+  };
 
   const getAllCategoryData=()=>{
     return allApi(API_CONSTANTS.ALL_CATEGORY_URL, "", "get")
@@ -53,7 +66,7 @@ const HomePage = () => {
     .catch((err) => {
     }).finally(()=> {
     });
-  }
+  };
 
   const getSpecialityData=()=>{
     return allApi(API_CONSTANTS.SPECIALITY_CATEGORY_URL, "", "get")
@@ -65,7 +78,7 @@ const HomePage = () => {
     .catch((err) => {
     }).finally(()=> {
     });
-  }
+  };
 
   const getSnackData=()=>{
     return allApi(API_CONSTANTS.SNACK_RANGE_URL, "", "get")
@@ -77,7 +90,7 @@ const HomePage = () => {
     .catch((err) => {
     }).finally(()=> {
     });
-  }
+  };
 
   const getGiftingCollectionData=()=>{
     return allApi(API_CONSTANTS.GIFTING_CATEGORY_URL, "", "get")
@@ -89,7 +102,7 @@ const HomePage = () => {
     .catch((err) => {
     }).finally(()=> {
     });
-  }
+  };
 
   const getAllProducts=()=>{
     return allApi(API_CONSTANTS.ALL_PRODUCTS_URL, "", "get")
@@ -101,21 +114,55 @@ const HomePage = () => {
     .catch((err) => {
     }).finally(()=> {
     });
-  }
+  };
 
+  const fetchMenuList = () => {
+    return allApi(API_CONSTANTS.MENU_LIST_URL, "" , "get")
+    .then((response) => {
+      if (response.status === 200) {
+          let data = response?.data;
+          data.push({name: "About Us"});
+          setMenuList(data)
+      } 
+    })
+    .catch((err) => {
+    }).finally(()=>{
+    });
+  };
+
+  const getFestSpecialData = () => {
+    return allApi(API_CONSTANTS.ACTIVE_FEST_SPECIAL, "", "get")
+    .then((response) => {
+      if(response?.status === 200){
+        setFestSpecialList(response?.data)
+      }
+    })
+    .catch((err) => {
+    }).finally(()=> {
+    });
+  }
+  
   return (
     <>
-      <FestivalSpecial/>
-      <ShopOurRange data={allCategories}/>
-      <Benifits/>
-      <DashboardProducts data={allProducts}/>
-      <Collection data={giftingCollectionData}/>
-      <Speciality data={specialityData}/>
-      <TrustUs />
-      <ShopOurSnackRange title="Shop Our Snacks Range" data={snacksRangeData}/>  
-      <OurStory/>
-      <LatestBlog/>
-      <AvailablityPlatform/>
+      {loader ? <Loading/> : 
+      <>
+        <Navbar data={menuList}/>
+        <div className='mt-[5rem]'>
+          <FestivalSpecial data={festSpecialList}/>
+        </div>
+        <ShopOurRange data={allCategories}/>
+        <Benifits/>
+        <DashboardProducts data={allProducts}/>
+        <Collection data={giftingCollectionData}/>
+        <Speciality data={specialityData}/>
+        <TrustUs />
+        <ShopOurSnackRange title="Shop Our Snacks Range" data={snacksRangeData}/>  
+        <OurStory/>
+        <LatestBlog/>
+        <AvailablityPlatform/>
+        <Footer/>
+      </>
+      }
     </>
   )
 }

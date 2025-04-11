@@ -117,11 +117,12 @@ const OrderForm = () => {
     if(value?.address?.id){
       data['shipping_address_id'] = value?.address?.id;
     }else{
-      data['shipping_address_details'] = {
-        landmark: value?.landmark,
+      data['shipping_address'] = {
+        flat_no: value?.flatLandmark,
+        landmark: value?.flatLandmark,
         city: value?.city,
         state: value?.state,
-        zip_code: value?.zip_code,
+        zip_code: value?.zipCode,
         country: value?.country
       }
     };
@@ -283,7 +284,6 @@ const OrderForm = () => {
       allApiWithHeaderToken(`${API_CONSTANTS.COMMON_COUPON_URL}/check_user_coupon`, data , "post")
         .then((response) => {
           if (response.status === 200) {
-            console.log("response.",response?.data?.data?.discount_type)
             let discountedValue;
 
             if(response?.data?.data?.discount_type === 1){
@@ -670,7 +670,7 @@ const OrderForm = () => {
               </div>
               <div className="col-span-5 md:col-span-3">
                 {products.map((product, index) => (
-                  <div key={product.id} className="my-auto grid grid-cols-4 gap-4">
+                  <div key={product?.id} className="my-auto grid grid-cols-4 gap-4">
                     <div className="col-span-4 md:col-span-2">
                       <Dropdown
                         value={values?.products[index]?.product || ""}  // Default to "" if undefined

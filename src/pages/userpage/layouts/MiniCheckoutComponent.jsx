@@ -48,10 +48,10 @@ const MiniCheckoutComponent = () => {
             <p className="text-sm text-gray-500">Weight: <span className="font-[Tektur]">{item?.weight}</span></p>
             <p className="font-bold font-[Tektur]">₹ {item?.quantity * Number(item?.discountedPrice)} { item?.discountedPrice < item?.actualPrice ? <span className='ms-4 text-gray-500 font-thin line-through'>₹ {item?.actualPrice}</span> : null}</p>
             <div className="flex items-center gap-2 mt-2">
-              <div class="flex items-center border-2 border-[#caa446] rounded-md mt-2 overflow-hidden">
-                    <button class="px-3 py-2 text-lg hover:bg-gray-200 hover:cursor-pointer" onClick={() => updateQuantity(item.id, -1)} disabled={item?.quantity <= 1}>−</button>
-                        <span id="quantity" class="px-4 py-2 text-[13px] font-[Tektur]">{item?.quantity}</span>
-                    <button class="px-3 py-2 text-lg hover:bg-gray-200 hover:cursor-pointer" onClick={() => updateQuantity(item.id, 1)}>+</button>
+              <div className="flex items-center border border-[#caa446] rounded-md mt-2 overflow-hidden">
+                    <button className="px-3 py-2 text-lg hover:bg-gray-200 hover:cursor-pointer" onClick={() => updateQuantity(item.id, -1)} disabled={item?.quantity <= 1}>−</button>
+                        <span id="quantity" className="px-4 py-2 text-[13px] font-[Tektur]">{item?.quantity}</span>
+                    <button className="px-3 py-2 text-lg hover:bg-gray-200 hover:cursor-pointer" onClick={() => updateQuantity(item.id, 1)}>+</button>
               </div>
               <button onClick={() => removeItem(item.id)} className="text-red-500 ml-4 text-[20px]">
                     <i className="ri-delete-bin-line"></i>

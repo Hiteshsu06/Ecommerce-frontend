@@ -55,8 +55,12 @@ const CatergoryList = ({search}) => {
   const nameBodyTemplate= (rowData) => {
     return (
       <div className="flex items-center gap-4">
-        <div className="w-[60px] overflow-hidden h-[60px]">
-          <img src={rowData?.image_url ? rowData?.image_url : DefaultImage} alt="" width={80} style={{height: "100%"}}/>
+        <div className="w-12 h-12 overflow-hidden rounded-full">
+          <img 
+            src={rowData?.image_url ? rowData.image_url : DefaultImage} 
+            alt="Profile" 
+            className="w-full h-full object-cover" 
+          />
         </div>
         <span>{rowData?.name}</span>
       </div>
@@ -94,6 +98,7 @@ const CatergoryList = ({search}) => {
   };
 
   const confirmDialogbox = () => {
+    setLoader(true);
     setIsConfirm(!isConfirm);
     allApiWithHeaderToken(`${API_CONSTANTS.COMMON_CATEGORIES_URL}/${deleteId}`, '', "delete")
       .then((response) => {
@@ -108,6 +113,7 @@ const CatergoryList = ({search}) => {
           detail: err?.response?.data?.errors,
           life: 3000,
         });
+        setLoader(false);
       });
   };
 

@@ -5,6 +5,11 @@ export const ROUTES_CONSTANTS = {
     VIEW_BLOG_DESCRIPTION: "/view-blog",
     VIEW_COLLECTION_DESCRIPTION: "/collection",
     VIEW_PRODUCT_DESCRIPTION: "/product",
+    SIGN_IN: "/sign-in",
+    REGISTER: "/register",
+    PAYMENT: "/payment",
+    PAYMENT_CONFIRMED: "/payment-confirmed",
+    PAYMENT_REJECTED: "/payment-rejected",
     
     // Admin based routes
     LOGIN: "/login",

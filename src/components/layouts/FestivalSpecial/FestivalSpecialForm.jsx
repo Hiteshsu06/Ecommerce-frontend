@@ -1,6 +1,6 @@
 // components
 import ButtonComponent from "@common/ButtonComponent";
-import MultiselectComponent from "@common/MultiselectComponent";
+import PicklistComponent from "@common/PicklistComponent";
 import { allApiWithHeaderToken } from "@api/api";
 import InputTextComponent from "@common/InputTextComponent";
 import { API_CONSTANTS } from "@constants/apiurl";
@@ -14,7 +14,7 @@ import * as yup from "yup";
 import { useFormik } from "formik";
 import { useNavigate, useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { useEffect, useRef, useState } from "react";
+import { useLayoutEffect, useRef, useState } from "react";
 import { Toast } from "primereact/toast";
 
 const structure = {
@@ -35,12 +35,12 @@ const FestivalSpecialForm = () => {
   const navigate = useNavigate();
   const [data, setData] = useState(structure);
   const [loader, setLoader] = useState(false);
-  const [productList, setProductList] = useState([]);
+  const [source, setSource] = useState([]);
+  const [target, setTarget] = useState([]);
   const { id } = useParams();
 
   const validationSchema = yup.object().shape({
-    name: yup.string().required(t("name_is_required")),
-    description: yup.string().required(t("description_is_required"))
+    name: yup.string().required(t("name_is_required"))
   });
 
   const onHandleSubmit = async (value) => {
@@ -55,46 +55,40 @@ const FestivalSpecialForm = () => {
 
   const createFestProducts = (value) => {
     let data = {
-      name: value?.name,
-      description: value?.description,
-      status: 1,
-      image: value?.image
-    }
+        name: value?.name,
+        status: 0,
+        products: value?.products,
+        image: value?.image
+      }
     setLoader(true);
-    allApiWithHeaderToken(API_CONSTANTS.COMMON_CATEGORIES_URL, data , "post", 'multipart/form-data')
+    allApiWithHeaderToken(API_CONSTANTS.COMMON_FEST_PRODUCTS_URL, data , "post", 'multipart/form-data')
       .then((response) => {
         if (response.status === 201) {
-          navigate(ROUTES_CONSTANTS.CATEGORIES);
-        }
-      })
-      .catch((err) => {
-        toast.current.show({
-          severity: "error",
-          summary: "Error",
-          detail: err?.response?.data?.errors,
-          life: 3000,
-        });
-        setLoader(false);
-      }).finally(()=>{
-        setLoader(false);
-      });
+        navigate(ROUTES_CONSTANTS.FEST);
+      }
+    })
+    .catch((err) => {
+      setLoader(false);
+    }).finally(()=>{
+      setLoader(false);
+    });
   };
 
   const updateFestProducts = (value) => {
     setLoader(true);
     let body = {
       name: value?.name,
-      description: value?.description,
+      products: value?.products,
       status: Number(value?.status),
     }
     if(value?.image){
       body['image'] = value?.image
     }
 
-    allApiWithHeaderToken(`${API_CONSTANTS.COMMON_CATEGORIES_URL}/${id}`, body, "put", 'multipart/form-data')
+    allApiWithHeaderToken(`${API_CONSTANTS.COMMON_FEST_PRODUCTS_URL}/${id}`, body, "put", 'multipart/form-data')
       .then((response) => {
         if (response.status === 200) {
-          navigate(ROUTES_CONSTANTS.CATEGORIES);
+          navigate(ROUTES_CONSTANTS.FEST);
         }
       })
       .catch((err) => {
@@ -116,16 +110,57 @@ const FestivalSpecialForm = () => {
 
   const fetchProductList = async () => {
     setLoader(true); 
-    const productResponse = await allApiWithHeaderToken(API_CONSTANTS.COMMON_PRODUCTS_URL, "", "get");
-    if (productResponse.status === 200) { 
-      setProductList(productResponse?.data);
-      setLoader(false); 
-    } 
-  }
+    try {
+      const productResponse = await allApiWithHeaderToken(`${API_CONSTANTS.COMMON_PRODUCTS_URL}/active_product`, "", "get");
+      if (productResponse.status === 200) {  
+        setSource(productResponse?.data);
+        setLoader(false); 
+      } 
+      if (productResponse.status === 200 && id) {
+        // Fetch inventory data only if id exists
+        const festResponse = await allApiWithHeaderToken(`${API_CONSTANTS.COMMON_FEST_PRODUCTS_URL}/${id}`, "", "get");
+        if (festResponse.status === 200) {
+          // For Source/Target Picklist
+          let sourceData = [];
+          let targetData = [];
+          productResponse?.data?.forEach((item)=>{
+            if(festResponse?.data?.product_ids?.includes(Number(item?.id))){
+              targetData?.push(item);
+            }
+            else{
+              sourceData?.push(item);
+            }
+          });
+          setSource(sourceData);
+          setTarget(targetData);
 
-  useEffect(() => {
+          // Other Data
+          let resData = {
+            name: festResponse?.data?.name,
+            products: festResponse?.data?.product_ids,
+            status: festResponse?.data?.status,
+            image_url: festResponse?.data?.image_url,
+          };
+          setData(resData);
+        } 
+      }
+  
+    } catch (err) {
+      toast.current.show({
+        severity: "error",
+        summary: "Error",
+        detail: err?.response?.data?.errors,
+        life: 3000,
+      });
+      setLoader(false);
+    } finally {
+      setLoader(false);  // Stop loading after the operation is finished
+    }
+  };
+
+  useLayoutEffect(() => {
     fetchProductList();
-}, []);
+}, [id]);
 
   const formik = useFormik({
     initialValues: data,
@@ -138,7 +173,7 @@ const FestivalSpecialForm = () => {
   const { values, errors, handleSubmit, handleChange, setFieldValue, touched } = formik;
 
   return (
-    <div className="flex h-screen bg-BgPrimaryColor overflow-y-scroll">
+    <div className="flex h-screen bg-BgPrimaryColor py-5 overflow-y-scroll">
       {loader && <Loading/>}
       <Toast ref={toast} position="top-right" />
       <div className="mx-16 my-auto grid h-fit w-full grid-cols-4 gap-4 bg-BgSecondaryColor p-8 border rounded border-BorderColor">
@@ -170,40 +205,22 @@ const FestivalSpecialForm = () => {
             className="w-full rounded border-[1px] border-[#ddd] px-[1rem] py-[8px] text-[11px] focus:outline-none"
           />
         </div>
-        <div className="col-span-2">
-          <MultiselectComponent
+        <div className="col-span-4">
+          <PicklistComponent 
             value={values?.products}
-            options={productList} 
-            optionLabel="name"
             name="products"
-            onChange={(e) => {
-              setFieldValue("products", e.value);
-            }}
             placeholder={t("fest_products")}
-            display="chip"
+            onChange={(event) => {
+              setSource(event.source);
+              setTarget(event.target);
+              setFieldValue('products', event?.target?.map(product => Number(product.id)));
+            }}
+            source={source}
+            target={target}
             error={errors?.products}
             touched={touched?.products}
-            className="col-span-2 w-full rounded border-[1px] border-[#ddd] custom-dropdown focus:outline-none"
           />
         </div>
-        {
-          id && (
-            <>
-              <div className="col-span-2">
-              <Dropdown
-                  value={values?.status}
-                  onChange={(field, value) => setFieldValue(field, value)}
-                  data={statusList}
-                  placeholder={t("status")}
-                  name="status"
-                  className="custom-dropdown col-span-2 w-full rounded border-[1px] border-[#ddd] focus:outline-none"
-                  optionLabel="name"
-                />
-              </div>
-              <div className="col-span-2"></div>
-            </>
-          )
-        }
         <div className="col-span-3"></div>
         <div className="mt-4 flex justify-end gap-4">
           <ButtonComponent

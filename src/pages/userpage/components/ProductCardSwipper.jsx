@@ -8,7 +8,6 @@ import 'swiper/css/autoplay';
 import ProductCard from '@userpage-component';
 
 const ProductCardSwipper = ({data}) => {
-    console.log(data)
     return (
         <Swiper
             modules={[Autoplay]}
@@ -18,7 +17,7 @@ const ProductCardSwipper = ({data}) => {
         >
             <SwiperSlide>
                 {data.map((item) => (
-                    <div className="w-full h-60 bg-gray-200 rounded-lg" key={item.id}>
+                    <div className="w-full h-60 bg-gray-200 rounded-lg" key={item?.id}>
                         <ProductCard  data={item}/>
                     </div>
                 ))}

@@ -6,12 +6,13 @@ import { Toast } from "primereact/toast";
 
 // components
 import Breadcrum from "@common/Breadcrum";
-import NestedDatatable from "@common/NestedDatatable";
+import DataTable from "@common/DataTable";
 import ButtonComponent from "@common/ButtonComponent";
 import Confirmbox from "@common/Confirmbox";
 import { allApiWithHeaderToken } from "@api/api";
 import { ROUTES_CONSTANTS } from "@constants/routesurl";
 import { API_CONSTANTS } from "@constants/apiurl";
+import { CheckboxComponent } from "@common/CheckboxComponent";
 
 const FestivalSpecialList = ({search}) => {
   const toast = useRef(null);
@@ -20,6 +21,9 @@ const FestivalSpecialList = ({search}) => {
   const [isConfirm, setIsConfirm] = useState(false);
   const [deleteId, setDeleteId] = useState(null);
   const [loader, setLoader] = useState(false);
+  const [skip, setSkip] = useState(0);
+  const [limit, setLimit] = useState(5);
+  const [total, setTotal] = useState(0);
 
   const item = {
     heading: t("festival_special"),
@@ -48,44 +52,56 @@ const FestivalSpecialList = ({search}) => {
     );
   };
 
-  const statusBodyTemplate= (rowData) => {
+  const productBodyTemplate=(rowData)=>{
     return (
       <div className="flex items-center gap-4">
-        {rowData?.status === 1 ? <span className="text-[green]">Active</span> : <span className="text-[red]">Inactive</span>}
+        {rowData?.products}
       </div>
     );
   };
 
-  const nestedActionBodyTemplate = (rowData) => {
+  const statusChangedHandler=(id)=>{
+    setLoader(true);
+    let body = {
+      id: id
+    }
+  
+    allApiWithHeaderToken(`${API_CONSTANTS.COMMON_FEST_PRODUCTS_URL}/update_status`, body, "post")
+      .then((response) => {
+        if (response.status === 200) {
+          fetchFestProductsList();
+        }
+      })
+      .catch((err) => {
+        toast.current.show({
+          severity: "error",
+          summary: "Error",
+          detail: err?.response?.data?.errors,
+          life: 3000,
+        });
+        setLoader(false);
+      }).finally(()=>{
+        setLoader(false);
+      });
+  };
+
+  const festivalNameBodyTemplate=(rowData)=>{
     return (
-      <div className="flex">
-        <ButtonComponent
-          icon="ri-pencil-line"
-          className="text-[1rem]"
-          onClick={() => editFestProducts(rowData)}
-        />
-        <ButtonComponent
-          icon="ri-delete-bin-line"
-          className="text-[1rem]"
-          onClick={() => confirmDeleteFestProducts(rowData)}
-        />
+      <div className="flex items-center gap-4">
+        <CheckboxComponent onChange={()=> {statusChangedHandler(rowData?.id)}} checked={rowData?.status}/>
+        {rowData?.name}
       </div>
     );
   };
 
   const columns = [
-    { field: "name", header: t("festival_name")},
-    { header: t("status"), body: statusBodyTemplate },
+    { header: t("festival_name"), body: festivalNameBodyTemplate},
+    { header: t("products"), body: productBodyTemplate },
     { header: t("action"), body: actionBodyTemplate, headerStyle: { paddingLeft: '3%'} },
   ];
 
-  const nestedColumns = [
-    { field: "product_name", header: t("product_name")},
-    { header: t("action"), body: nestedActionBodyTemplate, headerStyle: { paddingLeft: '3%'} },
-  ];
-
   const editFestProducts = (item) => {
-    navigate(`/edit-category/${item?.id}`);
+    navigate(`${ROUTES_CONSTANTS.EDIT_FEST_PRODUCT}/${item?.id}`);
   };
 
   const confirmDeleteFestProducts = (item) => {
@@ -100,7 +116,7 @@ const FestivalSpecialList = ({search}) => {
 
   const confirmDialogbox = () => {
     setIsConfirm(!isConfirm);
-    allApiWithHeaderToken(`${API_CONSTANTS.COMMON_CATEGORIES_URL}/${deleteId}`, '', "delete")
+    allApiWithHeaderToken(`${API_CONSTANTS.COMMON_FEST_PRODUCTS_URL}/${deleteId}`, '', "delete")
       .then((response) => {
         if (response.status === 200) {
           fetchFestProductsList();
@@ -116,25 +132,6 @@ const FestivalSpecialList = ({search}) => {
       });
   };
 
-  function transformData(input) {
-      return input.map((item, index) => ({
-        key: `${index}`,
-        data: {
-          id: item?.id,
-          name: item?.name,
-          description: item?.description,
-          createdAt: item?.createdAt,
-          updatedAt: item?.updatedAt,
-        },
-        children: (item.children || []).map((child, childIndex) => ({
-          key: `${index}-${childIndex}`,
-          data: {
-            name: child.product_name
-          }
-        })),
-      }));
-    }
-
   const fetchFestProductsList = () => {
     setLoader(true);
     let body = {
@@ -142,48 +139,10 @@ const FestivalSpecialList = ({search}) => {
       skip: 0,
       limit:10
     }
-    allApiWithHeaderToken(`${API_CONSTANTS.COMMON_CATEGORIES_URL}/filter`, body , "post")
+    allApiWithHeaderToken(`${API_CONSTANTS.COMMON_FEST_PRODUCTS_URL}/filter`, body , "post")
       .then((response) => {
         if (response.status === 200) {
-          let nestedData = [
-            {
-                key: '0',
-                name: 'Documents',
-                data: 'Documents Folder',
-                icon: 'pi pi-fw pi-inbox',
-                children: [
-                    {
-                        key: '0-0',
-                        product_name: 'Work',
-                        data: 'Work Folder'
-                    },
-                    {
-                      key: '0-0',
-                      product_name: 'Work',
-                      data: 'Work Folder'
-                    },
-                ]
-            },
-            {
-                key: '1',
-                name: 'Events',
-                data: 'Events Folder',
-                icon: 'pi pi-fw pi-calendar',
-                children: [
-                  {
-                    key: '0-0',
-                    product_name: 'Work',
-                    data: 'Work Folder'
-                  },
-                  {
-                    key: '0-0',
-                    product_name: 'Work',
-                    data: 'Work Folder'
-                  },
-                ]
-          }]
-          let transformedData = transformData(nestedData);
-          setData(transformedData);
+          setData(response?.data?.data);
         } 
       })
       .catch((err) => {
@@ -207,6 +166,12 @@ const FestivalSpecialList = ({search}) => {
     navigate(ROUTES_CONSTANTS.CREATE_FEST_PRODUCT);
   };
 
+  const paginationChangeHandler = (skip, limit) => {
+    setSkip(skip);
+    setLimit(limit);
+    fetchFestProductsList(skip, limit);
+  };
+
   return (
     <div className="text-TextPrimaryColor">
       <Toast ref={toast} position="top-right" />
@@ -225,11 +190,14 @@ const FestivalSpecialList = ({search}) => {
         />
       </div>
       <div className="mt-4">
-        <NestedDatatable
+        <DataTable
           className="bg-BgPrimaryColor border rounded border-BorderColor"
           columns={columns}
-          nestedColumns={nestedColumns}
           data={data}
+          skip={skip}
+          rows={limit}
+          total={total}
+          paginationChangeHandler={paginationChangeHandler}
           loader={loader}
           showGridlines={true}
         />

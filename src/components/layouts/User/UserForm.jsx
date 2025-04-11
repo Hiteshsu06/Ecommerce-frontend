@@ -62,7 +62,6 @@ const UserForm = () => {
         }) ;
 
     const onHandleSubmit = (value) => {
-        console.log("id",id)
         if (id) {
           // Update User
           updateUser(value);
@@ -122,7 +121,6 @@ const UserForm = () => {
         allApiWithHeaderToken(`${API_CONSTANTS.COMMON_USERS_URL}/${id}`, body, "put", 'multipart/form-data' )
           .then((response) => {
             if (response.status === 200) {
-              console.log("response", response)
               navigate(ROUTES_CONSTANTS.USERS);
             }
           })
@@ -162,7 +160,6 @@ const UserForm = () => {
               allApiWithHeaderToken(`${API_CONSTANTS.COMMON_USERS_URL}/${id}`, "", "get")
               .then((response) => {
                 if (response.status === 200) {
-                    console.log("data",response)
                     let data = {
                         name: response?.data?.name,
                         gender: response?.data?.gender,

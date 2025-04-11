@@ -16,6 +16,8 @@ export const API_CONSTANTS = {
     COMMON_ADRESESS_URL: "api/v1/addresses",
     COMMON_ADMIN_DASHBOARD_URL: "api/v1/dashboard",
     COMMON_BLOGS_URL: "api/v1/blogs",
+    COMMON_PRODUCT_REVIEW_URL: "api/v1/product_reviews",
+    COMMON_FEST_PRODUCTS_URL: "api/v1/fest_specials",
 
     // General use
     BLOGS_URL: "api/v1/user_dashboard/latest_blogs",
@@ -27,4 +29,8 @@ export const API_CONSTANTS = {
     MENU_LIST_URL: "api/v1/user_dashboard/nav_menu_list",
     GET_PRODUCT_BY_SUBCATEGORY_ID_URL: "api/v1/user_dashboard/get_products_by_subcategory",
     ALL_SUB_CATEGORY_URL : "api/v1/user_dashboard/all_sub_categories",
+    PRODUCT_REVIEW_URL : "api/v1/user_dashboard/add_user_review",
+    PRODUCT_REVIEW_BY_ID_URL : "api/v1/user_dashboard/get_product_review_by_id",
+    ACTIVE_FEST_SPECIAL: "api/v1/user_dashboard/get_active_fest_special",
+    SUBSCRIBE_USER_BY_MAIL_URL: "api/v1/user_dashboard/subscribe_user_by_email",
 }

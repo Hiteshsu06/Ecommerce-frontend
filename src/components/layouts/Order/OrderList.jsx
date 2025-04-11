@@ -93,6 +93,7 @@ const OrderList = ({search}) => {
   };
 
   const confirmDialogbox = () => {
+    setLoader(true);
     setIsConfirm(!isConfirm);
     allApiWithHeaderToken(`${API_CONSTANTS.COMMON_ORDER_URL}/${deleteId}`, '', "delete")
       .then((response) => {
@@ -107,7 +108,8 @@ const OrderList = ({search}) => {
           detail: err?.response?.data?.errors,
           life: 3000,
         });
-      });
+        setLoader(false);
+      })
   };
 
   const fetchOrderList = (sk=skip, li=limit) => {

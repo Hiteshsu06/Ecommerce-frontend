@@ -25,7 +25,7 @@ const Collection = ({data}) => {
         loop={true}
         >
         {data.map((item) => (
-            <SwiperSlide key={item.id}>
+            <SwiperSlide key={item?.id}>
                 <CollectionCard data={item} />
             </SwiperSlide>
         ))}

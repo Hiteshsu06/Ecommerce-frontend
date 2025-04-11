@@ -90,6 +90,7 @@ const DiscountList = ({search}) => {
   };
 
   const confirmDialogbox = () => {
+    setLoader(true);
     setIsConfirm(!isConfirm);
     allApiWithHeaderToken(`${API_CONSTANTS.COMMON_DISCOUNT_URL}/${deleteId}`, '', "delete")
       .then((response) => {
@@ -104,6 +105,7 @@ const DiscountList = ({search}) => {
           detail: err?.response?.data?.errors,
           life: 3000,
         });
+        setLoader(false);
       });
   };
 

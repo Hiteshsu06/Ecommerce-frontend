@@ -1,9 +1,10 @@
-import { ProgressSpinner } from 'primereact/progressspinner';
-
-const Loading = ({width}) => {
+const Loading = () => {
   return (
-    <div className={`flex items-center justify-content-center absolute z-10 bg-[rgb(236 236 241 / 50%)] h-[70vh] ${width ? width : 'w-full'}`}>
-        <ProgressSpinner style={{width: '50px', height: '50px'}} className='text-BgTertiaryColor'/>
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-white">
+      <div className="relative flex flex-col items-center justify-center">
+        <div className="h-16 w-16 animate-spin rounded-full border-4 border-gray-200 border-t-[#caa446]"></div>
+        <span className="mt-2 text-sm font-medium hidden sm:block">loading...</span>
+      </div>
     </div>
   )
 }

@@ -19,7 +19,7 @@ const DashboardProducts = ({data}) => {
             loop={true}
             >
             {data.map((item) => (
-                <SwiperSlide key={item.id}>
+                <SwiperSlide key={item?.id}>
                     <ProductBuyCard data={item} />
                 </SwiperSlide>
             ))}

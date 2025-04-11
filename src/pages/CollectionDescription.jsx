@@ -6,6 +6,7 @@ import { ROUTES_CONSTANTS } from "@constants/routesurl";
 import { allApi } from "@api/api";
 
 // Components
+import Loading from '@common/Loading';
 const Navbar = lazy(() => import("@userpage/Navbar"));
 const Footer = lazy(() => import("@userpage/Footer"));
 const ProductBuyCard = lazy(() => import("@userpage-components/ProductBuyCard"));
@@ -24,6 +25,7 @@ const CollectionDescription = () => {
   const [categories, setCategories] = useState([]);
   const [products, setProducts] = useState([]);
   const [loader, setLoader] = useState(false);
+  const [menuList, setMenuList] = useState([]);
   const navigate = useNavigate();
 
   useEffect(()=>{
@@ -34,7 +36,8 @@ const CollectionDescription = () => {
     setLoader(true);
     const promises = [
       getAllCategories(),
-      getCategoryProducts()
+      getCategoryProducts(),
+      fetchMenuList()
     ]
     const settledResults = await Promise.allSettled(promises);
     if(settledResults){
@@ -71,7 +74,6 @@ const CollectionDescription = () => {
   };
 
   const collectionDescription=(item)=>{
-    console.log("item",item)
     navigate(
         `${ROUTES_CONSTANTS.VIEW_COLLECTION_DESCRIPTION}/${item?.name}`, 
     { 
@@ -79,12 +81,28 @@ const CollectionDescription = () => {
         category_id: item?.id,
         name: item?.name
     } })
-  }
+  };
+
+  const fetchMenuList = () => {
+    return allApi(API_CONSTANTS.MENU_LIST_URL, "" , "get")
+    .then((response) => {
+      if (response.status === 200) {
+          let data = response?.data;
+          data.push({name: "About Us"});
+          setMenuList(data)
+      } 
+    })
+    .catch((err) => {
+    }).finally(()=>{
+    });
+  };
 
   return (
     <>
-        <Navbar fix={true}/>
-        <div className="bg-[#fdfaf2] text-center py-8">
+    {loader ? <Loading/> : 
+      <>
+        <Navbar data={menuList}/>
+        <div className="bg-[#fdfaf2] text-center py-8 mt-[5rem]">
             {/* Breadcrumb */}
             <nav className="text-gray-600 text-[16px]">
                 <span className='hover:cursor-pointer' onClick={()=>{ navigate("/") }}>Home</span> <span className='px-4'>&gt;</span> <span className="text-gray-600 hover:cursor-pointer">{name}</span>
@@ -96,7 +114,7 @@ const CollectionDescription = () => {
             {/* Features Section */}
             <div className="flex justify-evenly items-center mt-6 w-full">
                 {features?.map((feature, index) => (
-                <div key={index} className="flex flex-col items-center">
+                <div key={feature?.id} className="flex flex-col items-center">
                     {/* Icon Wrapper */}
                     <div className="w-14 h-14 bg-[#b89550] text-white flex items-center justify-center rounded-full text-2xl">
                     <i className={`${feature.icon}`}></i>
@@ -111,7 +129,7 @@ const CollectionDescription = () => {
         <div className="bg-[#fdfaf2] py-8 px-4">
             <div className="grid grid-cols-3 md:grid-cols-6 gap-6">
                 {categories?.map((item, index) => (
-                <div key={index} className="text-center">
+                <div key={item?.id} className="text-center">
                     {/* Image */}
                     <div className="relative">
                     <img onClick={() => { collectionDescription(item?.category) }}
@@ -143,6 +161,8 @@ const CollectionDescription = () => {
         <div>
           <Footer/>
         </div>
+      </>
+    }
     </>
   )
 }

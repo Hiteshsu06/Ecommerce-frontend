@@ -57,17 +57,6 @@ const ProductList = ({search}) => {
     );
   };
 
-  const nameBodyTemplate= (rowData) => {
-    return (
-      <div className="flex items-center gap-4">
-        <div className="min-w-[60px] overflow-hidden h-[60px]">
-          <img src={rowData?.image_url ? rowData?.image_url : DefaultImage} alt="" width={80} style={{height: "100%"}}/>
-        </div>
-        <span>{rowData?.name}</span>
-      </div>
-    );
-  };
-
   const statusBodyTemplate= (rowData) => {
     return (
       <div className="flex items-center gap-4">
@@ -118,7 +107,6 @@ const ProductList = ({search}) => {
           detail: err?.response?.data?.errors,
           life: 3000,
         });
-      }).finally(()=>{
         setLoader(false);
       });
   };
@@ -263,7 +251,6 @@ const ProductList = ({search}) => {
   return (
     <div className="text-TextPrimaryColor">
       <Toast ref={toast} position="top-right" />
-      {loader && <Loading/>}
       <Confirmbox
         isConfirm={isConfirm}
         closeDialogbox={closeDialogbox}

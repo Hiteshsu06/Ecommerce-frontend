@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 
 // Components
 import { ROUTES_CONSTANTS } from "@constants/routesurl";
+import Image from "@common/Image";
 
 const CollectionCard = ({ data }) => {
   const { t } = useTranslation("msg");
@@ -21,13 +22,14 @@ const CollectionCard = ({ data }) => {
   }
 
   return (
-    <div className="flex flex-col cursor-pointer select-none">
+    <div className="flex flex-col cursor-pointer select-none pb-1">
         <div className='flex-shrink-0 w-full h-[30rem] rounded-lg overflow-hidden bg-white shadow-md card aspect-[0.7171875]'>
-            <img
+            <Image
                 src={data?.image_url}
                 className="w-full h-full object-cover"
                 alt={data?.name}
                 draggable="false"
+                onClick={() => { collectionDescription(data) }}
             />
         </div>
         <div className="p-4">

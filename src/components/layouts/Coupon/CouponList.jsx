@@ -76,6 +76,7 @@ const CouponList = ({search}) => {
 
   const confirmDialogbox = () => {
     setIsConfirm(!isConfirm);
+    setLoader(true);
     allApiWithHeaderToken(`${API_CONSTANTS.COMMON_COUPON_URL}/${deleteId}`, '', "delete")
       .then((response) => {
         if (response.status === 200) {
@@ -89,6 +90,7 @@ const CouponList = ({search}) => {
           detail: err?.response?.data?.errors,
           life: 3000,
         });
+        setLoader(false);
       });
   };
 
