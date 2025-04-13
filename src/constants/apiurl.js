@@ -2,6 +2,8 @@ export const API_CONSTANTS = {
     SIGNUP: "users",
     LOGIN: "users/sign_in",
     LOGOUT: "users/sign_out",
+    FORGOT_PASSWORD: "users/password",
+    RESET_PASSWORD: "users/password",
 
     // Admin use
     COMMON_CATEGORIES_URL: "api/v1/categories",
@@ -33,4 +35,7 @@ export const API_CONSTANTS = {
     PRODUCT_REVIEW_BY_ID_URL : "api/v1/user_dashboard/get_product_review_by_id",
     ACTIVE_FEST_SPECIAL: "api/v1/user_dashboard/get_active_fest_special",
     SUBSCRIBE_USER_BY_MAIL_URL: "api/v1/user_dashboard/subscribe_user_by_email",
+    SEND_PHONE_OTP_URL: "api/v1/user_dashboard/send_user_otp",
+    VERIFY_PHONE_OTP_URL: "api/v1/user_dashboard/verify_user_otp",
+    PAYMENT_INTENT_CREATE: "api/v1/payment_transactions/create_payment_intent"
 }

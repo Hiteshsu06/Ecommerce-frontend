@@ -7,6 +7,7 @@ import InputTextComponent from "@common/InputTextComponent";
 import { allApi } from "@api/api";
 import Loading from '@common/Loading';
 import { API_CONSTANTS } from "@constants/apiurl";
+import { ROUTES_CONSTANTS } from "@constants/routesurl";
 
 // external libraries
 import * as yup from "yup";
@@ -27,7 +28,7 @@ const ResetPassword = () => {
   const [toastType, setToastType] = useState('');
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const token = searchParams.get('token');
+  const token = searchParams.get("token");
 
   const validationSchema = yup.object().shape({
     password: yup
@@ -48,13 +49,16 @@ const ResetPassword = () => {
 
   const onHandleSubmit = async (value) => {
     let body = {
-      newPassword: value?.password,
-      token: token
+      user: {
+        password: value?.password,
+        reset_password_token: token,
+        password_confirmation: value?.confirmPassword
+      }
     }
     setLoader(true);
-    allApi(API_CONSTANTS.RESET_PASSWORD, body, "post")
+    allApi(API_CONSTANTS.RESET_PASSWORD, body, "put")
     .then((response) => {
-      if(response?.status === 201 && response?.data?.status === "success"){
+      if(response?.status === 200){
         setToastType('success');
         toast.current.show({
           severity: "success",
@@ -72,7 +76,7 @@ const ResetPassword = () => {
 
   const toastHandler=()=>{
     if (toastType === 'success') {
-        navigate('/');
+      navigate(ROUTES_CONSTANTS.LOGIN); 
      }
   };
 
@@ -100,7 +104,7 @@ const ResetPassword = () => {
               value={values?.password}
               onChange={handleChange}
               type="password"
-              placeholder={t("your_password")}
+              placeholder={t("password")}
               name="password"
               error={errors?.password}
               touched={touched?.password}
@@ -112,7 +116,7 @@ const ResetPassword = () => {
               value={values?.confirmPassword}
               onChange={handleChange}
               type="password"
-              placeholder={t("your_confirm_password")}
+              placeholder={t("confirm_password")}
               name="confirmPassword"
               error={errors?.confirmPassword}
               touched={touched?.confirmPassword}

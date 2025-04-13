@@ -1,53 +1,155 @@
 // Utils
-import { useState } from "react";
-import { useFormik } from "formik";
-import { useNavigate } from "react-router-dom";
+import React, {useState} from 'react';
+import { useNavigate, useLocation } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import * as yup from "yup";
+import { loadStripe } from '@stripe/stripe-js';
+import {
+  PaymentElement,
+  Elements,
+  useStripe,
+  useElements,
+} from '@stripe/react-stripe-js';
+
+// Components
+import { API_CONSTANTS } from "@constants/apiurl";
+import { allApiWithHeaderToken } from "@api/api";
+import { ROUTES_CONSTANTS } from "@constants/routesurl";
+
+const CheckoutForm = () => {
+  const stripe = useStripe();
+  const elements = useElements();
+  const navigate = useNavigate();
+  const location = useLocation();
+  const { t } = useTranslation("msg");
+  const { order } = location?.state || {};
+  const [errorMessage, setErrorMessage] = useState(null);
+  const [isProcessing, setIsProcessing] = useState(false);
+
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+  
+    if (elements == null) {
+      return;
+    }
+  
+    setIsProcessing(true); // Show processing state
+  
+    try {
+      // Call elements.submit() first
+      const submitResult = await elements.submit();
+  
+      if (submitResult.error) {
+        setErrorMessage(submitResult.error.message); // Show error message from submission
+        setIsProcessing(false); // Hide processing state
+        return;
+      }
+
+      let body ={
+        amount: order?.total_price + order?.handling_fee + order?.tax_price
+      }
+  
+      // Make an API call to create the payment intent and get the client secret
+      const response = await allApiWithHeaderToken(API_CONSTANTS.PAYMENT_INTENT_CREATE, body, "post");
+  
+      // Check if the response was successful and get the client_secret
+      if (response?.status === 200 && response?.data?.client_secret) {
+        const clientSecret = response.data.client_secret;  // Extract the client_secret
+  
+        // Now, confirm the payment using the client_secret
+        const { error, paymentIntent } = await stripe.confirmPayment({
+          elements,
+          clientSecret,
+          confirmParams: {
+            return_url: window?.location?.origin + ROUTES_CONSTANTS.PAYMENT_CONFIRMED, // Pass return_url here for Stripe
+          },
+           redirect: "if_required"
+        });
+  
+        if (error) {
+          setErrorMessage(error.message); // Show error message to the user
+        } else {
+          // paymentIntent.status will help you check the payment status
+          if (paymentIntent.status === 'succeeded') {
+              allApiWithHeaderToken(API_CONSTANTS.COMMON_ORDER_URL, order , "post")
+              .then((response) => {
+                console.log("response",response)
+                navigate(ROUTES_CONSTANTS.PAYMENT_CONFIRMED, { 
+                  state: { 
+                          order: order
+                      } 
+                });
+              })
+              .catch((err) => {
+              }).finally(()=>{
+              }); 
+          } else {
+            // Payment failed or was canceled
+            setErrorMessage('Payment failed, please try again.'); // Show failure message
+          }
+        }
+      } else {
+        setErrorMessage("Failed to retrieve client secret from server.");
+      }
+    } catch (error) {
+      console.log("error",error)
+        // navigate(ROUTES_CONSTANTS.PAYMENT_REJECTED);
+        setErrorMessage("An error occurred while processing your payment.");
+    } finally {
+      setIsProcessing(false); // Hide processing state
+    }
+  };
+  
+  return (
+    <form onSubmit={handleSubmit}>
+      <PaymentElement />
+      <button
+        type="submit"
+        className="w-full mt-4 bg-blue-500 text-white py-3 px-4 rounded hover:bg-blue-600 transition duration-200"
+        >
+        {`Pay ₹ ${order?.total_price + order?.handling_fee + order?.tax_price}`}
+      </button>
+      <p className="text-[0.8rem] text-gray-500 text-center mt-4">
+        {t("you_will_be_redirected_to_stripe_to_complete_your_payment")}
+      </p>
+      {/* Show error message to your customers */}
+      {errorMessage && <div>{errorMessage}</div>}
+    </form>
+  );
+};
 
 const Payment = () => {
   const navigate = useNavigate();
-  const [loading, setLoading] = useState(false);
-  const [orderDetails, setOrderDetails] = useState({
-    orderTotal: 1000,
-    orderItems: []
-  });
+  const location = useLocation();
+  const { order } = location?.state || {};
+  const userDetails = JSON.parse(localStorage.getItem("userDetails"));
   const { t } = useTranslation("msg");
 
-  const validationSchema = yup.object().shape({
-    cardName: yup.string().required("Cardholder name is required"),
-    cardNumber: yup
-      .string()
-      .matches(/^\d{16}$/, "Card number must be 16 digits")
-      .required("Card number is required"),
-    expDate: yup
-      .string()
-      .matches(/^(0[1-9]|1[0-2])\/\d{2}$/, "Invalid expiration date")
-      .required("Expiration date is required"),
-    cvv: yup
-      .string()
-      .matches(/^\d{3}$/, "CVV must be 3 digits")
-      .required("CVV is required"),
-  });
+  // stripe
+  
+  const stripePromise = loadStripe('pk_test_51RDAUiCpms7NHvWSBlZRktPM4SBH5YbgOo0gWHgfoM5qYLArs1fe55YtX4MW1DS1OdyhMXDKTDWXTfoHLavvoQQn00Nox9H4x6');
+  const options = {
+    mode: 'payment',
+    amount: 1099,
+    currency: 'usd',
+    // Fully customizable with appearance API.
+    appearance: {
+      /*...*/
+    },
+    wallets: {
+      applePay: 'auto',
+      googlePay: 'auto'
+    },
+    enableLink: false
+  };
 
-  const formik = useFormik({
-    initialValues: {
-      cardName: "",
-      cardNumber: "",
-      expDate: "",
-      cvv: "",
-    },
-    validationSchema,
-    onSubmit: (values) => {
-      setLoading(true);
-      // Simulate payment processing
-      setTimeout(() => {
-        setLoading(false);
-        alert("Payment Successful!");
-        navigate("/success"); // Redirect after payment
-      }, 2000);
-    },
-  });
+  // Deivery Date
+  const today = new Date();
+  const fiveDaysFromToday = new Date();
+  fiveDaysFromToday.setDate(today.getDate() + 5);
+  const eightDaysFromToday = new Date();
+  eightDaysFromToday.setDate(today.getDate() + 8);
+  const optionsDate = { month: 'long', day: 'numeric' };
+  const formattedRange = `${fiveDaysFromToday.toLocaleDateString("en-US", optionsDate)}–${eightDaysFromToday.toLocaleDateString("en-US", optionsDate)}, ${today.getFullYear()}`;
 
   return (
     <div className="container max-w-4xl mx-auto px-4 py-8 md:py-12">
@@ -65,92 +167,9 @@ const Payment = () => {
         <div className="grid grid-cols-1 lg:grid-cols-5 gap-8">
           {/* Left column - Payment form */}
           <div className="lg:col-span-3 space-y-6">
-            <section>
-              <h2 className="font-semibold text-gray-800 mb-4 text-[1rem]">{t("payment_method")}</h2>
-              <div className="flex items-center mb-6 p-3 border rounded-md bg-blue-50">
-                <i className="ri-bank-card-line h-6 w-4 text-blue-600 mr-2"></i>
-                <span className="font-medium text-[0.9rem]">{t("debit_card")}</span>
-              </div>
-
-              <form onSubmit={formik.handleSubmit} className="space-y-4">
-                <div>
-                  <label className="block font-medium text-gray-700 text-[0.8rem]">{t("cardholder_name")}</label>
-                  <input
-                    type="text"
-                    name="cardName"
-                    placeholder="John Smith"
-                    onChange={formik.handleChange}
-                    onBlur={formik.handleBlur}
-                    value={formik.values.cardName}
-                    className="text-[0.8rem] w-full border border-gray-300 px-4 py-2 focus:outline-none focus:ring-1 focus:ring-gray-700 mt-1"
-                  />
-                  {formik.touched.cardName && formik.errors.cardName && (
-                    <p className="text-red-500 text-[0.8rem]">{formik.errors.cardName}</p>
-                  )}
-                </div>
-
-                <div>
-                  <label className="block text-[0.8rem] font-medium text-gray-700">{t("card_number")}</label>
-                  <input
-                    type="text"
-                    name="cardNumber"
-                    placeholder="1234 5678 9012 3456"
-                    onChange={formik.handleChange}
-                    onBlur={formik.handleBlur}
-                    value={formik.values.cardNumber}
-                    className="text-[0.8rem] w-full border border-gray-300 px-4 py-2 focus:outline-none focus:ring-1 focus:ring-gray-700 mt-1"
-                  />
-                  {formik.touched.cardNumber && formik.errors.cardNumber && (
-                    <p className="text-red-500 text-[0.8rem]">{formik.errors.cardNumber}</p>
-                  )}
-                </div>
-
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-[0.8rem] font-medium text-gray-700">{t("expiration_date")}</label>
-                    <input
-                      type="text"
-                      name="expDate"
-                      placeholder="MM/YY"
-                      onChange={formik.handleChange}
-                      onBlur={formik.handleBlur}
-                      value={formik.values.expDate}
-                      className="text-[0.8rem] w-full border border-gray-300 px-4 py-2 focus:outline-none focus:ring-1 focus:ring-gray-700 mt-1"
-                    />
-                    {formik.touched.expDate && formik.errors.expDate && (
-                      <p className="text-red-500 text-[0.8rem]">{formik.errors.expDate}</p>
-                    )}
-                  </div>
-
-                  <div>
-                    <label className="block text-[0.8rem] font-medium text-gray-700">{t("cvv")}</label>
-                    <input
-                      type="password"
-                      name="cvv"
-                      placeholder="123"
-                      onChange={formik.handleChange}
-                      onBlur={formik.handleBlur}
-                      value={formik.values.cvv}
-                      className="text-[0.8rem] w-full border border-gray-300 px-4 py-2 focus:outline-none focus:ring-1 focus:ring-gray-700 mt-1"
-                    />
-                    {formik.touched.cvv && formik.errors.cvv && (
-                      <p className="text-red-500 text-[0.8rem]">{formik.errors.cvv}</p>
-                    )}
-                  </div>
-                </div>
-
-                <button
-                  type="submit"
-                  disabled={loading}
-                  className="w-full bg-blue-500 text-white py-3 px-4 rounded hover:bg-blue-600 transition duration-200"
-                >
-                  {loading ? t("processing") : `Pay ${orderDetails?.orderTotal}`}
-                </button>
-                <p className="text-[0.8rem] text-gray-500 text-center mt-4">
-                  {t("you_will_be_redirected_to_stripe_to_complete_your_payment")}
-                </p>
-              </form>
-            </section>
+             <Elements stripe={stripePromise} options={options}>
+              <CheckoutForm />
+            </Elements>
           </div>
 
           {/* Right column - Order summary */}
@@ -158,29 +177,20 @@ const Payment = () => {
             <section className="bg-gray-50 p-6 rounded-md">
               <h2 className="font-semibold text-gray-800 mb-4 text-[1rem]">{t("order_summary")}</h2>
               
-              <div className="space-y-3">
-                {orderDetails?.orderItems?.map((item) => (
-                  <div key={item?.id} className="flex justify-between text-sm">
-                    <span>{item?.name} (x{item?.quantity})</span>
-                    <span className="font-medium">{item?.price}</span>
-                  </div>
-                ))}
-              </div>
-              
               <hr className="my-4" />
               
               <div className="space-y-2">
                 <div className="flex justify-between text-sm">
                   <span>{t("subtotal")}</span>
-                  <span>$109.95</span>
+                  <span>₹ {order?.total_price}</span>
                 </div>
                 <div className="flex justify-between text-sm">
                   <span>{t("shipping")}</span>
-                  <span>$10.00</span>
+                  <span>₹ {order?.handling_fee}</span>
                 </div>
                 <div className="flex justify-between text-sm">
                   <span>{t("tax")}</span>
-                  <span>$5.00</span>
+                  <span>₹ {order?.tax_price}</span>
                 </div>
               </div>
               
@@ -188,19 +198,19 @@ const Payment = () => {
               
               <div className="flex justify-between font-bold text-[0.9rem]">
                 <span>{t("total")}</span>
-                <span>${orderDetails?.orderTotal}</span>
+                <span>₹ {order?.total_price + order?.handling_fee + order?.tax_price}</span>
               </div>
             </section>
 
             <section className="bg-gray-50 p-6 rounded-md">
               <h2 className="text-[1rem] font-semibold text-gray-800 mb-4">{t("shipping")}</h2>
               <address className="not-italic text-[0.8rem]">
-                <p className="font-medium">Alex Johnson</p>
-                <p>123 Main Street</p>
-                <p>San Francisco, CA 94105</p>
-                <p>United States</p>
+                <p className="font-medium">{userDetails?.name}</p>
+                <p>{order?.flat_no} {order?.city}</p>
+                <p>{order?.zip_code} {order?.state}</p>
+                <p>{order?.country}</p>
               </address>
-              <p className="text-gray-500 mt-2 text-[0.8rem]">{t("estimated_delivery")}: April 8-10, 2025</p>
+              <p className="text-gray-500 mt-2 text-[0.8rem]">{t("estimated_delivery")}: {formattedRange}</p>
             </section>
           </div>
         </div>

@@ -30,6 +30,9 @@ const PaymentConfirmed = lazy(() => import("@pages/PaymentConfirmed"));
 const PaymentRejected = lazy(() => import("@pages/PaymentRejected"));
 const SignIn = lazy(() => import("@pages/SignIn"));
 const Register = lazy(() => import("@pages/Register"));
+const UserProfilePage = lazy(() => import("@pages/UserProfilePage"));
+const UserHelpPage = lazy(() => import("@pages/UserHelpPage"));
+const UserResetPasswordPage = lazy(() => import("@pages/UserResetPasswordPage"));
 
 function App() {
   const theme = localStorage.getItem('theme');
@@ -51,6 +54,9 @@ function App() {
           <Route path="/payment-rejected" element={<PaymentRejected />}/>
           <Route path="/sign-in" element={<SignIn />}/>
           <Route path="/register" element={<Register />}/>
+          <Route path="/edit-profile" element={<UserProfilePage />}/>
+          <Route path="/user-help" element={<UserHelpPage />}/>
+          <Route path="/user-reset-password" element={<UserResetPasswordPage />}/>
           
           {/* Routes for admin screen */}
           <Route path="/dashboard/*" element={<DashboardPage />}/>

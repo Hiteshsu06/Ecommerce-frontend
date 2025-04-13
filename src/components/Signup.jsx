@@ -60,7 +60,8 @@ const Signup = () => {
         name: value.name,
         email: value.email,
         password: value.password,
-        phone_number: value.phoneNumber
+        phone_number: value.phoneNumber, 
+        role_id: 1
       });
       allApi(API_CONSTANTS.SIGNUP, body, "post")
       .then((response) => {

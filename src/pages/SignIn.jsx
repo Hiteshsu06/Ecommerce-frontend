@@ -26,6 +26,8 @@ const SignInRegister = () => {
   const [data, setData] = useState(initialValues);
   const [menuList, setMenuList] = useState([]);
   const [isLoginScreen, setIsLoginScreen] = useState(false);
+  const [isloggedIn, setIsLoggedId] = useState(false);
+  const [isForgotPasswordSent, setIsForgotPasswordSent] = useState(false);
 
   const validationSchema = yup.object().shape({
     email: yup.string().required(t("email_is_required")),
@@ -33,20 +35,6 @@ const SignInRegister = () => {
       ? yup.string()
       : yup.string().required(t("password_is_required"))
   });
-
-  const onHandleSubmit = (value) => {
-    signinCustomer(value);
-  };
-
-  const formik = useFormik({
-    initialValues: data,
-    onSubmit: onHandleSubmit,
-    validationSchema: validationSchema,
-    enableReinitialize: true,
-    validateOnBlur: true,
-  });
-
-  const { values, errors, handleSubmit, handleChange, touched } = formik;
 
   const fetchMenuList = () => {
     setLoader(true);
@@ -65,14 +53,61 @@ const SignInRegister = () => {
     });
   };
 
-  const signinCustomer = () =>{
+  const onHandleSubmit = (value) =>{
     if(isLoginScreen){
-      // Forgot Pasword api
+      // for Password Reset screen
+      let body = {
+        user: {
+          email: value?.email
+        }
+      }
+      setLoader(true);
+      allApi(API_CONSTANTS.FORGOT_PASSWORD, body, "post")
+      .then((response) => {
+        if(response?.status === 200){
+          resetForm(); 
+          setIsForgotPasswordSent(true);
+        }
+      })
+      .catch((err) => {
+      }).finally(()=>{
+        setLoader(false);
+      }); 
     }
     else{
-      // Login api
+      // For Login Screen
+      setLoader(true);
+      let data = {
+        user: {
+        ...value}
+      }
+      allApi(API_CONSTANTS.LOGIN, data, "post")
+      .then((response) => {
+        if(response?.status === 200){
+          localStorage.setItem("token", JSON.stringify(response?.headers?.authorization));
+          localStorage.setItem("userDetails", JSON.stringify(response?.data?.data));
+          navigate(ROUTES_CONSTANTS.SIGN_IN);
+          resetForm(); 
+          setIsLoggedId(true);
+        }
+      })
+      .catch((err) => {
+        setLoader(false);
+      }).finally(()=> {
+        setLoader(false);
+      });
     }
   }
+
+  const formik = useFormik({
+    initialValues: data,
+    onSubmit: onHandleSubmit,
+    validationSchema: validationSchema,
+    enableReinitialize: true,
+    validateOnBlur: true,
+  });
+
+  const { values, errors, resetForm, handleSubmit, handleChange, touched } = formik;
 
   useEffect(()=>{
     fetchMenuList();
@@ -110,6 +145,9 @@ const SignInRegister = () => {
                       touched={touched?.email}
                       className="text-[0.8rem] rounded-none w-full border border-gray-300 px-4 py-2 focus:outline-none focus:ring-1 focus:ring-gray-700"
                     />
+                    {
+                      isForgotPasswordSent ?  <div className="text-[0.75rem] text-[green]">{t("reset_password_link_has_been_sent")}</div> : null
+                    }
                    <div className='flex gap-3'>
                     <button
                         type="submit"
@@ -120,7 +158,7 @@ const SignInRegister = () => {
                     </button>
                     <button
                         type="submit"
-                        onClick={() => { setIsLoginScreen(!isLoginScreen) }}
+                        onClick={() => { setIsLoginScreen(!isLoginScreen); setIsForgotPasswordSent(false); }}
                         className="hover:border border border-white text-[1.1rem] font-[playfair] bg-white px-6 py-2 rounded-md text-[#cca438] hover:border-[#cca438]"
                         >
                         {t("cancel")}
@@ -151,8 +189,11 @@ const SignInRegister = () => {
                       touched={touched?.password}
                       className="text-[0.8rem] rounded-none w-full border border-gray-300 px-4 py-2 focus:outline-none focus:ring-1 focus:ring-gray-700"
                     />
+                    {
+                      isloggedIn ?  <div className="text-[0.75rem] text-[green]">{t("user_logged_in_successfully")}</div> : null
+                    }
                     <div className="text-sm">
-                      <a onClick={() => { setIsLoginScreen(!isLoginScreen) }} className="text-gray-700 hover:cursor-pointer hover:text-gray-900 underline font-[playfair] text-[1rem]">
+                      <a onClick={() => { setIsLoginScreen(!isLoginScreen); setIsLoggedId(false); }} className="text-gray-700 hover:cursor-pointer hover:text-gray-900 underline font-[playfair] text-[1rem]">
                         {t("forgot_your_password")}
                       </a>
                     </div>

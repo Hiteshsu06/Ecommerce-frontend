@@ -11,9 +11,9 @@ import { API_CONSTANTS } from "@constants/apiurl";
 import { allApiWithHeaderToken } from "@api/api";
 
 const AvatarProfile = ({ size, shape, userDetails }) => {
+  const data = JSON.parse(localStorage.getItem("userDetails"));
   const menu = useRef(null);
   const toast = useRef(null);
-  let data = JSON.parse(localStorage.getItem("userDetails"));
   const { t } = useTranslation("msg");
   const [toastType, setToastType] = useState(''); 
   const navigate = useNavigate();
@@ -92,7 +92,6 @@ const AvatarProfile = ({ size, shape, userDetails }) => {
         }
       })
       .catch((err) => {
-        console.error("err", err);
         toast.current.show({
             severity: "error",
             summary: "Error",

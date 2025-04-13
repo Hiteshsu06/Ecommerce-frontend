@@ -36,25 +36,20 @@ const ForgotPassword = () => {
 
   const onHandleSubmit = async (value) => {
     let body = {
-      email: value?.email
+      user: {
+        email: value?.email
+      }
     }
     setLoader(true);
     allApi(API_CONSTANTS.FORGOT_PASSWORD, body, "post")
     .then((response) => {
-      if(response?.status === 201 && response?.data?.status === "success"){
+      if(response?.status === 200){
         setToastType('success');
         toast.current.show({
           severity: "success",
           summary: t("success"),
           detail: response?.data?.message,
           life: 1000
-        });
-      }else{
-        toast.current.show({
-          severity: "error",
-          summary: t("error"),
-          detail: response?.data?.message,
-          life: 3000,
         });
       }
     })
@@ -89,7 +84,7 @@ const ForgotPassword = () => {
   return (
     <div className="h-screen items-center flex justify-center max-sm:px-4">
       {loader && <Loading/>}
-      <div className="w-1/3 h-[35%] shadow-cards max-lg:w-1/2 max-sm:w-full border px-5 py-5 max-lg:px-10 max-md:px-5">
+      <div className="w-1/3 shadow-cards max-lg:w-1/2 max-sm:w-full border px-5 py-5 max-lg:px-10 max-md:px-5">
         <Toast ref={toast} position="top-right" style={{scale: '0.7'}} onHide={toastHandler}/>
         <div className="text-center text-[1.5rem] font-[600] tracking-wide max-lg:text-[1.4em] max-sm:text-[1rem]">
           {t("forgot_password")}

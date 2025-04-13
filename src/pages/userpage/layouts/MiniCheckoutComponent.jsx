@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from "react-router-dom";
 import { Dialog } from 'primereact/dialog';
+import { useTranslation } from "react-i18next";
 
 // Components
 import CheckoutComponent from "@userpage-layouts/CheckoutComponent";
@@ -11,6 +12,7 @@ const MiniCheckoutComponent = () => {
   const [cart, setCart] = useState([]);
   const navigate = useNavigate();
   const [visible, setVisible] = useState(false);
+  const { t } = useTranslation("msg");
 
   const updateQuantity = (id, amount) => {
     setCart((prevCart) => {
@@ -40,6 +42,7 @@ const MiniCheckoutComponent = () => {
 
   return (
     <div className="max-w-md mx-auto p-4 bg-white pb-[200px]">
+      {!cart?.length ? <span>{t("no_product_added")}</span> : null}
       {cart?.map((item) => (
         <div key={item?.id} className="flex items-center gap-4 pb-4 mb-4">
           <img src={item?.image} alt={item?.name} className="w-16 h-16 rounded-lg" />

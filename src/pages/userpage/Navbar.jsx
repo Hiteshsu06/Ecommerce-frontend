@@ -1,23 +1,72 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef  } from 'react';
 import { Sidebar } from 'primereact/sidebar';
 import { useNavigate } from "react-router-dom";
+import { TieredMenu } from 'primereact/tieredmenu';
+import { Avatar } from "primereact/avatar";
 import { useTranslation } from "react-i18next";
 
 // Components
 import MiniCheckoutComponent from "@userpage-layouts/MiniCheckoutComponent.jsx";
 import NavbarSubmenu from '@userpage-components/NavbarSubmenu.jsx';
 import ButtonComponent from "@common/ButtonComponent";
+import { allApiWithHeaderToken } from "@api/api";
+import { API_CONSTANTS } from "@constants/apiurl";
 import useCartStore from "@store";
+import { ROUTES_CONSTANTS } from "@constants/routesurl";
 
 const Navbar = ({ data, fix = false }) => {
     const [visibleRight, setVisibleRight] = useState(false);
     const [showNavbar, setShowNavbar] = useState(true); // State to control navbar visibility
     const [lastScrollY, setLastScrollY] = useState(0);
-    const { t } = useTranslation("msg");
     const navigate = useNavigate();
-
+    const { t } = useTranslation("msg");
+    const menu = useRef(null);
     const [cart, setCart] = useState([]);
     const triggerUpdate = useCartStore((state) => state.triggerUpdate);
+    const userDetails = JSON.parse(localStorage.getItem("userDetails"));
+
+    const loggedInItems = [
+        {
+            label: userDetails?.name,
+            icon: <Avatar
+                className="mr-2"
+                label={userDetails?.name[0]}
+                shape="circle"
+            />,
+            command: () => {}
+        },
+        {
+            separator: true
+        },
+        {
+            label: t("edit_profile"),
+            icon: "ri-user-3-line",
+            command: () => {
+              navigate(`/edit-profile`)
+            },
+            className: "text-[0.8rem] user-profile-menu-item-list"
+        },
+        {
+            label: t("help"),
+            icon: "ri-questionnaire-line",
+            command: () => {
+                navigate('/user-help')
+            },
+            className: "text-[0.8rem] user-profile-menu-item-list"
+        },
+        {
+            label: t("logout"),
+            icon: "ri-logout-circle-r-line",
+            command: () => {
+                logout();
+                let theme = localStorage.getItem("theme");
+                localStorage.removeItem("userDetails");
+                localStorage.removeItem("token");
+                localStorage.setItem("theme", theme);
+            },
+            className: "text-[0.8rem] user-profile-menu-item-list"
+        }
+    ];
 
     // Fetch cart data
     useEffect(() => {
@@ -51,6 +100,17 @@ const Navbar = ({ data, fix = false }) => {
             };
         }
     }, [lastScrollY]);
+
+     const logout=()=>{
+        allApiWithHeaderToken(API_CONSTANTS.LOGOUT, "" , "delete")
+        .then((response) => {
+            if (response.status === 200){
+                navigate("/");
+            } 
+        })
+        .catch((err) => {
+        });
+      }
 
     return (
         <div
@@ -86,12 +146,20 @@ const Navbar = ({ data, fix = false }) => {
                         {cart?.length}
                     </span>
                 </div>
-                <ButtonComponent
-                    // onClick={handleAccount}
-                    type="button"
-                    className="w-full text-[22px] text-black"
-                    icon="ri-user-3-line"
-                />
+                {
+                    userDetails ? <Avatar
+                    className="mr-2"
+                    label={userDetails?.name[0]}
+                    shape="circle"
+                    onClick={(e) => menu.current.toggle(e)}
+                    /> : 
+                    <ButtonComponent
+                        onClick={()=>{ navigate(ROUTES_CONSTANTS.SIGN_IN); }} 
+                        type="button"
+                        className="w-full text-[22px] text-black"
+                        icon="ri-user-3-line"
+                    />
+                }
             </div>
             <Sidebar
                 visible={visibleRight}
@@ -103,6 +171,13 @@ const Navbar = ({ data, fix = false }) => {
             >
                 <MiniCheckoutComponent />
             </Sidebar>
+            <TieredMenu 
+                model={loggedInItems} 
+                popup 
+                ref={menu} 
+                breakpoint="767px" 
+                className="p-0 text-[0.8rem] user-avatar-menu"
+            />
         </div>
     );
 };
