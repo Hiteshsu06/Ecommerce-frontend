@@ -30,24 +30,25 @@ const AvailablityPlatform = () => {
             url: "https://blinkit.com/",
             logo: "https://www.anandsweets.in/cdn/shop/files/blinkit-1.svg?v=1686135486&width=360"
         }
-    ]
+    ];
+
     return (
-        <div className="flex flex-col justify-center items-center p-10">
-            <h1 className="font-semibold font-[playfair] text-[2.5rem] text-[#1D2E43]">We Are Also Available On</h1>
-            <p className="text-[16px] font-medium pt-2 font-[playfair] text-[#464646]">Same day delivery in bangalore</p>
-            <div className="flex md:grid md:grid-cols-2 lg:grid lg:grid-cols-6 p-5">
+        <div className="flex flex-col justify-center items-center p-6 sm:p-10">
+            <h1 className="font-semibold font-[playfair] text-[2.5rem] text-[#1D2E43] text-center">We Are Also Available On</h1>
+            <p className="text-[16px] font-medium pt-2 font-[playfair] text-[#464646] text-center">Same day delivery in Bangalore</p>
+            <div className="flex flex-wrap justify-center md:grid md:grid-cols-2 lg:grid-cols-6 gap-5 p-5">
                 {
                     platform.map((item, index) => {
                         return (
-                            <a href={item.url} key={item?.id} className="platform">
-                                <img src={item.logo} alt={item.name} className="aspect-[3.0]" />
+                            <a href={item.url} key={index} className="flex justify-center items-center">
+                                <img src={item.logo} alt={item.name} className="max-w-[120px] h-auto aspect-[3.0] object-contain" />
                             </a>
-                        )
+                        );
                     })
                 }
             </div>
         </div>
-    )
-}
+    );
+};
 
-export default AvailablityPlatform
+export default AvailablityPlatform;

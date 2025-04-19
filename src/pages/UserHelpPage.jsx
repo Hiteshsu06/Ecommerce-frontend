@@ -16,13 +16,15 @@ const Register = () => {
   const { t } = useTranslation("msg");
   const navigate = useNavigate();
   const [menuList, setMenuList] = useState([]);
+  const [footerRangeList, setFooterRangeList] = useState([]);
 
   const fetchMenuList = () => {
     setLoader(true);
     allApi(API_CONSTANTS.MENU_LIST_URL, "" , "get")
     .then((response) => {
       if (response.status === 200) {
-          let data = response?.data;
+          let data = response?.data.filter((item, index)=> index <= 6);
+          setFooterRangeList(data);
           data.push({name: "About Us"});
           setMenuList(data)
       } 
@@ -62,7 +64,7 @@ const Register = () => {
             </div>
         </div>
         </div>
-        <Footer/>
+        <Footer data={footerRangeList}/>
       </>
       }
     </>

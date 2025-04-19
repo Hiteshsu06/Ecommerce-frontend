@@ -33,6 +33,14 @@ const Register = lazy(() => import("@pages/Register"));
 const UserProfilePage = lazy(() => import("@pages/UserProfilePage"));
 const UserHelpPage = lazy(() => import("@pages/UserHelpPage"));
 const UserResetPasswordPage = lazy(() => import("@pages/UserResetPasswordPage"));
+const AboutUs = lazy(() => import("@pages/AboutUs"));
+const TermsAndCondition = lazy(() => import("@pages/TermsAndCondition"));
+const CategoryDescriptionPage = lazy(() => import("@pages/CategoryDescriptionPage"));
+const ReturnExchangePolicyPage = lazy(() => import("@pages/ReturnExchangePolicyPage"));
+const ShippingPolicyPage = lazy(() => import("@pages/ShippingPolicyPage"));
+const PrivacyPolicyPage = lazy(() => import("@pages/PrivacyPolicyPage"));
+const ContactUsPage = lazy(() => import("@pages/ContactUsPage"));
+const TrackOrderPage = lazy(() => import("@pages/TrackOrderPage"));
 
 function App() {
   const theme = localStorage.getItem('theme');
@@ -57,6 +65,15 @@ function App() {
           <Route path="/edit-profile" element={<UserProfilePage />}/>
           <Route path="/user-help" element={<UserHelpPage />}/>
           <Route path="/user-reset-password" element={<UserResetPasswordPage />}/>
+          <Route path="/about-us" element={<AboutUs />}/>
+          <Route path="/terms-condition" element={<TermsAndCondition />}/>
+          <Route path="/category-description/:name" element={<CategoryDescriptionPage />}/>
+          <Route path="/sub-category-description/:name" element={<CategoryDescriptionPage />}/>
+          <Route path="/return-exchange-policy" element={<ReturnExchangePolicyPage />}/>
+          <Route path="/shipping-policy" element={<ShippingPolicyPage />}/>
+          <Route path="/privacy-policy" element={<PrivacyPolicyPage />}/>
+          <Route path="/contact-us" element={<ContactUsPage />}/>
+          <Route path="/track-order" element={<TrackOrderPage />}/>
           
           {/* Routes for admin screen */}
           <Route path="/dashboard/*" element={<DashboardPage />}/>

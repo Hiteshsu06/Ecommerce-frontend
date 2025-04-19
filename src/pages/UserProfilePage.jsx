@@ -30,6 +30,7 @@ const UserProfilePage = () => {
   const navigate = useNavigate();
   const [data, setData] = useState(structure);
   const [menuList, setMenuList] = useState([]);
+  const [footerRangeList, setFooterRangeList] = useState([]);
   const userDetails = JSON.parse(localStorage.getItem("userDetails"));
 
   const validationSchema = yup.object().shape({
@@ -90,7 +91,8 @@ const UserProfilePage = () => {
     allApi(API_CONSTANTS.MENU_LIST_URL, "" , "get")
     .then((response) => {
       if (response.status === 200) {
-          let data = response?.data;
+          let data = response?.data.filter((item, index)=> index <= 6);
+          setFooterRangeList(data);
           data.push({name: "About Us"});
           setMenuList(data)
       } 
@@ -121,7 +123,7 @@ const UserProfilePage = () => {
       {loader ? <Loading/> : 
       <>
         <Navbar data={menuList}/>
-        <div className="min-h-screen mt-[5rem] flex flex-col items-center justify-center bg-white px-6 py-4">
+        <div className="min-h-screen flex flex-col items-center justify-center bg-white px-6 py-4">
         <div className="text-center mb-8">
           <h1 className="text-3xl text-[#1D2E43] font-[playfair] font-bold">{t("edit_profile")}</h1>
           <div className="text-sm text-gray-600 mt-2">
@@ -190,7 +192,7 @@ const UserProfilePage = () => {
           </div>
         </div>
         </div>
-        <Footer/>
+        <Footer data={footerRangeList}/>
       </>
       }
     </>

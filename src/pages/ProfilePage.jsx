@@ -135,122 +135,105 @@ const ProfilePage = () => {
   const { values, errors, handleSubmit, handleChange, touched, setFieldValue } = formik;
 
   return (
-    <div className="h-screen p-auto">
-      {loader && <Loading/>}
-      <Toast ref={toast} position="top-right" style={{scale: '0.7'}} onHide={toastHandler}/>
-      <div className="flex min-h-full bg-BgPrimaryColor py-4 overflow-y-auto">
-            <div className="mx-4 sm:mx-16 my-auto grid h-fit w-full grid-cols-4 gap-4 bg-BgSecondaryColor p-8 border rounded border-BorderColor">
-              <div className="col-span-4 md:col-span-4">
-                  <h4 className="xs:text-xl mb-2 font-serif font-extrabold sm:text-xl md:text-2xl lg:text-3xl dark:text-white">
-                     {t("my_profile")}
-                  </h4>
-                  <div>
-                    <FileUpload
-                      isLabel={t("profile_image")}
-                      value={values?.image_url}
-                      name="image"
-                      onChange={(e)=> {
-                        setFieldValue('image', e?.currentTarget?.files[0]);
-                        setFieldValue('image_url', URL.createObjectURL(e?.target?.files[0]));
-                        }}
-                      isProfile={true}
-                    />
-                  </div>
-              </div>
-              <div className="col-span-4 md:col-span-2">
-                <InputTextComponent
-                  value={values?.name}
-                  onChange={handleChange}
-                  type="text"
-                  placeholder={t("name")}
-                  name="name"
-                  isLabel={true}
-                  error={errors?.name}
-                  touched={touched?.name}
-                  className="w-full rounded border-[1px] border-[#ddd] px-[1rem] py-[8px] text-[11px] focus:outline-none"
-                />
-              </div>
-              <div className="col-span-4 md:col-span-2">
-                <InputTextComponent
-                  value={values?.phoneNumber}
-                  onChange={handleChange}
-                  type="text"
-                  placeholder={t("phone_number")}
-                  name="phoneNumber"
-                  isLabel={true}
-                  error={errors?.phoneNumber}
-                  touched={touched?.phoneNumber}
-                  className="w-full rounded border-[1px] border-[#ddd] px-[1rem] py-[8px] text-[11px] focus:outline-none"
-                />
-              </div>
-              <div className="col-span-4 md:col-span-2">
-                <InputTextComponent
-                  value={values?.email}
-                  onChange={handleChange}
-                  type="text"
-                  placeholder={t("email")}
-                  name="email"
-                  isLabel={true}
-                  error={errors?.email}
-                  touched={touched?.email}
-                  disabled={true}
-                  className="w-full rounded border-[1px] border-[#ddd] px-[1rem] py-[8px] text-[11px] focus:outline-none"
-                />
-              </div>
-               <div className="col-span-4 md:col-span-2">
-                  <label className="text-[12px] text-TextSecondaryColor ms-[4px] font-[600]">{t("gender")}</label>
-                  <div className="flex flex-wrap gap-3 mt-2">
-                      <div className="flex align-items-center">
-                          <RadioButton 
-                              name="gender" 
-                              value="Male" 
-                              onChange={(e) => setFieldValue('gender', e.value)} 
-                              checked={values.gender === 'Male'} 
-                          />
-                          <label className="ml-2 font-[600] text-[12px]">Male</label>
-                      </div>
-                      <div className="flex align-items-center">
-                          <RadioButton 
-                              name="gender" 
-                              value="Female" 
-                              onChange={(e) => setFieldValue('gender', e.value)} 
-                              checked={values.gender === 'Female'} 
-                          />
-                          <label className="ml-2 font-[600] text-[12px]">Female</label>
-                      </div>
-                      <div className="flex align-items-center">
-                          <RadioButton 
-                              name="gender" 
-                              value="Other" 
-                              onChange={(e) => setFieldValue('gender', e.value)} 
-                              checked={values.gender === 'Other'} 
-                          />
-                          <label className="ml-2 font-[600] text-[12px]">Other</label>
-                      </div>
-                  </div>
-                  {errors?.gender && touched?.gender ? (
-                      <p className="text-[0.7rem] text-red-600">{errors?.gender}</p>
-                      ) : (
-                      ""
-                  )}
-              </div>
-              <div className="col-span-4 md:col-span-2"></div>
-              <div className="col-span-3"></div>
-              <div className="mt-4 flex justify-end gap-4">
-              <ButtonComponent
-                onClick={backHandler}
-                type="button"
-                label={t("back")}
-                className="rounded bg-[#1f1f70] px-6 py-2 text-[12px] text-white"
-              />
-              <ButtonComponent
-                onClick={() => handleSubmit()}
-                type="submit"
-                label={t("update")}
-                className="rounded bg-[#1f1f70] px-6 py-2 text-[12px] text-white"
-              />
-              </div>
+    <div className="min-h-screen bg-BgPrimaryColor p-4 sm:p-6 lg:p-8 overflow-y-auto">
+      {loader && <Loading />}
+      <Toast ref={toast} position="top-right" style={{ scale: '0.7' }} onHide={toastHandler} />
+
+      <div className="max-w-6xl mx-auto grid gap-6 rounded border border-BorderColor bg-BgSecondaryColor p-4 sm:p-6 lg:p-8">
+        <h4 className="text-xl sm:text-2xl lg:text-3xl font-serif font-extrabold dark:text-white">
+          {t("my_profile")}
+        </h4>
+
+        {/* Profile Image Upload */}
+        <div className="w-full">
+          <FileUpload
+            isLabel={t("profile_image")}
+            value={values?.image_url}
+            name="image"
+            onChange={(e) => {
+              setFieldValue('image', e?.currentTarget?.files[0]);
+              setFieldValue('image_url', URL.createObjectURL(e?.target?.files[0]));
+            }}
+            isProfile={true}
+          />
+        </div>
+
+        {/* Form Fields */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <InputTextComponent
+            value={values?.name}
+            onChange={handleChange}
+            type="text"
+            placeholder={t("name")}
+            name="name"
+            isLabel={true}
+            error={errors?.name}
+            touched={touched?.name}
+            className="w-full rounded border border-[#ddd] px-4 py-2 text-sm focus:outline-none"
+          />
+
+          <InputTextComponent
+            value={values?.phoneNumber}
+            onChange={handleChange}
+            type="text"
+            placeholder={t("phone_number")}
+            name="phoneNumber"
+            isLabel={true}
+            error={errors?.phoneNumber}
+            touched={touched?.phoneNumber}
+            className="w-full rounded border border-[#ddd] px-4 py-2 text-sm focus:outline-none"
+          />
+
+          <InputTextComponent
+            value={values?.email}
+            onChange={handleChange}
+            type="text"
+            placeholder={t("email")}
+            name="email"
+            isLabel={true}
+            error={errors?.email}
+            touched={touched?.email}
+            disabled={true}
+            className="w-full rounded border border-[#ddd] px-4 py-2 text-sm focus:outline-none"
+          />
+
+          {/* Gender */}
+          <div>
+            <label className="text-sm font-semibold text-TextSecondaryColor">{t("gender")}</label>
+            <div className="flex flex-wrap gap-4 mt-2">
+              {["Male", "Female", "Other"].map((g) => (
+                <div className="flex items-center" key={g}>
+                  <RadioButton
+                    name="gender"
+                    value={g}
+                    onChange={(e) => setFieldValue("gender", e.value)}
+                    checked={values.gender === g}
+                  />
+                  <label className="ml-2 text-sm font-medium">{g}</label>
+                </div>
+              ))}
             </div>
+            {errors?.gender && touched?.gender && (
+              <p className="text-xs text-red-600 mt-1">{errors?.gender}</p>
+            )}
+          </div>
+        </div>
+
+        {/* Buttons */}
+        <div className="flex flex-col sm:flex-row justify-end gap-4 mt-6">
+          <ButtonComponent
+            onClick={backHandler}
+            type="button"
+            label={t("back")}
+            className="rounded bg-[#1f1f70] px-6 py-2 text-sm text-white w-full sm:w-auto"
+          />
+          <ButtonComponent
+            onClick={() => handleSubmit()}
+            type="submit"
+            label={t("update")}
+            className="rounded bg-[#1f1f70] px-6 py-2 text-sm text-white w-full sm:w-auto"
+          />
+        </div>
       </div>
     </div>
   );

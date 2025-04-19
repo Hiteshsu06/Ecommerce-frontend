@@ -20,6 +20,8 @@ export const API_CONSTANTS = {
     COMMON_BLOGS_URL: "api/v1/blogs",
     COMMON_PRODUCT_REVIEW_URL: "api/v1/product_reviews",
     COMMON_FEST_PRODUCTS_URL: "api/v1/fest_specials",
+    COMMON_SUBSCIBER_URL: "api/v1/subscribers",
+    COMMON_CUSTOMER_ENQUIRY_URL: "api/v1/contact_details",
 
     // General use
     BLOGS_URL: "api/v1/user_dashboard/latest_blogs",
@@ -37,5 +39,6 @@ export const API_CONSTANTS = {
     SUBSCRIBE_USER_BY_MAIL_URL: "api/v1/user_dashboard/subscribe_user_by_email",
     SEND_PHONE_OTP_URL: "api/v1/user_dashboard/send_user_otp",
     VERIFY_PHONE_OTP_URL: "api/v1/user_dashboard/verify_user_otp",
-    PAYMENT_INTENT_CREATE: "api/v1/payment_transactions/create_payment_intent"
+    PAYMENT_INTENT_CREATE: "api/v1/payment_transactions/create_payment_intent",
+    ADD_CONTACT_DETAILS: "api/v1/user_dashboard/add_contact_details"
 }

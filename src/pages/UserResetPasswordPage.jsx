@@ -23,6 +23,7 @@ const data = {
 
 const UserResetPasswordPage = () => {
     const [menuList, setMenuList] = useState([]);
+    const [footerRangeList, setFooterRangeList] = useState([]);
     const userDetails = JSON.parse(localStorage.getItem("userDetails"));
     const { t } = useTranslation("msg");
     const [loader, setLoader] = useState(false);
@@ -73,7 +74,8 @@ const UserResetPasswordPage = () => {
     allApi(API_CONSTANTS.MENU_LIST_URL, "" , "get")
     .then((response) => {
       if (response.status === 200) {
-          let data = response?.data;
+          let data = response?.data.filter((item, index)=> index <= 6);
+          setFooterRangeList(data);
           data.push({name: "About Us"});
           setMenuList(data)
       } 
@@ -104,7 +106,7 @@ const UserResetPasswordPage = () => {
       {loader ? <Loading/> : 
       <>
         <Navbar data={menuList}/>
-        <div className="mt-[6rem] flex flex-col items-center justify-center bg-white px-6 py-4">
+        <div className="flex flex-col items-center justify-center bg-white px-6 py-4">
         <div className="text-center mb-8">
           <h1 className="text-3xl text-[#1D2E43] font-[playfair] font-bold">{t("reset_password")}</h1>
           <div className="text-sm text-gray-600 mt-2">
@@ -145,7 +147,7 @@ const UserResetPasswordPage = () => {
           </div>
         </div>
         </div>
-        <Footer/>
+        <Footer data={footerRangeList}/>
       </>
       }
     </>

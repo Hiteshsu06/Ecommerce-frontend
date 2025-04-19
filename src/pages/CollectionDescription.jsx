@@ -26,6 +26,7 @@ const CollectionDescription = () => {
   const [products, setProducts] = useState([]);
   const [loader, setLoader] = useState(false);
   const [menuList, setMenuList] = useState([]);
+  const [footerRangeList, setFooterRangeList] = useState([]);
   const navigate = useNavigate();
 
   useEffect(()=>{
@@ -87,7 +88,8 @@ const CollectionDescription = () => {
     return allApi(API_CONSTANTS.MENU_LIST_URL, "" , "get")
     .then((response) => {
       if (response.status === 200) {
-          let data = response?.data;
+          let data = response?.data.filter((item, index) => index <= 6);
+          setFooterRangeList(data);
           data.push({name: "About Us"});
           setMenuList(data)
       } 
@@ -102,7 +104,7 @@ const CollectionDescription = () => {
     {loader ? <Loading/> : 
       <>
         <Navbar data={menuList}/>
-        <div className="bg-[#fdfaf2] text-center py-8 mt-[5rem]">
+        <div className="bg-[#fdfaf2] text-center py-8">
             {/* Breadcrumb */}
             <nav className="text-gray-600 text-[16px]">
                 <span className='hover:cursor-pointer' onClick={()=>{ navigate("/") }}>Home</span> <span className='px-4'>&gt;</span> <span className="text-gray-600 hover:cursor-pointer">{name}</span>
@@ -158,9 +160,7 @@ const CollectionDescription = () => {
           <ShopOurSnackRange title="Shop Other Categories"/> 
         </div>
 
-        <div>
-          <Footer/>
-        </div>
+        <Footer data={footerRangeList}/>
       </>
     }
     </>

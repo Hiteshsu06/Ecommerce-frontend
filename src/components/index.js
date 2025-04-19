@@ -20,5 +20,7 @@ import BlogList from '@adminpage-layouts/Blog/BlogList';
 import FestivalSpecialForm from '@adminpage-layouts/FestivalSpecial/FestivalSpecialForm';
 import FestivalSpecialList from '@adminpage-layouts/FestivalSpecial/FestivalSpecialList';
 import ReviewList from '@adminpage-layouts/Review/ReviewList';
+import SubscriberList from '@adminpage-layouts/Subscriber/SubscriberList';
+import CustomerEnquiryList from '@adminpage-layouts/CustomerEnquiry/CustomerEnquiryList';
 
-export { Topbar, Sidebar, CategoryList, CategoryForm, SubCategoryList, SubCategoryForm, ProductList, ProductForm, InventoryList, InventoryForm, DashboardStats, OrderList, OrderForm, CouponList, CouponForm, DiscountForm, DiscountList, UserList, BlogList, FestivalSpecialList, FestivalSpecialForm, ReviewList };
+export { Topbar, Sidebar, CategoryList, CategoryForm, SubCategoryList, SubCategoryForm, ProductList, ProductForm, InventoryList, InventoryForm, DashboardStats, OrderList, OrderForm, CouponList, CouponForm, DiscountForm, DiscountList, UserList, BlogList, FestivalSpecialList, FestivalSpecialForm, ReviewList, SubscriberList, CustomerEnquiryList };

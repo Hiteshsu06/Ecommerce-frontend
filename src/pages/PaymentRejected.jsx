@@ -39,7 +39,7 @@ const PaymentRejected = () => {
         <div className="p-6 md:p-10 space-y-8">
           {/* Error summary */}
           <div variant="destructive" className="mb-6">
-            <title className="text-base font-semibold">{t("transaction_failed")}</title>
+            <h3 className="text-base font-semibold">{t("transaction_failed")}</h3>
             <p className="text-[0.9rem]">
               {errorDetails.errorMessage} {t("please_check_payment_details_desc")} 
             </p>
@@ -84,15 +84,15 @@ const PaymentRejected = () => {
               {t("please_try_again_or_choose_different_payment_method")}
             </p>
             <div className="text-[0.8rem] flex flex-col md:flex-row space-y-3 md:space-y-0 md:space-x-4 justify-center">
-              <button>{t("try_again")}</button>
-              <button>{t("use_different_payment_method")}</button>
-              <button>{t("need_help")}</button>
+              <button className="btn-primary">{t("try_again")}</button>
+              <button className="btn-primary">{t("use_different_payment_method")}</button>
+              <button className="btn-primary">{t("need_help")}</button>
             </div>
           </section>
         </div>
       </div>
     </div>
-  )
-}
+  );
+};
 
 export default PaymentRejected;

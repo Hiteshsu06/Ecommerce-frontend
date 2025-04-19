@@ -81,8 +81,24 @@ const MiniCheckoutComponent = () => {
         </button>
         </div>
     </div>
-    <Dialog header="Checkout" blockScroll={true} visible={visible} style={{ width: '30vw' }} onHide={() => {if (!visible) return; setVisible(false); }}>
-        <CheckoutComponent />
+    <Dialog
+        header="Checkout"
+        blockScroll={true}
+        visible={visible}
+        onHide={() => {
+          if (!visible) return;
+          setVisible(false);
+        }}
+        style={{
+          width: '90vw',
+          maxWidth: '400px',
+          height: '80vh',
+          maxHeight: '80vh',
+          overflowY: 'auto',
+          top: '5vh' // pushes it down from the top to avoid navbar
+        }}
+      >
+      <CheckoutComponent />
     </Dialog>
     </div>
   )

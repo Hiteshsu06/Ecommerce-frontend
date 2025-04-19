@@ -1,44 +1,6 @@
 // Utils
-import { useState } from "react";
 import { useTranslation } from "react-i18next";
-
-const orderDetails = {
-  orderNumber: "#ORD-38291",
-  orderDate: "April 5, 2025",
-  paymentMethod: "Visa ending in 4242",
-  total: "$124.95",
-  subtotal: "$109.95",
-  shipping: "$10.00",
-  tax: "$5.00",
-  name: "Alex Johnson",
-  email: "alex.johnson@example.com",
-  shippingAddress: {
-    street: "123 Main Street",
-    city: "San Francisco",
-    state: "CA",
-    zip: "94105",
-    country: "United States"
-  },
-  estimatedDelivery: "April 8-10, 2025",
-  trackingNumber: "TRK-20252504-8901"
-};
-
-const orderItems = [
-  {
-    id: 1,
-    name: "Premium Wireless Headphones",
-    price: "$89.95",
-    quantity: 1,
-    image: "/placeholder.svg"
-  },
-  {
-    id: 2,
-    name: "Smartphone Fast Charger",
-    price: "$20.00",
-    quantity: 1,
-    image: "/placeholder.svg"
-  }
-];
+import { useNavigate, useLocation } from "react-router-dom";
 
 const OrderItem = ({ item }) => {
   const { t } = useTranslation("msg");
@@ -46,23 +8,45 @@ const OrderItem = ({ item }) => {
   return (
     <div className="flex items-start space-x-4 py-3">
       <div className="w-16 h-16 flex-shrink-0 overflow-hidden rounded border bg-gray-100">
-          <img 
-            src={item.image} 
-            alt={item.name} 
-            className="h-full w-full object-cover"
-          />
+        <img 
+          src={item?.image} 
+          alt={item?.name} 
+          className="h-full w-full object-cover"
+        />
       </div>
       <div className="flex-1 min-w-0">
-        <h3 className="text-[0.8rem] font-medium text-gray-900 truncate">{item.name}</h3>
-        <p className="mt-1 text-[0.8rem] text-gray-500">{t("qty")}: {item.quantity}</p>
+        <h3 className="text-[0.8rem] font-medium text-gray-900 truncate">{item?.name}</h3>
+        <p className="mt-1 text-[0.8rem] text-gray-500">{t("qty")}: {item?.quantity}</p>
       </div>
-      <div className="text-[0.8rem] font-medium text-gray-900">{item.price}</div>
+      <div className="text-[0.8rem] font-medium text-gray-900">{item?.discountedPrice}</div>
     </div>
   );
 };
 
 const PaymentConfirmed = () => {
+  const navigate = useNavigate();
+  const location = useLocation();
+  const { order } = location?.state || {};
   const { t } = useTranslation("msg");
+  const cart = JSON.parse(localStorage.getItem('cart')) || [];
+  const orderDetails = JSON.parse(localStorage.getItem('orderDetails')) || [];
+  const userDetails = JSON.parse(localStorage.getItem("userDetails"));
+
+  const continueShopping=()=>{
+    navigate("/");
+    localStorage.removeItem("userDetails");
+    localStorage.removeItem("orderDetails");
+    localStorage.removeItem("cart");
+  }
+
+  // Deivery Date
+  const today = new Date();
+  const fiveDaysFromToday = new Date();
+  fiveDaysFromToday.setDate(today.getDate() + 5);
+  const eightDaysFromToday = new Date();
+  eightDaysFromToday.setDate(today.getDate() + 8);
+  const optionsDate = { month: 'long', day: 'numeric' };
+  const formattedRange = `${fiveDaysFromToday.toLocaleDateString("en-US", optionsDate)}–${eightDaysFromToday.toLocaleDateString("en-US", optionsDate)}, ${today.getFullYear()}`;
 
   return (
     <div className="container max-w-4xl mx-auto px-4 py-8 md:py-16">
@@ -79,7 +63,7 @@ const PaymentConfirmed = () => {
             {t("thank_you_for_your_purchase_your_order_has_been_confirmed")}
           </p>
           <p className="text-gray-500 text-[0.7rem]">
-            {t("order")} {orderDetails.orderNumber} • {orderDetails.orderDate}
+            {t("order")} {orderDetails?.orderNumber} • {orderDetails?.orderDate}
           </p>
         </div>
 
@@ -89,7 +73,7 @@ const PaymentConfirmed = () => {
           <section>
             <h2 className="text-[1rem] font-semibold text-gray-800 mb-4">{t("order_summary")}</h2>
             <div className="space-y-4">
-              {orderItems?.map((item) => (
+              {cart?.map((item) => (
                 <OrderItem key={item?.id} item={item} />
               ))}
             </div>
@@ -97,37 +81,37 @@ const PaymentConfirmed = () => {
             <div className="mt-6 space-y-2">
               <div className="flex justify-between text-[0.8rem]">
                 <span className="text-gray-600">{t("subtotal")}</span>
-                <span className="font-medium">{orderDetails?.subtotal}</span>
+                <span className="font-medium">₹ {order?.total_price}</span>
               </div>
               <div className="flex justify-between text-[0.8rem]">
                 <span className="text-gray-600">{t("shipping")}</span>
-                <span className="font-medium">{orderDetails?.shipping}</span>
+                <span className="font-medium">₹ {order?.handling_fee}</span>
               </div>
               <div className="flex justify-between text-[0.8rem]">
                 <span className="text-gray-600">{t("tax")}</span>
-                <span className="font-medium">{orderDetails?.tax}</span>
+                <span className="font-medium">₹ {order?.tax_price}</span>
               </div>
               <hr className="my-2"/>
               <div className="flex justify-between font-semibold text-[1rem]">
                 <span>{t("total")}</span>
-                <span>{orderDetails?.total}</span>
+                <span>₹ {order?.total_price + order?.handling_fee + order?.tax_price}</span>
               </div>
             </div>
           </section>
 
           {/* Payment and Shipping */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-16">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             {/* Payment information */}
             <section>
               <h2 className="font-semibold text-gray-800 mb-4 text-[1rem]">{t("payment_information")}</h2>
               <div className="p-4 bg-gray-50 rounded-md text-[0.8rem]">
                 <div className="flex justify-between mb-2">
                   <span className="text-gray-600">{t("method")}:</span>
-                  <span className="font-medium">{orderDetails?.paymentMethod}</span>
+                  <span className="font-medium">{order?.payment_mode}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-gray-600">{t("billing_name")}:</span>
-                  <span className="font-medium">{orderDetails?.name}</span>
+                  <span className="font-medium">{userDetails?.name}</span>
                 </div>
               </div>
             </section>
@@ -136,18 +120,18 @@ const PaymentConfirmed = () => {
             <section>
               <h2 className="text-[1rem] font-semibold text-gray-800 mb-4">{t("shipping_information")}</h2>
               <div className="p-4 bg-gray-50 rounded-md text-[0.8rem]">
-                <p className="font-medium">{orderDetails?.name}</p>
-                <p>{orderDetails?.shippingAddress?.street}</p>
+                <p className="font-medium">{userDetails?.name}</p>
+                <p>{order?.shipping_address?.flat_no}</p>
                 <p>
-                  {orderDetails?.shippingAddress?.city}, {orderDetails?.shippingAddress?.state} {orderDetails?.shippingAddress?.zip}
+                  {order?.shipping_address?.city}, {order?.shipping_address?.state} {order?.shipping_address?.zip_code}
                 </p>
-                <p>{orderDetails?.shippingAddress?.country}</p>
+                <p>{order?.shipping_address?.country}</p>
                 <div className="mt-2 pt-2 border-t border-gray-200">
                   <p className="text-gray-600">
-                    <span className="font-medium">{t("estimated_delivery")}:</span> {orderDetails.estimatedDelivery}
+                    <span className="font-medium">{t("estimated_delivery")}:</span> {formattedRange}
                   </p>
                   <p className="text-gray-600 text-sm mt-1">
-                    <span className="font-medium">{t("shipping_information")}:</span> {orderDetails.trackingNumber}
+                    <span className="font-medium">{t("shipping_information")}:</span> {order.trackingNumber}
                   </p>
                 </div>
               </div>
@@ -161,7 +145,7 @@ const PaymentConfirmed = () => {
             </p>
             <div className="flex flex-col md:flex-row space-y-3 md:space-y-0 md:space-x-4 justify-center mt-2">
               <button>{t("track_order")}</button>
-              <button>{t("continue_shopping")}</button>
+              <button onClick={continueShopping}>{t("continue_shopping")}</button>
             </div>
             <p className="text-gray-500 text-sm mt-6">
               {t("need_help_contact_our_support")} <a href="mailto:support@example.com" className="text-blue-600 hover:underline">support@example.com</a>
@@ -170,7 +154,7 @@ const PaymentConfirmed = () => {
         </div>
       </div>
     </div>
-  )
+  );
 }
 
 export default PaymentConfirmed;

@@ -5,11 +5,15 @@ import Chart from "react-apexcharts";
 import { useTranslation } from "react-i18next";
 
 // Components
-import Customers from "@assets/customers.png";
 import { API_CONSTANTS } from "@constants/apiurl";
 import { allApiWithHeaderToken } from "@api/api";
 import { Toast } from "primereact/toast";
-import { ROUTES_CONSTANTS } from "@constants/routesurl";
+import  CategoriesSvg from "@assets/categories.png";
+import  SubCategoriesSvg from "@assets/subcategories.png";
+import  OrderSvg from "@assets/order.png";
+import  ProductSvg from "@assets/product.png";
+import  RevenueSvg from "@assets/revenue.png";
+import  CustomersSvg from "@assets/customers.png";
 
 const DashboardStats = () => {
   const toast = useRef(null);
@@ -22,8 +26,9 @@ const DashboardStats = () => {
     productCounts: 0,
     categoryCounts: 0,
     subCategoryCounts: 0,
-    orderCounts: 0,
-    customerCounts: 0
+    customerCount: 0,
+    orderCount: 0,
+    totalRevenue: 0
   });
 
   let revenueByMonth = {
@@ -221,7 +226,10 @@ const DashboardStats = () => {
           let obj = {
             productCounts: response?.data?.product_count,
             categoryCounts: response?.data?.category_count,
-            subCategoryCounts: response?.data?.sub_category_count
+            subCategoryCounts: response?.data?.sub_category_count,
+            customerCount: response?.data?.customer_count,
+            orderCount: response?.data?.order_count,
+            totalRevenue: response?.data?.total_revenue
           }
           setCounts({...counts, ...obj});
         } 
@@ -263,37 +271,37 @@ const DashboardStats = () => {
       <div className="flex gap-10 text-TextSecondaryColor">
         <div className="mt-4 flex w-[25%] bg-BgSecondaryColor border rounded border-BorderColor p-6">
           <div className="flex gap-5">
-          <img src={Customers} alt="img" width="35" height="20"/>
+          <img src={CategoriesSvg} alt="img" width="35" height="20"/>
             <div>
                 <div className="font-bold">{counts?.categoryCounts}+</div>
-                <div className="text-[0.8rem]">Total Category</div>
+                <div className="text-[0.8rem]">{t("total_categories")}</div>
             </div>
           </div>
         </div>
         <div className="mt-4 flex w-[25%] bg-BgSecondaryColor border rounded border-BorderColor p-6">
           <div className="flex gap-5">
-          <img src={Customers} alt="img" width="35" height="20"/>
+          <img src={SubCategoriesSvg} alt="img" width="35" height="20"/>
             <div>
                 <div className="font-bold">{counts?.subCategoryCounts}+</div>
-                <div className="text-[0.8rem]">Total SubCategory</div>
+                <div className="text-[0.8rem]">{t("total_subcategories")}</div>
             </div>
           </div>
         </div>
         <div className="mt-4 flex w-[25%] bg-BgSecondaryColor border rounded border-BorderColor p-6">
           <div className="flex gap-5">
-          <img src={Customers} alt="img" width="35" height="20"/>
+          <img src={ProductSvg} alt="img" width="35" height="20"/>
             <div>
                 <div className="font-bold">{counts?.productCounts}+</div>
-                <div className="text-[0.8rem]">Total Products</div>
+                <div className="text-[0.8rem]">{t("total_products")}</div>
             </div>
           </div>
         </div>
         <div className="mt-4 flex w-[25%] bg-BgSecondaryColor border rounded border-BorderColor p-6">
           <div className="flex gap-5">
-            <img src={Customers} alt="img" width="35" height="20"/>
+            <img src={CustomersSvg} alt="img" width="35" height="20"/>
             <div>
-                <div className="font-bold">{counts?.customerCounts}+</div>
-                <div className="text-[0.8rem]">Total Customers</div>
+                <div className="font-bold">{counts?.customerCount}+</div>
+                <div className="text-[0.8rem]">{t("total_customers")}</div>
             </div>
           </div>
         </div>
@@ -301,84 +309,119 @@ const DashboardStats = () => {
       <div className="flex gap-10 text-TextSecondaryColor">
         <div className="mt-4 flex w-[22.5%] bg-BgSecondaryColor border rounded border-BorderColor p-6">
           <div className="flex gap-5">
-          <img src={Customers} alt="img" width="35" height="20"/>
+          <img src={OrderSvg} alt="img" width="35" height="20"/>
             <div>
-                <div className="font-bold">{counts?.orderCounts}+</div>
-                <div className="text-[0.8rem]">Total Order</div>
+                <div className="font-bold">{counts?.orderCount}+</div>
+                <div className="text-[0.8rem]">{t("total_orders")}</div>
             </div>
           </div>
         </div>
         <div className="mt-4 flex w-[22.5%] bg-BgSecondaryColor border rounded border-BorderColor p-6">
           <div className="flex gap-5">
-          <img src={Customers} alt="img" width="35" height="20"/>
+          <img src={RevenueSvg} alt="img" width="35" height="20"/>
             <div>
-                <div className="font-bold">-</div>
-                <div className="text-[0.8rem]">Total Revenue</div>
+                <div className="font-bold">₹ {counts?.totalRevenue}</div>
+                <div className="text-[0.8rem]">{t("total_revenue")}</div>
             </div>
           </div>
         </div>
       </div>
       <div className="grid grid-cols-2 gap-4 mt-12">
-        <div className="flex justify-center p-6 bg-white border border-gray-200 rounded-lg shadow-sm"> 
-           <Chart
+        <div className="relative flex justify-center p-6 bg-white border border-gray-200 rounded-lg shadow-sm overflow-hidden">
+          <Chart
             options={revenueByMonth.options}
             series={revenueByMonth.series}
             type="bar"
             width="500"
           />
+
+          {/* Overlay */}
+          <div className="absolute inset-0 flex items-center justify-center backdrop-blur-sm bg-white/70 z-10">
+            <span className="text-[1rem] font-semibold text-gray-600">{t("coming_soon")}</span>
+          </div>
         </div>
-        <div className="flex justify-center p-6 bg-white border border-gray-200 rounded-lg shadow-sm"> 
+        <div className="relative flex justify-center p-6 bg-white border border-gray-200 rounded-lg shadow-sm overflow-hidden">
           <Chart 
             options={yearWiseRevenue.options} 
             series={yearWiseRevenue.series} 
             type="donut" 
             width="400" 
           />
+
+          {/* Overlay */}
+          <div className="absolute inset-0 flex items-center justify-center backdrop-blur-sm bg-white/70 z-10">
+            <span className="text-[1rem] font-semibold text-gray-600">{t("coming_soon")}</span>
+          </div>
         </div>
       </div>
       <div className="grid grid-cols-3 gap-4 mt-12">
         {/* Season Wise Revenue */}
-        <div className="flex justify-center p-6 bg-white border border-gray-200 rounded-lg shadow-sm">
+        <div className="relative flex justify-center p-6 bg-white border border-gray-200 rounded-lg shadow-sm overflow-hidden">
           <Chart 
             options={winterReasonRevenue.options} 
             series={winterReasonRevenue.series} 
             type="donut" 
             width="340" 
           />
+
+          {/* Overlay */}
+          <div className="absolute inset-0 flex items-center justify-center backdrop-blur-sm bg-white/70 z-10">
+            <span className="text-[1rem] font-semibold text-gray-600">{t("coming_soon")}</span>
+          </div>
         </div>
-        <div className="flex justify-center p-6 bg-white border border-gray-200 rounded-lg shadow-sm">
+        <div className="relative flex justify-center p-6 bg-white border border-gray-200 rounded-lg shadow-sm overflow-hidden">
           <Chart 
             options={rainyReasonRevenue.options} 
             series={rainyReasonRevenue.series} 
             type="donut" 
             width="340" 
           />
+
+          {/* Overlay */}
+          <div className="absolute inset-0 flex items-center justify-center backdrop-blur-sm bg-white/70 z-10">
+            <span className="text-[1rem] font-semibold text-gray-600">{t("coming_soon")}</span>
+          </div>
         </div>
-        <div className="flex justify-center p-6 bg-white border border-gray-200 rounded-lg shadow-sm">
+        <div className="relative flex justify-center p-6 bg-white border border-gray-200 rounded-lg shadow-sm overflow-hidden">
           <Chart 
             options={summerReasonRevenue.options} 
             series={summerReasonRevenue.series} 
             type="donut" 
             width="340" 
           />
+
+          {/* Overlay */}
+          <div className="absolute inset-0 flex items-center justify-center backdrop-blur-sm bg-white/70 z-10">
+            <span className="text-[1rem] font-semibold text-gray-600">{t("coming_soon")}</span>
+          </div>
         </div>
       </div>
       <div className="grid grid-cols-2 gap-4 mt-16 mb-4">
-        <div className="flex justify-center p-6 bg-white border border-gray-200 rounded-lg shadow-sm">
+        <div className="relative flex justify-center p-6 bg-white border border-gray-200 rounded-lg shadow-sm overflow-hidden">
           <Chart
-              options={transactionByMonth.options}
-              series={transactionByMonth.series}
-              type="line"
-              width="500" 
+            options={transactionByMonth.options}
+            series={transactionByMonth.series}
+            type="line"
+            width="500" 
           />
+
+          {/* Overlay */}
+          <div className="absolute inset-0 flex items-center justify-center backdrop-blur-sm bg-white/70 z-10">
+            <span className="text-[1rem] font-semibold text-gray-600">{t("coming_soon")}</span>
+          </div>
         </div>
-        <div className="flex justify-center p-6 bg-white border border-gray-200 rounded-lg shadow-sm">
+        <div className="relative flex justify-center p-6 bg-white border border-gray-200 rounded-lg shadow-sm overflow-hidden">
           <Chart
-              options={comarisonOfRevenue.options}
-              series={comarisonOfRevenue.series}
-              type="area"
-              width="500" 
+            options={comarisonOfRevenue.options}
+            series={comarisonOfRevenue.series}
+            type="area"
+            width="500" 
           />
+
+          {/* Overlay */}
+          <div className="absolute inset-0 flex items-center justify-center backdrop-blur-sm bg-white/70 z-10">
+            <span className="text-[1rem] font-semibold text-gray-600">{t("coming_soon")}</span>
+          </div>
         </div>
       </div>
     </div>

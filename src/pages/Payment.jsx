@@ -70,18 +70,11 @@ const CheckoutForm = () => {
         } else {
           // paymentIntent.status will help you check the payment status
           if (paymentIntent.status === 'succeeded') {
-              allApiWithHeaderToken(API_CONSTANTS.COMMON_ORDER_URL, order , "post")
-              .then((response) => {
-                console.log("response",response)
-                navigate(ROUTES_CONSTANTS.PAYMENT_CONFIRMED, { 
-                  state: { 
-                          order: order
-                      } 
-                });
-              })
-              .catch((err) => {
-              }).finally(()=>{
-              }); 
+              navigate(ROUTES_CONSTANTS.PAYMENT_CONFIRMED, { 
+                state: { 
+                        order: order
+                    } 
+              });
           } else {
             // Payment failed or was canceled
             setErrorMessage('Payment failed, please try again.'); // Show failure message
@@ -91,7 +84,6 @@ const CheckoutForm = () => {
         setErrorMessage("Failed to retrieve client secret from server.");
       }
     } catch (error) {
-      console.log("error",error)
         // navigate(ROUTES_CONSTANTS.PAYMENT_REJECTED);
         setErrorMessage("An error occurred while processing your payment.");
     } finally {
@@ -100,25 +92,31 @@ const CheckoutForm = () => {
   };
   
   return (
-    <form onSubmit={handleSubmit}>
-      <PaymentElement />
+    <form onSubmit={handleSubmit} className="space-y-4 w-full">
+      <PaymentElement className="w-full" />
+      
       <button
         type="submit"
-        className="w-full mt-4 bg-blue-500 text-white py-3 px-4 rounded hover:bg-blue-600 transition duration-200"
-        >
-        {`Pay ₹ ${order?.total_price + order?.handling_fee + order?.tax_price}`}
+        disabled={isProcessing}
+        className="w-full mt-4 bg-blue-500 text-white py-3 px-4 rounded hover:bg-blue-600 transition duration-200 text-sm sm:text-base"
+      >
+        {isProcessing
+          ? t("processing_payment")
+          : `Pay ₹ ${order?.total_price + order?.handling_fee + order?.tax_price}`}
       </button>
-      <p className="text-[0.8rem] text-gray-500 text-center mt-4">
+
+      <p className="text-xs sm:text-sm text-gray-500 text-center mt-4">
         {t("you_will_be_redirected_to_stripe_to_complete_your_payment")}
       </p>
-      {/* Show error message to your customers */}
-      {errorMessage && <div>{errorMessage}</div>}
+
+      {errorMessage && (
+        <div className="text-red-600 text-xs text-center">{errorMessage}</div>
+      )}
     </form>
   );
 };
 
 const Payment = () => {
-  const navigate = useNavigate();
   const location = useLocation();
   const { order } = location?.state || {};
   const userDetails = JSON.parse(localStorage.getItem("userDetails"));
@@ -129,17 +127,17 @@ const Payment = () => {
   const stripePromise = loadStripe('pk_test_51RDAUiCpms7NHvWSBlZRktPM4SBH5YbgOo0gWHgfoM5qYLArs1fe55YtX4MW1DS1OdyhMXDKTDWXTfoHLavvoQQn00Nox9H4x6');
   const options = {
     mode: 'payment',
-    amount: 1099,
+    amount: order?.total_price,
     currency: 'usd',
-    // Fully customizable with appearance API.
-    appearance: {
-      /*...*/
-    },
+    enableLink: false,
     wallets: {
       applePay: 'auto',
       googlePay: 'auto'
     },
-    enableLink: false
+    // paymentMethodTypes: ['card'],
+    automatic_payment_methods: {
+      enabled: true
+    },
   };
 
   // Deivery Date
@@ -152,76 +150,74 @@ const Payment = () => {
   const formattedRange = `${fiveDaysFromToday.toLocaleDateString("en-US", optionsDate)}–${eightDaysFromToday.toLocaleDateString("en-US", optionsDate)}, ${today.getFullYear()}`;
 
   return (
-    <div className="container max-w-4xl mx-auto px-4 py-8 md:py-12">
-    <div className="bg-white rounded-lg shadow-md overflow-hidden">
-      <div className="bg-blue-50 p-6 md:p-8 border-b">
-        <h1 className="text-2xl md:text-3xl text-center font-bold text-gray-800 mb-2">
-          {t("checkout")}
-        </h1>
-        <p className="text-gray-600 mb-1 text-center text-[0.8rem]">
-          {t("complete_your_purchase_by_providing_your_payment_details")}
-        </p>
-      </div>
+    <div className="container max-w-6xl mx-auto px-4 py-8 md:py-12">
+      <div className="bg-white rounded-lg shadow-md overflow-hidden">
+        <div className="bg-blue-50 p-4 sm:p-6 md:p-8 border-b">
+          <h1 className="text-xl sm:text-2xl md:text-3xl text-center font-bold text-gray-800 mb-2">
+            {t("checkout")}
+          </h1>
+          <p className="text-gray-600 mb-1 text-center text-xs sm:text-sm">
+            {t("complete_your_purchase_by_providing_your_payment_details")}
+          </p>
+        </div>
 
-      <div className="p-6 md:p-8">
-        <div className="grid grid-cols-1 lg:grid-cols-5 gap-8">
-          {/* Left column - Payment form */}
-          <div className="lg:col-span-3 space-y-6">
-             <Elements stripe={stripePromise} options={options}>
-              <CheckoutForm />
-            </Elements>
-          </div>
+        <div className="p-4 sm:p-6 md:p-8">
+          <div className="grid grid-cols-1 lg:grid-cols-5 gap-6 lg:gap-8">
+            {/* Left column - Payment form */}
+            <div className="lg:col-span-3 w-full">
+              <Elements stripe={stripePromise} options={options}>
+                <CheckoutForm />
+              </Elements>
+            </div>
 
-          {/* Right column - Order summary */}
-          <div className="lg:col-span-2 space-y-6">
-            <section className="bg-gray-50 p-6 rounded-md">
-              <h2 className="font-semibold text-gray-800 mb-4 text-[1rem]">{t("order_summary")}</h2>
-              
-              <hr className="my-4" />
-              
-              <div className="space-y-2">
-                <div className="flex justify-between text-sm">
-                  <span>{t("subtotal")}</span>
-                  <span>₹ {order?.total_price}</span>
+            {/* Right column - Order summary */}
+            <div className="lg:col-span-2 w-full space-y-6">
+              <section className="bg-gray-50 p-4 sm:p-6 rounded-md">
+                <h2 className="font-semibold text-gray-800 mb-4 text-base">{t("order_summary")}</h2>
+                <hr className="my-4" />
+                <div className="space-y-2 text-sm">
+                  <div className="flex justify-between">
+                    <span>{t("subtotal")}</span>
+                    <span>₹ {order?.total_price}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>{t("shipping")}</span>
+                    <span>₹ {order?.handling_fee}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>{t("tax")}</span>
+                    <span>₹ {order?.tax_price}</span>
+                  </div>
                 </div>
-                <div className="flex justify-between text-sm">
-                  <span>{t("shipping")}</span>
-                  <span>₹ {order?.handling_fee}</span>
+                <hr className="my-4" />
+                <div className="flex justify-between font-bold text-sm">
+                  <span>{t("total")}</span>
+                  <span>₹ {order?.total_price + order?.handling_fee + order?.tax_price}</span>
                 </div>
-                <div className="flex justify-between text-sm">
-                  <span>{t("tax")}</span>
-                  <span>₹ {order?.tax_price}</span>
-                </div>
-              </div>
-              
-              <hr className="my-4" />
-              
-              <div className="flex justify-between font-bold text-[0.9rem]">
-                <span>{t("total")}</span>
-                <span>₹ {order?.total_price + order?.handling_fee + order?.tax_price}</span>
-              </div>
-            </section>
+              </section>
 
-            <section className="bg-gray-50 p-6 rounded-md">
-              <h2 className="text-[1rem] font-semibold text-gray-800 mb-4">{t("shipping")}</h2>
-              <address className="not-italic text-[0.8rem]">
-                <p className="font-medium">{userDetails?.name}</p>
-                <p>{order?.flat_no} {order?.city}</p>
-                <p>{order?.zip_code} {order?.state}</p>
-                <p>{order?.country}</p>
-              </address>
-              <p className="text-gray-500 mt-2 text-[0.8rem]">{t("estimated_delivery")}: {formattedRange}</p>
-            </section>
+              <section className="bg-gray-50 p-4 sm:p-6 rounded-md">
+                <h2 className="text-base font-semibold text-gray-800 mb-4">{t("shipping")}</h2>
+                <address className="not-italic text-sm">
+                  <p className="font-medium">{userDetails?.name}</p>
+                  <p>{order?.flat_no} {order?.city}</p>
+                  <p>{order?.zip_code} {order?.state}</p>
+                  <p>{order?.country}</p>
+                </address>
+                <p className="text-gray-500 mt-2 text-sm">
+                  {t("estimated_delivery")}: {formattedRange}
+                </p>
+              </section>
+            </div>
           </div>
         </div>
       </div>
-    </div>
 
-    <div className="text-center mt-6 text-[0.8rem] text-gray-500">
-      <p>{t("your_payment_information_is_encrypted_and_secure")}</p>
-      <p className="mt-1">{t("by_completing_this_purchase_you_agree_terms_and_condition")}</p>
+      <div className="text-center mt-6 text-xs sm:text-sm text-gray-500 px-2">
+        <p>{t("your_payment_information_is_encrypted_and_secure")}</p>
+        <p className="mt-1">{t("by_completing_this_purchase_you_agree_terms_and_condition")}</p>
+      </div>
     </div>
-  </div>
   )
 }
 

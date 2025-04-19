@@ -1,5 +1,6 @@
 // utils
-import { useState, useEffect } from 'react';
+import { useState, useLayoutEffect } from 'react';
+import { useTranslation } from "react-i18next";
 
 // components
 import LatestBlog from '@userpage-components/LatestBlog';
@@ -28,32 +29,33 @@ const HomePage = () => {
   const [festSpecialList, setFestSpecialList] = useState([]);
   const [allProducts, setAllProducts] = useState([]);
   const [menuList, setMenuList] = useState([]);
-  
-  useEffect(()=>{
+  const [footerRangeList, setFooterRangeList] = useState([]);
+  const { t } = useTranslation("msg");
+
+  useLayoutEffect(()=>{
     fetchData();
   },[]);
 
   const fetchData = async () => {
     setLoader(true);
-    const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
-
-    const promises = [
-      fetchMenuList(),
-      getFestSpecialData(),
-      getAllCategoryData(),
-      getGiftingCollectionData(),
-      getSpecialityData(),
-      getSnackData(),
-      getAllProducts(),
-    ]
-
-    // Run API calls + delay in parallel
-    await Promise.allSettled([
-      Promise.allSettled(promises), // API calls
-      delay(1000) // 1-second delay
-    ]);
-
-    setLoader(false)
+  
+    try {
+      // Top section: Fetch APIs one by one
+      await fetchMenuList();
+      await getFestSpecialData();
+      await getAllCategoryData();
+      await getAllProducts();
+      await getGiftingCollectionData();
+  
+      setLoader(false);
+      // Loading rest of api's later in background
+      await getSpecialityData();
+      await getSnackData();
+    } catch (error) {
+      setLoader(false);
+    } finally {
+      setLoader(false);
+    }
   };
 
   const getAllCategoryData=()=>{
@@ -120,7 +122,8 @@ const HomePage = () => {
     return allApi(API_CONSTANTS.MENU_LIST_URL, "" , "get")
     .then((response) => {
       if (response.status === 200) {
-          let data = response?.data;
+          let data = response?.data.filter((item, index)=> index <= 6);
+          setFooterRangeList(data);
           data.push({name: "About Us"});
           setMenuList(data)
       } 
@@ -147,20 +150,18 @@ const HomePage = () => {
       {loader ? <Loading/> : 
       <>
         <Navbar data={menuList}/>
-        <div className='mt-[5rem]'>
-          <FestivalSpecial data={festSpecialList}/>
-        </div>
+        <FestivalSpecial data={festSpecialList}/>
         <ShopOurRange data={allCategories}/>
         <Benifits/>
         <DashboardProducts data={allProducts}/>
         <Collection data={giftingCollectionData}/>
         <Speciality data={specialityData}/>
         <TrustUs />
-        <ShopOurSnackRange title="Shop Our Snacks Range" data={snacksRangeData}/>  
+        <ShopOurSnackRange title={t("shop_our_snack_range")} data={snacksRangeData}/>  
         <OurStory/>
         <LatestBlog/>
         <AvailablityPlatform/>
-        <Footer/>
+        <Footer data={footerRangeList}/>
       </>
       }
     </>

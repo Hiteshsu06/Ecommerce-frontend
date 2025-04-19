@@ -1,4 +1,3 @@
-// Libararies
 import { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useTranslation } from "react-i18next";
@@ -15,53 +14,70 @@ const LatestBlogDescription = () => {
   const navigate = useNavigate();
   const { t } = useTranslation("msg");
   const [menuList, setMenuList] = useState([]);
+  const [footerRangeList, setFooterRangeList] = useState([]);
   const { image_url, heading, description, createdAt } = location.state || {};
- 
+
   const fetchMenuList = () => {
-    return allApi(API_CONSTANTS.MENU_LIST_URL, "" , "get")
-    .then((response) => {
-      if (response.status === 200) {
-          let data = response?.data;
+    return allApi(API_CONSTANTS.MENU_LIST_URL, "", "get")
+      .then((response) => {
+        if (response.status === 200) {
+          let data = response?.data.filter((item, index)=> index <= 6);
+          setFooterRangeList(data);
           data.push({name: "About Us"});
-          setMenuList(data)
-      } 
-    })
-    .catch((err) => {
-    }).finally(()=>{
-    });
+          setMenuList(data);
+        }
+      })
+      .catch((err) => {
+        // handle error
+      });
   };
 
-  useEffect(()=>{
+  useEffect(() => {
     fetchMenuList();
-  },[])
+  }, []);
 
   return (
-    <div>
-      <Navbar data={menuList}/>
-      <div className='px-24 relative mt-[5rem]'>
-        <img src={image_url} alt="blog-img" />
-        <div className='bg-white absolute top-[85%] text-center left-[15%] px-12 w-[70%]'>
-          <div className='uppercase mt-2'>{t("blogs")}</div>
-          <div className='text-[36px] font-bold text-center mb-4 text-[#1D2E43] font-[playfair]'>{heading}</div>
-          <div>{refactorPrefilledDate(createdAt)}</div>
+    <div className="w-full overflow-x-hidden">
+      <Navbar data={menuList} />
+
+      {/* Header image and blog info */}
+      <div className="relative px-4 sm:px-8 md:px-16 lg:px-24">
+        <img src={image_url} alt="blog-img" className="w-full max-h-[500px] object-cover rounded-md" />
+
+        <div className="bg-white shadow-lg p-4 sm:p-6 md:px-12 md:py-6 absolute left-1/2 -translate-x-1/2 top-[85%] w-[90%] sm:w-[80%] md:w-[70%] text-center rounded-md">
+          <div className="uppercase text-xs sm:text-sm text-gray-500">{t("blogs")}</div>
+          <div className="text-xl sm:text-2xl md:text-3xl font-bold mb-2 text-[#1D2E43] font-[playfair]">{heading}</div>
+          <div className="text-sm text-gray-500">{refactorPrefilledDate(createdAt)}</div>
         </div>
       </div>
-      <div className='mt-32 px-32 leading-snug tracking-wider' dangerouslySetInnerHTML={{ __html: description }}>
+
+      {/* Description */}
+      <div className="mt-40 px-4 sm:px-8 md:px-16 lg:px-32 leading-relaxed tracking-wide text-justify">
+        <div dangerouslySetInnerHTML={{ __html: description }} />
       </div>
-      <div className='px-32 my-10'>
+
+      {/* Divider */}
+      <div className="my-10 px-4 sm:px-8 md:px-16 lg:px-32">
         <hr />
       </div>
-      <div className='px-32 flex gap-4 mb-10'>
-        <div><i className="ri-corner-down-left-line text-[20px] hover:cursor-pointer" onClick={()=>{
-          navigate("/")
-        }}></i></div>
-        <div className='text-[18px] hover:cursor-pointer' onClick={()=>{
-          navigate("/")
-        }}>{t("previous")}</div>
-      </div>
-      <Footer/>
-    </div>
-  )
-}
 
-export default LatestBlogDescription
+      {/* Back button */}
+      <div className="flex items-center gap-2 mb-10 px-4 sm:px-8 md:px-16 lg:px-32">
+        <i
+          className="ri-corner-down-left-line text-xl hover:cursor-pointer"
+          onClick={() => navigate("/")}
+        ></i>
+        <span
+          className="text-sm sm:text-base hover:cursor-pointer"
+          onClick={() => navigate("/")}
+        >
+          {t("previous")}
+        </span>
+      </div>
+
+      <Footer data={footerRangeList}/>
+    </div>
+  );
+};
+
+export default LatestBlogDescription;

@@ -35,52 +35,47 @@ const Register = () => {
 
   const onHandleSubmit = async (value) => {
     setLoader(true);
-    let body = structuredClone(
-      {
-        name: value.fullName,
-        email: value.email,
-        password: value.password,
-        role_id: 1
-      });
-      allApi(API_CONSTANTS.SIGNUP, body, "post")
-      .then((response) => {
-        if(response?.status === 200){
-          navigate(ROUTES_CONSTANTS?.SIGN_IN)
-        }
-      })
-      .catch((err) => {
-        setLoader(false);
-        setIsSignUpSuccessfull(err?.response?.data?.errors);
-      }).finally(()=>{
-        setLoader(false);
-      });
+    const body = {
+      name: value.fullName,
+      email: value.email,
+      password: value.password,
+      role_id: 1
     };
+
+    try {
+      const response = await allApi(API_CONSTANTS.SIGNUP, body, "post");
+      if (response?.status === 200) {
+        navigate(ROUTES_CONSTANTS?.SIGN_IN);
+      }
+    } catch (err) {
+      setIsSignUpSuccessfull(err?.response?.data?.errors);
+    } finally {
+      setLoader(false);
+    }
+  };
 
   const fetchMenuList = () => {
     setLoader(true);
-    allApi(API_CONSTANTS.MENU_LIST_URL, "" , "get")
-    .then((response) => {
-      if (response.status === 200) {
-          let data = response?.data;
-          data.push({name: "About Us"});
-          setMenuList(data)
-      } 
-    })
-    .catch((err) => {
-      setLoader(false);
-    }).finally(()=>{
-      setLoader(false);
-    });
+    allApi(API_CONSTANTS.MENU_LIST_URL, "", "get")
+      .then((response) => {
+        if (response.status === 200) {
+          let data = response?.data.filter((item, index)=> index <= 6);
+          data.push({ name: "About Us" });
+          setMenuList(data);
+        }
+      })
+      .catch(() => setLoader(false))
+      .finally(() => setLoader(false));
   };
 
-  useEffect(()=>{
+  useEffect(() => {
     fetchMenuList();
-  },[]);
+  }, []);
 
   const formik = useFormik({
-    initialValues: initialValues,
+    initialValues,
     onSubmit: onHandleSubmit,
-    validationSchema: validationSchema,
+    validationSchema,
     enableReinitialize: true,
     validateOnBlur: true,
   });
@@ -89,78 +84,95 @@ const Register = () => {
 
   return (
     <>
-      {loader ? <Loading/> : 
-      <>
-        <Navbar data={menuList}/>
-        <div className="min-h-screen mt-[5rem] flex flex-col items-center justify-center bg-white px-6 py-4">
-        <div className="text-center mb-8">
-          <h1 className="text-3xl text-[#1D2E43] font-[playfair] font-bold">{t("register")}</h1>
-          <div className="text-sm text-gray-600 mt-2">
-            <span className="hover:cursor-pointer" onClick={()=>{ navigate("/") }}>{t("home")}</span> <span className="mx-1 text-[11px]">&gt;</span> <span>{t("create_account")}</span>
-          </div>
-        </div>
+      {loader ? (
+        <Loading />
+      ) : (
+        <>
+          <Navbar data={menuList} />
+          <div className="min-h-screen flex flex-col items-center justify-center bg-white px-4 sm:px-6 lg:px-8 py-8">
+            <div className="text-center mb-6">
+              <h1 className="text-2xl sm:text-3xl text-[#1D2E43] font-[playfair] font-bold">
+                {t("register")}
+              </h1>
+              <div className="text-xs sm:text-sm text-gray-600 mt-1">
+                <span
+                  className="hover:cursor-pointer"
+                  onClick={() => navigate("/")}
+                >
+                  {t("home")}
+                </span>
+                <span className="mx-1">&gt;</span>
+                <span>{t("create_account")}</span>
+              </div>
+            </div>
 
-        <div className="w-full max-w-md">
-          <h2 className="text-2xl text-[#1D2E43] mb-6 font-[playfair]">{t("register")}</h2>
-          <div className="space-y-4">
-            <InputTextComponent
-              value={values?.fullName}
-              onChange={handleChange}
-              type="text"
-              placeholder={t("full_name")}
-              name="fullName"
-              error={errors?.fullName}
-              touched={touched?.fullName}
-              className="text-[0.8rem] rounded-none w-full border border-gray-300 px-4 py-2 focus:outline-none focus:ring-1 focus:ring-gray-700"
-            />
-            <InputTextComponent
-              value={values?.email}
-              onChange={handleChange}
-              type="text"
-              placeholder={t("email")}
-              name="email"
-              error={errors?.email}
-              touched={touched?.email}
-              className="text-[0.8rem] rounded-none w-full border border-gray-300 px-4 py-2 focus:outline-none focus:ring-1 focus:ring-gray-700"
-            />
-            <InputTextComponent
-              value={values?.password}
-              onChange={handleChange}
-              type="text"
-              placeholder={t("password")}
-              name="password"
-              error={errors?.password}
-              touched={touched?.password}
-              className="text-[0.8rem] rounded-none w-full border border-gray-300 px-4 py-2 focus:outline-none focus:ring-1 focus:ring-gray-700"
-            />
-            {
-              isSignUpSuccessfull ?  <div className="text-[0.75rem] text-[red]">{isSignUpSuccessfull}</div> : null
-            }
-            <p className="text-[0.9rem] text-gray-700">
-              {t("user_register_description")}
-            </p>
-            <button
-              type="submit"
-              onClick={() => handleSubmit()}
-              className="text-white w-full text-[1.1rem] font-[playfair] hover:bg-white border border-[#caa446] bg-[#cca438] px-6 py-2 rounded-md hover:text-[#cca438] hover:border hover:border-[#caa446]"
-            >
-              {t("register")}
-            </button>
-            <button
-              type="button"
-              onClick={() => { navigate(ROUTES_CONSTANTS?.SIGN_IN) }}
-              className="w-full border border-[#cca438] font-[playfair] text-[1.1rem] hover:text-white hover:bg-[#cca438] text-[#cca438]  px-6 py-2 rounded-md"
-            >
-              {t("login")}
-            </button>
+            <div className="w-full max-w-sm sm:max-w-md md:max-w-lg lg:max-w-md">
+              <h2 className="text-xl sm:text-2xl text-[#1D2E43] mb-5 font-[playfair]">
+                {t("register")}
+              </h2>
+              <div className="space-y-4">
+                <InputTextComponent
+                  value={values.fullName}
+                  onChange={handleChange}
+                  type="text"
+                  placeholder={t("full_name")}
+                  name="fullName"
+                  error={errors.fullName}
+                  touched={touched.fullName}
+                  className="text-sm rounded w-full border border-gray-300 px-4 py-2 focus:outline-none focus:ring-1 focus:ring-gray-700"
+                />
+                <InputTextComponent
+                  value={values.email}
+                  onChange={handleChange}
+                  type="text"
+                  placeholder={t("email")}
+                  name="email"
+                  error={errors.email}
+                  touched={touched.email}
+                  className="text-sm rounded w-full border border-gray-300 px-4 py-2 focus:outline-none focus:ring-1 focus:ring-gray-700"
+                />
+                <InputTextComponent
+                  value={values.password}
+                  onChange={handleChange}
+                  type="password"
+                  placeholder={t("password")}
+                  name="password"
+                  error={errors.password}
+                  touched={touched.password}
+                  className="text-sm rounded w-full border border-gray-300 px-4 py-2 focus:outline-none focus:ring-1 focus:ring-gray-700"
+                />
+
+                {isSignUpSuccessfull && (
+                  <div className="text-xs text-red-500">{isSignUpSuccessfull}</div>
+                )}
+
+                <p className="text-sm text-gray-700">
+                  {t("user_register_description")}
+                </p>
+
+                <button
+                  type="submit"
+                  onClick={handleSubmit}
+                  className="text-white w-full text-base font-[playfair] bg-[#cca438] hover:bg-white border border-[#caa446] px-6 py-2 rounded-md hover:text-[#cca438] hover:border"
+                >
+                  {t("register")}
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => navigate(ROUTES_CONSTANTS?.SIGN_IN)}
+                  className="w-full text-base font-[playfair] border border-[#cca438] text-[#cca438] hover:text-white hover:bg-[#cca438] px-6 py-2 rounded-md"
+                >
+                  {t("login")}
+                </button>
+              </div>
+            </div>
           </div>
-        </div>
-        </div>
-        <Footer/>
-      </>
-      }
+          <Footer />
+        </>
+      )}
     </>
-  )
-}
+  );
+};
 
-export default Register
+export default Register;

@@ -13,6 +13,7 @@ import { allApiWithHeaderToken } from "@api/api";
 import { ROUTES_CONSTANTS } from "@constants/routesurl";
 import { API_CONSTANTS } from "@constants/apiurl";
 import DefaultImage from "@assets/no-image.jpeg";
+import Image from "@common/Image";
 
 const SubCategoryList = ({search}) => {
   const toast = useRef(null);
@@ -55,7 +56,7 @@ const SubCategoryList = ({search}) => {
     return (
       <div className="flex items-center gap-4">
         <div className="w-12 h-12 overflow-hidden rounded-full">
-          <img 
+          <Image 
             src={rowData?.image_url ? rowData.image_url : DefaultImage} 
             alt="Profile" 
             className="w-full h-full object-cover" 

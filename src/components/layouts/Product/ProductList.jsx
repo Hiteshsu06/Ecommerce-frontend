@@ -13,7 +13,6 @@ import Confirmbox from "@common/Confirmbox";
 import { allApiWithHeaderToken } from "@api/api";
 import { ROUTES_CONSTANTS } from "@constants/routesurl";
 import { API_CONSTANTS } from "@constants/apiurl";
-import DefaultImage from "@assets/no-image.jpeg";
 import FileUpload from "@common/FileUpload";
 import Loading from '@common/Loading';
 

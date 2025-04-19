@@ -4,7 +4,7 @@ import { Routes, Route, useLocation } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 
 // Components
-import { Topbar, ReviewList, Sidebar, CategoryList, ProductList, DashboardStats, SubCategoryList, InventoryList, OrderList, CouponList, DiscountList, UserList, BlogList, FestivalSpecialList } from "@adminpage-components/index";
+import { Topbar, ReviewList, Sidebar, CategoryList, ProductList, DashboardStats, SubCategoryList, InventoryList, OrderList, CouponList, DiscountList, UserList, BlogList, FestivalSpecialList, SubscriberList, CustomerEnquiryList } from "@adminpage-components/index";
 import Loading from "@common/Loading";
 
 const CategoryForm = lazy(() => import("@adminpage-layouts/Category/CategoryForm"));
@@ -64,6 +64,8 @@ const DashboardPage = () => {
               <Route path="/blogs" element={<BlogList search={searchField}/>} />
               <Route path="/fests" element={<FestivalSpecialList search={searchField}/>} />
               <Route path="/reviews" element={<ReviewList search={searchField}/>} />
+              <Route path="/subscribers" element={<SubscriberList search={searchField}/>} />
+              <Route path="/customer-enquiries" element={<CustomerEnquiryList search={searchField}/>} />
 
               {/* Create / Update forms */}
               <Route path="/create-category" element={<CategoryForm />} />
